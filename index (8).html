@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090b0f">
+<title>NSC Life OS</title>
+<style>
+:root{--bg:#090b0f;--card:#11151b;--card2:#171c24;--line:#28313e;--txt:#f4f7fb;--muted:#9ba7b8;--accent:#7c9cff;--ok:#65d39b;--warn:#f0c36e;--danger:#ef8080}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+body{min-height:100vh}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+.hide{display:none!important}
+#login{min-height:100vh;display:grid;place-items:center;padding:24px}
+.login-card{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:0 20px 70px #0007}
+.logo{font-size:25px;font-weight:850}.logo span{font-size:28px}
+.muted{color:var(--muted)}
+label{display:block;font-size:13px;color:var(--muted);margin:14px 0 7px}
+input,textarea,select{width:100%;background:#0c1015;color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:12px;outline:0}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #7c9cff1c}
+.btn{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:12px;padding:11px 14px;font-weight:700}
+.btn.primary{background:var(--accent);color:#07101e;border-color:transparent}
+.btn:active{transform:scale(.97)}
+.login-card .btn{width:100%;margin-top:18px}
+#app{min-height:100vh}
+.shell{display:flex;min-height:100vh}
+aside{width:245px;border-right:1px solid var(--line);padding:20px 14px;position:fixed;inset:0 auto 0 0;background:#0b0e13}
+.brand{padding:8px 10px 20px}
+.nav{display:grid;gap:5px}
+.nav button{background:transparent;color:var(--muted);border:0;text-align:left;padding:12px;border-radius:12px}
+.nav button:hover,.nav button.active{background:var(--card2);color:var(--txt)}
+main{margin-left:245px;width:calc(100% - 245px);padding:28px;max-width:1400px}
+.top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:20px}
+h1{font-size:30px;margin:0 0 5px}.date{color:var(--muted)}
+.avatar{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px 12px}
+.screen{display:none}.screen.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.card{grid-column:span 4;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;min-width:0}
+.card.wide{grid-column:span 8}.card.full{grid-column:1/-1}
+.card h2{font-size:16px;margin:0 0 13px}.big{font-size:28px;font-weight:850}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.between{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.list{display:grid;gap:8px;margin-top:12px}.item{background:#0c1015;border:1px solid var(--line);border-radius:12px;padding:11px}
+.bar{height:9px;background:#252d38;border-radius:99px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px;width:0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.ai textarea{min-height:110px;resize:vertical}
+.output{white-space:pre-wrap;margin-top:12px;background:#0b0f14;border:1px solid var(--line);padding:12px;border-radius:12px;color:#dce5ff}
+.chart{height:190px;display:flex;align-items:end;gap:7px;padding-top:20px}
+.daybar{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:end}
+.daybar i{display:block;width:100%;max-width:42px;background:var(--accent);border-radius:7px 7px 2px 2px;min-height:3px}
+.daybar small{color:var(--muted);font-size:10px}
+.pie-wrap{display:flex;gap:18px;align-items:center}
+.pie{width:130px;height:130px;border-radius:50%;background:conic-gradient(var(--accent) 0 25%,#65d39b 25% 50%,#f0c36e 50% 72%,#a78bfa 72% 100%);position:relative}
+.pie:after{content:"";position:absolute;inset:28px;background:var(--card);border-radius:50%}
+.legend{display:grid;gap:7px;font-size:12px;color:var(--muted)}
+.legend b{color:var(--txt)}
+.bottom{display:none}
+@media(max-width:760px){
+  aside{display:none}
+  main{margin:0;width:100%;padding:18px 14px 92px}
+  .top{align-items:center}.top .avatar{padding:8px 10px}
+  h1{font-size:24px}
+  .grid{grid-template-columns:1fr;gap:11px}
+  .card,.card.wide,.card.full{grid-column:1/-1}
+  .bottom{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;z-index:20;left:10px;right:10px;bottom:10px;background:#141922f5;border:1px solid var(--line);backdrop-filter:blur(15px);border-radius:18px;padding:6px}
+  .bottom button{background:transparent;border:0;color:var(--muted);padding:7px 2px;border-radius:12px;font-size:10px;min-height:48px}
+  .bottom button.active{background:var(--card2);color:var(--txt)}
+  .chart{height:165px}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<section id="login">
+  <div class="login-card">
+    <div class="logo"><span>🧠</span> NSC Life OS</div>
+    <p class="muted">Seu painel pessoal de rotina, estudos e dinheiro.</p>
+    <div id="loginMsg" class="output hide"></div>
+    <div id="cloudStatus" class="muted" style="font-size:12px;margin-top:10px">☁️ Conectando ao banco...</div>
+    <label for="loginEmail">E-mail</label>
+    <input id="loginEmail" type="email" placeholder="voce@email.com">
+    <label for="loginPass">Senha</label>
+    <input id="loginPass" type="password" placeholder="Sua senha">
+    <button id="enterBtn" class="btn primary">Entrar</button>
+    <button id="showRegisterBtn" class="btn" style="width:100%;margin-top:9px">Criar uma conta</button>
+    <div id="registerBox" class="hide">
+      <label for="regName">Nome</label><input id="regName" placeholder="Seu nome">
+      <label for="regEmail">E-mail</label><input id="regEmail" type="email" placeholder="voce@email.com">
+      <label for="regPass">Senha</label><input id="regPass" type="password" placeholder="Crie uma senha">
+      <label for="regJob">O que você faz?</label>
+      <select id="regJob">
+        <option>Estudante</option><option>Motorista de aplicativo</option><option>Autônomo</option>
+        <option>CLT</option><option>CLT + Estágio</option><option>Professor</option>
+        <option>Profissional da saúde</option><option>Empresário</option><option>Outro</option>
+      </select>
+      <button id="registerBtn" class="btn primary">Solicitar acesso</button>
+      <div id="registerMsg" class="output hide"></div>
+    </div>
+    <p class="muted" style="font-size:12px;margin-top:14px">Entre com seu e-mail e sua senha. Se ainda não tiver uma conta, toque em “Criar uma conta”.</p>
+  </div>
+</section>
+
+<section id="app" class="hide">
+<div class="shell">
+<aside>
+  <div class="brand"><div class="logo">🧠 NSC AI</div><div class="muted">Life OS</div></div>
+  <div id="sideNav" class="nav"></div>
+  <button id="logoutBtn" class="btn" style="margin-top:18px;width:100%">Sair</button>
+</aside>
+
+<main>
+  <div class="top">
+    <div><h1 id="greeting">Olá!</h1><div id="todayDate" class="date"></div></div>
+    <button id="profileBtn" class="avatar">👤 Perfil</button>
+  </div>
+
+  <section id="today" class="screen active">
+    <div class="grid">
+      <div class="card wide">
+        <h2>📌 Hoje</h2>
+        <div class="big" id="todayScore">0%</div>
+        <div class="muted">Conclusão do dia</div>
+        <div class="bar" style="margin-top:12px"><i id="todayBar"></i></div>
+      </div>
+      <div class="card">
+        <h2>💰 Resultado</h2><div class="big" id="todayBalance">R$ 0,00</div><div class="muted">Entradas menos gastos</div>
+      </div>
+      <div class="card">
+        <h2>📚 Estudos</h2><div class="big" id="todayStudy">0 min</div><div class="muted">registrados hoje</div>
+      </div>
+      <div class="card">
+        <h2>🎯 Metas</h2><div class="big" id="todayGoals">0/0</div><div class="muted">concluídas hoje</div>
+      </div>
+      <div class="card wide">
+        <h2>🧠 Caixa de IA</h2>
+        <div class="muted">Escreva naturalmente. Ex.: “Hoje estudei história do Maranhão cinco minutos.”</div>
+        <textarea id="aiText" placeholder="Digite aqui..."></textarea>
+        <div class="actions"><button id="aiSend" class="btn primary">➤ Enviar</button><button id="aiWrite" class="btn">✎ Escrever</button></div>
+        <div class="muted" style="margin-top:9px;font-size:12px">Enter envia. Shift + Enter cria outra linha.</div>
+        <div id="aiOutput" class="output hide"></div>
+      </div>
+      <div class="card">
+        <h2>⚡ Acesso rápido</h2>
+        <div class="actions"><button class="btn" data-go="money">💰 Gastos</button><button class="btn" data-go="study">📚 Estudar</button><button class="btn" data-go="tasks">📅 Tarefas</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="money" class="screen">
+    <div class="grid">
+      <div class="card"><h2>💵 Entradas hoje</h2><div class="big" id="moneyIn">R$ 0,00</div></div>
+      <div class="card"><h2>💸 Gastos hoje</h2><div class="big" id="moneyOut">R$ 0,00</div></div>
+      <div class="card"><h2>📈 Saldo hoje</h2><div class="big" id="moneyNet">R$ 0,00</div></div>
+      <div class="card wide"><h2>📊 Semana</h2><div id="weekChart" class="chart"></div><div class="muted">Entradas por dia, segunda a domingo</div></div>
+      <div class="card">
+        <h2>➕ Lançar dinheiro</h2>
+        <label>Tipo</label><select id="moneyType"><option value="income">Entrada</option><option value="expense">Gasto</option></select>
+        <label>Descrição</label><input id="moneyDesc" placeholder="Gasolina, teclado, salário...">
+        <label>Valor</label><input id="moneyValue" inputmode="decimal" placeholder="0,00">
+        <button id="addMoneyBtn" class="btn primary" style="margin-top:12px">Salvar</button>
+      </div>
+      <div class="card wide"><h2>🧾 Histórico</h2><div id="moneyList" class="list"></div></div>
+      <div class="card full"><h2>🟣 Para onde o dinheiro está indo</h2><div class="pie-wrap"><div class="pie"></div><div id="moneyLegend" class="legend"></div></div></div>
+    </div>
+  </section>
+
+  <section id="goals" class="screen">
+    <div class="grid">
+      <div class="card"><h2>🎯 Nova meta diária</h2><input id="goalText" placeholder="Ex.: Ler 5 páginas"><button id="addGoalBtn" class="btn primary" style="margin-top:12px">Adicionar</button></div>
+      <div class="card wide"><h2>Hoje</h2><div id="goalList" class="list"></div></div>
+    </div>
+  </section>
+
+  <section id="study" class="screen">
+    <div class="grid">
+      <div class="card"><h2>⏱️ Registrar estudo</h2><label>Assunto</label><input id="studySubject" placeholder="História do Maranhão"><label>Minutos</label><input id="studyMin" inputmode="numeric" placeholder="50"><label>Questões</label><input id="studyQ" inputmode="numeric" placeholder="30"><label>Acertos</label><input id="studyC" inputmode="numeric" placeholder="24"><button id="addStudyBtn" class="btn primary" style="margin-top:12px">Salvar estudo</button></div>
+      <div class="card"><h2>📊 Hoje</h2><div class="big" id="studySummary">0 min</div><div class="muted" id="studyAccuracy">0% de aproveitamento</div></div>
+      <div class="card wide"><h2>📚 Histórico de estudos</h2><div id="studyList" class="list"></div></div>
+      <div class="card full"><h2>📄 Simulado / PDF</h2><div class="muted">No protótipo, anote o resultado do simulado aqui. Na versão conectada, o PDF poderá ser analisado para organizar assuntos e desempenho.</div><label>Nome do simulado</label><input id="simName" placeholder="Simulado 01 - Maranhão"><div class="row" style="margin-top:10px"><input id="simTotal" inputmode="numeric" placeholder="Questões"><input id="simCorrect" inputmode="numeric" placeholder="Acertos"><input id="simWrong" inputmode="numeric" placeholder="Erros"></div><button id="saveSimBtn" class="btn primary" style="margin-top:10px">Registrar simulado</button></div>
+    </div>
+  </section>
+
+  <section id="workout" class="screen">
+    <div class="grid">
+      <div class="card"><h2>🏋️ Treino</h2><input id="workoutName" placeholder="Treino A"><input id="exercise" placeholder="Exercício" style="margin-top:8px"><input id="load" placeholder="Carga / observação" style="margin-top:8px"><button id="addWorkoutBtn" class="btn primary" style="margin-top:10px">Registrar</button></div>
+      <div class="card wide"><h2>Histórico</h2><div id="workoutList" class="list"></div></div>
+    </div>
+  </section>
+
+  <section id="tasks" class="screen">
+    <div class="grid">
+      <div class="card"><h2>📅 Nova tarefa</h2><input id="taskText" placeholder="Lavar e estender roupa"><label>Data</label><input id="taskDate" type="date"><button id="addTaskBtn" class="btn primary" style="margin-top:12px">Salvar</button></div>
+      <div class="card wide"><h2>Tarefas</h2><div id="taskList" class="list"></div></div>
+    </div>
+  </section>
+
+  <section id="sleep" class="screen">
+    <div class="grid">
+      <div class="card"><h2>😴 Sono</h2><label>Deitou</label><input id="sleepBed" type="time"><label>Acordou</label><input id="sleepWake" type="time"><button id="addSleepBtn" class="btn primary" style="margin-top:12px">Registrar</button></div>
+      <div class="card"><h2>Média recente</h2><div class="big" id="sleepAvg">0h 0min</div></div>
+      <div class="card wide"><h2>Histórico</h2><div id="sleepList" class="list"></div></div>
+    </div>
+  </section>
+
+  <section id="progress" class="screen">
+    <div class="grid">
+      <div class="card"><h2>📈 Progresso diário</h2><div class="big" id="progressDay">0%</div></div>
+      <div class="card"><h2>📆 Projeto 365</h2><div class="big" id="annualDay">Dia 1/365</div><div class="bar" style="margin-top:12px"><i id="annualBar"></i></div></div>
+      <div class="card wide"><h2>🧭 Consistência de 75 dias</h2><div class="big" id="challengeDay">Dia 1/75</div><div class="bar" style="margin-top:12px"><i id="challengeBar"></i></div><div class="muted" style="margin-top:9px">Acompanhamento de consistência e hábitos saudáveis, sem metas extremas.</div></div>
+    </div>
+  </section>
+
+
+  <section id="admin" class="screen">
+    <div class="grid">
+      <div class="card"><h2>👑 Administração</h2><div class="big" id="adminTotal">0</div><div class="muted">contas cadastradas</div></div>
+      <div class="card"><h2>🟡 Pendentes</h2><div class="big" id="adminPending">0</div><div class="muted">aguardando sua aprovação</div></div>
+      <div class="card"><h2>🟢 Aprovados</h2><div class="big" id="adminApproved">0</div><div class="muted">com acesso liberado</div></div>
+      <div class="card full"><h2>📋 Solicitações de acesso</h2><div id="adminUsers" class="list"></div></div>
+    </div>
+  </section>
+
+  <section id="profile" class="screen">
+    <div class="grid">
+      <div class="card"><h2>👤 Perfil</h2><div class="big" id="profileName">Usuário</div><div class="muted" id="profileEmail"></div></div>
+      <div class="card"><h2>☁️ Futuro</h2><div class="muted">Aqui entra o perfil profissional, tipo de trabalho, preferências e configurações da conta.</div></div>
+    </div>
+  </section>
+</main>
+</div>
+<div id="bottomNav" class="bottom"></div>
+</section>
+
+<script>
+const NSC_SUPABASE_URL = "https://pmjmmfmggjqtamoybobq.supabase.co";
+const NSC_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtam1tZm1nZ2pxdGFtb3lib2JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwOTE5MjAsImV4cCI6MjA3OTY2NzkyMH0.m8p0MzlR_1_EZ5V1ALTG-w15ZW6vBzbig9rTXGyEBCk";
+window.NSCCloud = window.supabase.createClient(NSC_SUPABASE_URL, NSC_SUPABASE_KEY);
+window.NSCCloudReady = window.NSCCloud ? true : false;
+</script>
+<script>
+(function(){
+"use strict";
+
+var KEY="nsc_life_os_v3";
+var DEFAULT={
+ version:4,
+ user:{name:"",email:"",role:"user"},
+ accounts:[],
+ money:[],
+ goals:[],
+ study:[],
+ workout:[],
+ tasks:[],
+ sleep:[],
+ simulations:[]
+};
+var data;
+
+function cloneDefault(){return JSON.parse(JSON.stringify(DEFAULT))}
+function load(){
+  try{
+    var raw=window.localStorage.getItem(KEY);
+    if(raw){var parsed=JSON.parse(raw);return Object.assign(cloneDefault(),parsed)}
+  }catch(err){console.log("Storage local indisponível",err)}
+  return cloneDefault();
+}
+data=load();
+
+function $(id){return document.getElementById(id)}
+function val(id){var e=$(id);return e?e.value.trim():""}
+function setText(id,text){var e=$(id);if(e)e.textContent=text}
+function save(){try{window.localStorage.setItem(KEY,JSON.stringify(data))}catch(err){} render()}
+function today(){
+  var d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
+}
+function money(n){return Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+function esc(s){return String(s||"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]})}
+function parseNum(s){return Number(String(s||"").replace(/\./g,"").replace(",","."))||0}
+function dayLabel(date){
+  var names=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+  return names[new Date(date+"T12:00:00").getDay()]
+}
+function go(id){
+  document.querySelectorAll(".screen").forEach(function(x){x.classList.remove("active")});
+  var target=$(id);if(target)target.classList.add("active");
+  document.querySelectorAll("[data-nav]").forEach(function(x){x.classList.toggle("active",x.getAttribute("data-nav")===id)});
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+var nav=[
+ ["today","🏠","Hoje"],["money","💰","Dinheiro"],["goals","🎯","Metas"],["study","📚","Estudos"],
+ ["workout","🏋️","Treino"],["tasks","📅","Tarefas"],["sleep","😴","Sono"],["progress","📈","Progresso"]
+];
+function buildNav(){
+  $("sideNav").innerHTML=nav.map(function(n){return '<button data-nav="'+n[0]+'">'+n[1]+' '+n[2]+'</button>'}).join("");
+  $("bottomNav").innerHTML=nav.slice(0,5).map(function(n){return '<button data-nav="'+n[0]+'"><div style="font-size:16px">'+n[1]+'</div>'+n[2]+'</button>'}).join("");
+  document.querySelectorAll("[data-nav]").forEach(function(b){b.addEventListener("click",function(){go(b.getAttribute("data-nav"))})});
+}
+function showAdminNav(){
+  if(document.querySelector('[data-nav="admin"]'))return;
+  var b=document.createElement("button");b.setAttribute("data-nav","admin");b.textContent="👑 Administração";
+  $("sideNav").appendChild(b);
+  b.addEventListener("click",function(){go("admin")});
+}
+async function enter(){
+  var email=val("loginEmail").trim().toLowerCase(), pass=val("loginPass");
+  if(!email||!pass){showLoginMsg("Digite seu e-mail e sua senha.");return;}
+  try{
+    var res=await NSCCloud.auth.signInWithPassword({email:email,password:pass});
+    if(res.error) throw res.error;
+    var uid=res.data.user.id;
+    var prof=await NSCCloud.from("profiles").select("*").eq("id",uid).single();
+    if(prof.error) throw prof.error;
+    if(prof.data.status==="pending"){await NSCCloud.auth.signOut();showLoginMsg("🟡 Sua conta está aguardando aprovação do administrador.");return;}
+    if(prof.data.status==="blocked"){await NSCCloud.auth.signOut();showLoginMsg("🔴 Esta conta está bloqueada.");return;}
+    data.user={name:prof.data.name,email:prof.data.email,role:prof.data.role,accountId:uid};
+    save(); openApp(); if(prof.data.role==="admin")showAdminNav(); go(prof.data.role==="admin"?"admin":"today");
+  }catch(e){
+    showLoginMsg(e.message||"Não foi possível entrar.");
+  }
+}
+function openApp(){
+  $("login").classList.add("hide");
+  $("app").classList.remove("hide");
+}
+function showLoginMsg(msg){
+  $("loginMsg").textContent=msg;
+  $("loginMsg").classList.remove("hide");
+}
+async function registerUser(){
+  var name=val("regName"),email=val("regEmail").trim().toLowerCase(),pass=val("regPass"),job=val("regJob");
+  if(!name||!email||!pass)return alert("Preencha nome, e-mail e senha.");
+  if(pass.length<6)return alert("A senha precisa ter pelo menos 6 caracteres.");
+  try{
+    var res=await NSCCloud.auth.signUp({email:email,password:pass,options:{data:{name:name,occupation:job}}});
+    if(res.error)throw res.error;
+    $("registerMsg").textContent="🟡 Cadastro enviado! Sua conta foi criada e ficará aguardando aprovação do administrador.";
+    $("registerMsg").classList.remove("hide");
+    ["regName","regEmail","regPass"].forEach(function(id){$(id).value=""});
+    await NSCCloud.auth.signOut();
+  }catch(e){
+    alert(e.message||"Não foi possível criar a conta.");
+  }
+}
+function approveUser(id,status){
+  var a=(data.accounts||[]).find(function(x){return x.id===id});if(!a)return;
+  a.status=status;save();
+}
+async function renderAdmin(){
+  var current=await NSCCloud.auth.getUser();
+  if(!current.data.user)return;
+  var me=await NSCCloud.from("profiles").select("role,status").eq("id",current.data.user.id).single();
+  if(me.error||me.data.role!=="admin"||me.data.status!=="approved")return;
+  var q=await NSCCloud.from("profiles").select("*").order("created_at",{ascending:false});
+  if(q.error){$("adminUsers").innerHTML='<div class="muted">Não foi possível carregar os usuários.</div>';return;}
+  var arr=q.data||[],pending=arr.filter(function(a){return a.status==="pending"}),approved=arr.filter(function(a){return a.status==="approved"});
+  setText("adminTotal",arr.length);setText("adminPending",pending.length);setText("adminApproved",approved.length);
+  $("adminUsers").innerHTML=arr.length?arr.map(function(a){
+    var buttons=a.status==="pending"
+      ?'<button class="btn primary" data-approve-cloud="'+a.id+'">✓ Aprovar</button><button class="btn" data-block-cloud="'+a.id+'">✕ Recusar</button>'
+      :'<button class="btn" data-block-cloud="'+a.id+'">⛔ Bloquear</button>';
+    if(a.status==="blocked")buttons='<button class="btn primary" data-approve-cloud="'+a.id+'">✓ Reativar</button>';
+    var badge=a.status==="approved"?"🟢 Aprovado":a.status==="blocked"?"🔴 Bloqueado":"🟡 Pendente";
+    return '<div class="item"><div class="between"><div><b>'+esc(a.name||"Sem nome")+'</b><br><small class="muted">'+esc(a.email||"")+' • '+esc(a.occupation||"Não informado")+'</small></div><b>'+badge+'</b></div><div class="actions">'+buttons+'</div></div>';
+  }).join(""):'<div class="muted">Nenhuma conta cadastrada.</div>';
+  document.querySelectorAll("[data-approve-cloud]").forEach(function(b){b.onclick=async function(){await NSCCloud.from("profiles").update({status:"approved"}).eq("id",b.getAttribute("data-approve-cloud"));renderAdmin();}});
+  document.querySelectorAll("[data-block-cloud]").forEach(function(b){b.onclick=async function(){await NSCCloud.from("profiles").update({status:"blocked"}).eq("id",b.getAttribute("data-block-cloud"));renderAdmin();}});
+}
+function addMoney(){
+  var desc=val("moneyDesc"), value=parseNum(val("moneyValue")), type=val("moneyType");
+  if(!desc||value<=0)return alert("Informe descrição e valor.");
+  var cat="Outros", low=desc.toLowerCase();
+  if(/gasolina|combustível|combustivel|estacionamento/.test(low))cat="Transporte";
+  else if(/óleo|oleo|pneu|manutenção|manutencao|peça|peca|carro/.test(low))cat="Veículo";
+  else if(/teclado|computador|notebook|celular|mouse|monitor/.test(low))cat="Tecnologia";
+  else if(/bombom|comida|lanche|almoço|almoco|janta|restaurante/.test(low))cat="Alimentação";
+  else if(/presente|namorada|namorado/.test(low))cat="Presentes";
+  else if(/curso|livro|apostila|estudo/.test(low))cat="Educação";
+  data.money.push({id:Date.now(),date:today(),desc:desc,value:value,type:type,cat:cat});
+  $("moneyDesc").value="";$("moneyValue").value="";save();
+}
+function addGoal(){
+  var text=val("goalText");if(!text)return;
+  data.goals.push({id:Date.now(),text:text,dates:{}});
+  $("goalText").value="";save();
+}
+function toggleGoal(id){
+  var g=data.goals.find(function(x){return x.id===id});if(!g)return;
+  g.dates[today()]=!g.dates[today()];save();
+}
+function addStudy(){
+  var subject=val("studySubject")||"Estudo", min=parseNum(val("studyMin")), q=parseNum(val("studyQ")), c=parseNum(val("studyC"));
+  if(min<=0)return alert("Informe o tempo de estudo.");
+  data.study.push({id:Date.now(),date:today(),subject:subject,minutes:min,questions:q,correct:c,note:""});
+  ["studySubject","studyMin","studyQ","studyC"].forEach(function(id){$(id).value=""});save();
+}
+function addWorkout(){
+  var name=val("workoutName")||"Treino", ex=val("exercise"), load=val("load");
+  if(!ex)return alert("Informe o exercício.");
+  data.workout.push({id:Date.now(),date:today(),name:name,exercise:ex,load:load});
+  $("exercise").value="";$("load").value="";save();
+}
+function addTask(){
+  var text=val("taskText"), date=val("taskDate")||today();if(!text)return;
+  data.tasks.push({id:Date.now(),text:text,date:date,done:false});$("taskText").value="";save();
+}
+function toggleTask(id){
+  var t=data.tasks.find(function(x){return x.id===id});if(t)t.done=!t.done;save();
+}
+function addSleep(){
+  var bed=val("sleepBed"),wake=val("sleepWake");if(!bed||!wake)return;
+  data.sleep.push({id:Date.now(),date:today(),bed:bed,wake:wake});$("sleepBed").value="";$("sleepWake").value="";save();
+}
+function duration(bed,wake){
+  var a=bed.split(":"),b=wake.split(":"),x=Number(a[0])*60+Number(a[1]),y=Number(b[0])*60+Number(b[1]);
+  if(y<=x)y+=1440;return y-x;
+}
+function aiOrganize(){
+  var t=val("aiText");if(!t)return;
+  var low=t.toLowerCase(), saved=[];
+  var words={zero:0,um:1,uma:1,dois:2,duas:2,três:3,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10};
+  function num(re){var m=low.match(re);if(!m)return null;return words[m[1]]!==undefined?words[m[1]]:Number(m[1])}
+  var min=num(/(\d+|zero|um|uma|dois|duas|três|tres|quatro|cinco|seis|sete|oito|nove|dez)\s*(?:min|minutos|mins)\b/i);
+  var q=num(/(\d+|zero|um|uma|dois|duas|três|tres|quatro|cinco|seis|sete|oito|nove|dez)\s*(?:quest(?:ões|oes))\b/i);
+  var c=num(/(\d+|zero|um|uma|dois|duas|três|tres|quatro|cinco|seis|sete|oito|nove|dez)\s*(?:acertos?|acertou)\b/i);
+  var e=num(/(\d+|zero|um|uma|dois|duas|três|tres|quatro|cinco|seis|sete|oito|nove|dez)\s*(?:erros?|errou)\b/i);
+  if(min!==null){
+    var subject="Estudo";
+    var ms=low.match(/(?:estudei|estudar|estudo)\s+(.+?)(?:\s+(?:hoje|ontem|por|durante)\b|$)/i);
+    if(ms)subject=ms[1].trim().replace(/[.,]+$/,"");
+    subject=subject.charAt(0).toUpperCase()+subject.slice(1);
+    data.study.push({id:Date.now(),date:today(),subject:subject,minutes:min,questions:q||0,correct:c||0,note:"Registrado pela Caixa de IA: "+t});
+    saved.push("📚 Estudo salvo: "+subject+" • "+min+" min");
+  }
+  var gm=low.match(/(?:gastei|comprei|paguei)\s+(?:r\$\s*)?(\d+(?:[.,]\d{1,2})?)/i);
+  if(gm){
+    var value=parseNum(gm[1]),cat="Outros";
+    if(/gasolina|combustível|combustivel/.test(low))cat="Transporte";
+    else if(/teclado|computador|notebook|celular|mouse|monitor/.test(low))cat="Tecnologia";
+    else if(/bombom|comida|lanche|almoço|almoco|janta|restaurante/.test(low))cat="Alimentação";
+    else if(/presente|namorada|namorado/.test(low))cat="Presentes";
+    data.money.push({id:Date.now()+1,date:today(),desc:t,value:value,type:"expense",cat:cat});
+    saved.push("💸 Gasto salvo: "+money(value)+" • "+cat);
+  }
+  if(q!==null&&c!==null)saved.push("📊 Aproveitamento: "+Math.round(c/q*100)+"%");
+  if(q!==null&&e!==null)saved.push("❌ Erros: "+e);
+  var out=saved.length?"🧠 Registro organizado\n\n✅ SALVO AUTOMATICAMENTE\n\n"+saved.join("\n")+"\n\nO histórico e os indicadores já foram atualizados.":"🧠 Não encontrei um registro estruturado para salvar.\n\nExemplo: “Hoje estudei história do Maranhão cinco minutos.”";
+  $("aiOutput").textContent=out;$("aiOutput").classList.remove("hide");$("aiText").value="";save();
+}
+function saveSimulation(){
+  var name=val("simName")||"Simulado",total=parseNum(val("simTotal")),correct=parseNum(val("simCorrect")),wrong=parseNum(val("simWrong"));
+  if(total<=0)return alert("Informe o total de questões.");
+  data.simulations.push({id:Date.now(),date:today(),name:name,total:total,correct:correct,wrong:wrong,pct:Math.round(correct/total*100)});
+  ["simName","simTotal","simCorrect","simWrong"].forEach(function(id){$(id).value=""});save();
+}
+function render(){
+  var now=today(), name=data.user.name||"Usuário";
+  setText("greeting","Olá, "+name+" 👋");
+  setText("todayDate",new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long",year:"numeric"}));
+  setText("profileName",name);setText("profileEmail",data.user.email||"");
+  var ins=data.money.filter(function(x){return x.date===now&&x.type==="income"}).reduce(function(a,x){return a+x.value},0);
+  var outs=data.money.filter(function(x){return x.date===now&&x.type==="expense"}).reduce(function(a,x){return a+x.value},0);
+  var studies=data.study.filter(function(x){return x.date===now}), mins=studies.reduce(function(a,x){return a+x.minutes},0),qs=studies.reduce(function(a,x){return a+x.questions},0),cs=studies.reduce(function(a,x){return a+x.correct},0);
+  var goalsDone=data.goals.filter(function(g){return g.dates[now]}).length, goalsTotal=data.goals.length;
+  var pct=goalsTotal?Math.round(goalsDone/goalsTotal*100):0;
+  setText("todayBalance",money(ins-outs));setText("todayStudy",mins+" min");setText("todayGoals",goalsDone+"/"+goalsTotal);setText("todayScore",pct+"%");$("todayBar").style.width=pct+"%";
+  setText("moneyIn",money(ins));setText("moneyOut",money(outs));setText("moneyNet",money(ins-outs));
+  setText("studySummary",mins+" min");setText("studyAccuracy",(qs?Math.round(cs/qs*100):0)+"% de aproveitamento");
+  setText("progressDay",pct+"%");
+  renderWeek();renderMoney();renderGoals();renderStudy();renderWorkout();renderTasks();renderSleep();renderProgress();renderAdmin();
+}
+function renderWeek(){
+  var d=new Date(),day=d.getDay(),monday=new Date(d);monday.setDate(d.getDate()-(day===0?6:day-1));
+  var vals=[];
+  for(var i=0;i<7;i++){var x=new Date(monday);x.setDate(monday.getDate()+i);var ds=x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");vals.push(data.money.filter(function(m){return m.date===ds&&m.type==="income"}).reduce(function(a,m){return a+m.value},0))}
+  var max=Math.max.apply(null,vals.concat([1]));
+  $("weekChart").innerHTML=vals.map(function(v,i){return '<div class="daybar"><i style="height:'+Math.max(3,Math.round(v/max*135))+'px" title="'+money(v)+'"></i><small>'+["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"][i]+'</small></div>'}).join("");
+}
+function renderMoney(){
+  var arr=data.money.slice().reverse().slice(0,30);
+  $("moneyList").innerHTML=arr.length?arr.map(function(x){return '<div class="item between"><span><b>'+esc(x.desc)+'</b><br><small class="muted">'+esc(x.date)+' • '+esc(x.cat)+'</small></span><b>'+((x.type==="expense")?"− ":"+ ")+money(x.value)+'</b></div>'}).join(""):'<div class="muted">Nenhum lançamento ainda.</div>';
+  var cats={};data.money.filter(function(x){return x.type==="expense"}).forEach(function(x){cats[x.cat]=(cats[x.cat]||0)+x.value});
+  var total=Object.values(cats).reduce(function(a,b){return a+b},0), entries=Object.entries(cats).sort(function(a,b){return b[1]-a[1]});
+  $("moneyLegend").innerHTML=entries.length?entries.map(function(e){return '<div>● <b>'+esc(e[0])+'</b> · '+money(e[1])+' ('+Math.round(e[1]/total*100)+'%)</div>'}).join(""):'<div>Nenhum gasto registrado.</div>';
+}
+function renderGoals(){
+  $("goalList").innerHTML=data.goals.length?data.goals.map(function(g){var done=!!g.dates[today()];return '<div class="item between"><span>'+esc(g.text)+'</span><button class="btn '+(done?"primary":"")+'" data-goal="'+g.id+'">'+(done?"✓ Feita":"Marcar")+'</button></div>'}).join(""):'<div class="muted">Crie sua primeira meta.</div>';
+  document.querySelectorAll("[data-goal]").forEach(function(b){b.onclick=function(){toggleGoal(Number(b.getAttribute("data-goal")))}})
+}
+function renderStudy(){
+  var arr=data.study.slice().reverse().slice(0,30);
+  $("studyList").innerHTML=arr.length?arr.map(function(x){var p=x.questions?Math.round(x.correct/x.questions*100):0;return '<div class="item"><b>'+esc(x.subject)+'</b><br><small class="muted">'+x.date+' • '+x.minutes+' min • '+x.questions+' questões • '+p+'%</small></div>'}).join(""):'<div class="muted">Nenhum estudo registrado.</div>';
+}
+function renderWorkout(){
+  var arr=data.workout.slice().reverse().slice(0,30);
+  $("workoutList").innerHTML=arr.length?arr.map(function(x){return '<div class="item"><b>'+esc(x.name)+' • '+esc(x.exercise)+'</b><br><small class="muted">'+x.date+' • '+esc(x.load)+'</small></div>'}).join(""):'<div class="muted">Nenhum treino registrado.</div>';
+}
+function renderTasks(){
+  var arr=data.tasks.slice().sort(function(a,b){return a.date.localeCompare(b.date)});
+  $("taskList").innerHTML=arr.length?arr.map(function(x){return '<div class="item between"><span style="'+(x.done?"text-decoration:line-through;opacity:.6":"")+'"><b>'+esc(x.text)+'</b><br><small class="muted">'+x.date+'</small></span><button class="btn '+(x.done?"primary":"")+'" data-task="'+x.id+'">'+(x.done?"✓":"Concluir")+'</button></div>'}).join(""):'<div class="muted">Nenhuma tarefa.</div>';
+  document.querySelectorAll("[data-task]").forEach(function(b){b.onclick=function(){toggleTask(Number(b.getAttribute("data-task")))}})
+}
+function renderSleep(){
+  var arr=data.sleep.slice().reverse().slice(0,20),total=arr.reduce(function(a,x){return a+duration(x.bed,x.wake)},0),avg=arr.length?Math.round(total/arr.length):0;
+  setText("sleepAvg",Math.floor(avg/60)+"h "+(avg%60)+"min");
+  $("sleepList").innerHTML=arr.length?arr.map(function(x){return '<div class="item"><b>'+x.date+'</b><br><small class="muted">'+x.bed+' → '+x.wake+' • '+Math.floor(duration(x.bed,x.wake)/60)+'h '+duration(x.bed,x.wake)%60+'min</small></div>'}).join(""):'<div class="muted">Nenhum sono registrado.</div>';
+}
+function renderProgress(){
+  var start=new Date("2026-09-03T00:00:00"),todayD=new Date(today()+"T00:00:00"),diff=Math.floor((todayD-start)/86400000)+1;
+  diff=Math.max(1,Math.min(365,diff));setText("annualDay","Dia "+diff+"/365");$("annualBar").style.width=Math.round(diff/365*100)+"%";
+  var cd=Math.max(1,Math.min(75,diff));setText("challengeDay","Dia "+cd+"/75");$("challengeBar").style.width=Math.round(cd/75*100)+"%";
+}
+$("enterBtn").onclick=enter;
+$("showRegisterBtn").onclick=function(){$("registerBox").classList.toggle("hide")};
+$("registerBtn").onclick=registerUser;
+$("logoutBtn").onclick=function(){$("app").classList.add("hide");$("login").classList.remove("hide")};
+$("profileBtn").onclick=function(){go("profile")};
+$("addMoneyBtn").onclick=addMoney;
+$("addGoalBtn").onclick=addGoal;
+$("addStudyBtn").onclick=addStudy;
+$("addWorkoutBtn").onclick=addWorkout;
+$("addTaskBtn").onclick=addTask;
+$("addSleepBtn").onclick=addSleep;
+$("aiSend").onclick=aiOrganize;
+$("aiWrite").onclick=function(){$("aiText").focus()};
+$("saveSimBtn").onclick=saveSimulation;
+$("aiText").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();aiOrganize()}});
+document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){go(b.getAttribute("data-go"))}});
+$("taskDate").value=today();
+buildNav();
+render();
+})();
+</script>
+</body>
+</html>
