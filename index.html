@@ -115,6 +115,26 @@ button,input,textarea,select{font-family:inherit}
   .bottom button.active{background:var(--card2);color:var(--txt)}
   .chart{height:165px}
 }
+
+/* Login redesenhado com painel lateral inspirado no arquivo enviado */
+#login{padding:0!important;background:rgba(5,5,5,.22)!important;backdrop-filter:none!important;overflow:hidden!important}
+#login #nscThreeCanvas{z-index:0}
+#login .login-layout{position:relative;z-index:1;width:100%;height:100%;min-height:100svh;display:flex;pointer-events:none}
+#login .login-panel{pointer-events:auto;width: min(520px,48vw);min-width:380px;display:flex;flex-direction:column;justify-content:center;padding:clamp(28px,5vw,60px);background:linear-gradient(90deg,rgba(5,5,5,.97),rgba(5,5,5,.82) 76%,rgba(5,5,5,.16));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#login .login-spacer{flex:1;min-width:0}
+#login .login-card{width:100%;max-height:calc(100svh - 40px);overflow:auto;padding:0;background:transparent;border:0;box-shadow:none;border-radius:0;backdrop-filter:none}
+#login .login-card>p:first-of-type{font-family:inherit;font-size:.95rem;line-height:1.5;color:#71717a;margin:10px 0 28px}
+#login .auth-tabs{display:flex;gap:16px;margin-bottom:24px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:8px}
+#login .auth-tab{background:none;border:0;color:#71717a;font-size:.9rem;font-weight:500;padding:0 0 8px;cursor:pointer}
+#login .auth-tab.active{color:#fff;border-bottom:2px solid #fff}
+#login .login-card label{font-size:.75rem;text-transform:uppercase;letter-spacing:.6px;color:#a1a1aa;margin:0 0 8px}
+#login .login-card input,#login .login-card select{padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.12);border-radius:10px}
+#login .login-card .btn{padding:14px;margin-top:10px;border-radius:10px}
+#login .login-card .btn.primary{background:#fff;color:#000}
+#login .login-card .login-close{position:absolute;right:0;top:0}
+#login .login-card .auth-help{font-size:.82rem;color:#71717a;margin-top:18px}
+@media(max-width:768px){#login .login-panel{width:100%;min-width:0;padding:28px 24px;background:rgba(5,5,5,.85)}#login .login-spacer{display:none}#login .login-card{max-height:calc(100svh - 56px)}}
+
 </style>
 <script type="module">import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"; window.pdfjsLib=pdfjsLib; pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -147,32 +167,42 @@ button,input,textarea,select{font-family:inherit}
 
 <section id="login" class="hide">
   <canvas id="nscThreeCanvas" aria-hidden="true"></canvas>
-  <div class="login-card">
-    <button class="login-close" id="closeLoginBtn" aria-label="Voltar à página inicial">×</button>
-    <div class="logo">NSC<span style="color:#777">.</span> Life OS</div>
-    <p class="muted">Entre no seu espaço de organização pessoal.</p>
-    <div id="loginMsg" class="output hide"></div>
-    <div id="cloudStatus" class="muted" style="font-size:12px;margin-top:10px">☁️ Conectando ao banco...</div>
-    <label for="loginEmail">E-mail</label>
-    <input id="loginEmail" type="email" placeholder="voce@email.com">
-    <label for="loginPass">Senha</label>
-    <input id="loginPass" type="password" placeholder="Sua senha">
-    <button id="enterBtn" class="btn primary">Entrar</button>
-    <button id="showRegisterBtn" class="btn" style="width:100%;margin-top:9px">Criar uma conta</button>
-    <div id="registerBox" class="hide">
-      <label for="regName">Nome</label><input id="regName" placeholder="Seu nome">
-      <label for="regEmail">E-mail</label><input id="regEmail" type="email" placeholder="voce@email.com">
-      <label for="regPass">Senha</label><input id="regPass" type="password" placeholder="Crie uma senha">
-      <label for="regJob">O que você faz?</label>
-      <select id="regJob">
-        <option>Estudante</option><option>Motorista de aplicativo</option><option>Autônomo</option>
-        <option>CLT</option><option>CLT + Estágio</option><option>Professor</option>
-        <option>Profissional da saúde</option><option>Empresário</option><option>Outro</option>
-      </select>
-      <button id="registerBtn" class="btn primary">Solicitar acesso</button>
-      <div id="registerMsg" class="output hide"></div>
+  <div class="login-layout">
+    <div class="login-panel">
+      <div class="login-card">
+        <button class="login-close" id="closeLoginBtn" aria-label="Voltar à página inicial">×</button>
+        <div class="logo">NSC<span style="color:#777">.</span> Life OS</div>
+        <p class="muted">Acesse seu ecossistema pessoal e mantenha sua evolução em movimento.</p>
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab active" id="authLoginTab">Entrar</button>
+          <button type="button" class="auth-tab" id="showRegisterBtn">Criar conta</button>
+        </div>
+        <div id="loginMsg" class="output hide"></div>
+        <div id="cloudStatus" class="muted" style="font-size:12px;margin:0 0 14px">☁️ Conectando ao banco...</div>
+        <div id="loginFields">
+          <label for="loginEmail">E-mail</label>
+          <input id="loginEmail" type="email" placeholder="seu@email.com" autocomplete="email">
+          <label for="loginPass">Senha</label>
+          <input id="loginPass" type="password" placeholder="Sua senha" autocomplete="current-password">
+          <button id="enterBtn" class="btn primary">Acessar sistema</button>
+          <p class="auth-help">Entre com o mesmo e-mail e senha da sua conta existente.</p>
+        </div>
+        <div id="registerBox" class="hide">
+          <label for="regName">Nome completo</label><input id="regName" placeholder="Seu nome" autocomplete="name">
+          <label for="regEmail">E-mail</label><input id="regEmail" type="email" placeholder="seu@email.com" autocomplete="email">
+          <label for="regPass">Senha</label><input id="regPass" type="password" placeholder="Crie uma senha" autocomplete="new-password">
+          <label for="regJob">O que você faz?</label>
+          <select id="regJob">
+            <option>Estudante</option><option>Motorista de aplicativo</option><option>Autônomo</option>
+            <option>CLT</option><option>CLT + Estágio</option><option>Professor</option>
+            <option>Profissional da saúde</option><option>Empresário</option><option>Outro</option>
+          </select>
+          <button id="registerBtn" class="btn primary">Solicitar acesso</button>
+          <div id="registerMsg" class="output hide"></div>
+        </div>
+      </div>
     </div>
-    <p class="muted" style="font-size:12px;margin-top:14px">Entre com seu e-mail e sua senha. Se ainda não tiver uma conta, toque em “Criar uma conta”.</p>
+    <div class="login-spacer" aria-hidden="true"></div>
   </div>
 </section>
 
@@ -512,7 +542,7 @@ function initNscAnimations(){
   }
   setupCanvas(document.getElementById('orbitCanvas'),'orbit');setupCanvas(document.getElementById('particleCanvas'),'globe');
 }
-$('enterBtn').onclick=enter;$('landingLoginBtn').onclick=$('landingStartBtn').onclick=$('landingLoginSecondary').onclick=function(){$('landing').classList.add('hide');$('login').classList.remove('hide');$('loginEmail').focus()};$('closeLoginBtn').onclick=function(){$('login').classList.add('hide');$('landing').classList.remove('hide')};$('showRegisterBtn').onclick=function(){$('registerBox').classList.toggle('hide')};$('registerBtn').onclick=registerUser;$('logoutBtn').onclick=async function(){try{await NSCCloud.auth.signOut()}catch(_){}cloudUserId=null;data=cloneDefault();simState={questions:[],index:0,answers:[],title:"",sourceName:"",cloudId:null};$('app').classList.add('hide');$('login').classList.add('hide');$('landing').classList.remove('hide')};$('profileBtn').onclick=function(){go('profile')};$('addMoneyBtn').onclick=addMoney;$('addGoalBtn').onclick=addGoal;$('addStudyBtn').onclick=addStudy;$('addWorkoutBtn').onclick=addWorkout;$('addTaskBtn').onclick=addTask;$('addSleepBtn').onclick=addSleep;$('analyzePdfBtn').onclick=analyzePdf;$('clearPdfBtn').onclick=clearPdf;$('nextQuestionBtn').onclick=nextQuestion;$('finishSimBtn').onclick=finishSim;$('taskDate').value=today();buildNav();render();initNscAnimations();
+$('enterBtn').onclick=enter;$('landingLoginBtn').onclick=$('landingStartBtn').onclick=$('landingLoginSecondary').onclick=function(){$('landing').classList.add('hide');$('login').classList.remove('hide');$('loginEmail').focus()};$('closeLoginBtn').onclick=function(){$('login').classList.add('hide');$('landing').classList.remove('hide')};$('showRegisterBtn').onclick=function(){$('registerBox').classList.remove('hide');$('loginFields').classList.add('hide');$('showRegisterBtn').classList.add('active');$('authLoginTab').classList.remove('active')};$('authLoginTab').onclick=function(){$('registerBox').classList.add('hide');$('loginFields').classList.remove('hide');$('authLoginTab').classList.add('active');$('showRegisterBtn').classList.remove('active')};$('registerBtn').onclick=registerUser;$('logoutBtn').onclick=async function(){try{await NSCCloud.auth.signOut()}catch(_){}cloudUserId=null;data=cloneDefault();simState={questions:[],index:0,answers:[],title:"",sourceName:"",cloudId:null};$('app').classList.add('hide');$('login').classList.add('hide');$('landing').classList.remove('hide')};$('profileBtn').onclick=function(){go('profile')};$('addMoneyBtn').onclick=addMoney;$('addGoalBtn').onclick=addGoal;$('addStudyBtn').onclick=addStudy;$('addWorkoutBtn').onclick=addWorkout;$('addTaskBtn').onclick=addTask;$('addSleepBtn').onclick=addSleep;$('analyzePdfBtn').onclick=analyzePdf;$('clearPdfBtn').onclick=clearPdf;$('nextQuestionBtn').onclick=nextQuestion;$('finishSimBtn').onclick=finishSim;$('taskDate').value=today();buildNav();render();initNscAnimations();
 })();
 </script>
 <script type="module">
