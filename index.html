@@ -13,7 +13,10 @@ body{min-height:100vh}
 button,input,textarea,select{font:inherit}
 button{cursor:pointer;touch-action:manipulation}
 .hide{display:none!important}
-#login{min-height:100vh;display:grid;place-items:center;padding:24px}
+#login{min-height:100vh;display:grid;place-items:center;padding:24px;position:relative;isolation:isolate;overflow:hidden;background:transparent;z-index:2}
+#nscThreeCanvas{position:fixed;inset:0;width:100%;height:100%;display:none;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 75% 45%,#111722 0%,#090b10 40%,#050608 76%)}
+#login:not(.hide) #nscThreeCanvas{display:block}
+#login .login-card{position:relative;z-index:1;background:rgba(16,17,19,.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-color:rgba(255,255,255,.13)}
 .login-card{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:0 20px 70px #0007}
 .logo{font-size:25px;font-weight:850}.logo span{font-size:28px}
 .muted{color:var(--muted)}
@@ -112,6 +115,26 @@ button,input,textarea,select{font-family:inherit}
   .bottom button.active{background:var(--card2);color:var(--txt)}
   .chart{height:165px}
 }
+
+/* Login redesenhado com painel lateral inspirado no arquivo enviado */
+#login{padding:0!important;background:rgba(5,5,5,.22)!important;backdrop-filter:none!important;overflow:hidden!important}
+#login #nscThreeCanvas{z-index:0}
+#login .login-layout{position:relative;z-index:1;width:100%;height:100%;min-height:100svh;display:flex;pointer-events:none}
+#login .login-panel{pointer-events:auto;width: min(520px,48vw);min-width:380px;display:flex;flex-direction:column;justify-content:center;padding:clamp(28px,5vw,60px);background:linear-gradient(90deg,rgba(5,5,5,.97),rgba(5,5,5,.82) 76%,rgba(5,5,5,.16));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#login .login-spacer{flex:1;min-width:0}
+#login .login-card{width:100%;max-height:calc(100svh - 40px);overflow:auto;padding:0;background:transparent;border:0;box-shadow:none;border-radius:0;backdrop-filter:none}
+#login .login-card>p:first-of-type{font-family:inherit;font-size:.95rem;line-height:1.5;color:#71717a;margin:10px 0 28px}
+#login .auth-tabs{display:flex;gap:16px;margin-bottom:24px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:8px}
+#login .auth-tab{background:none;border:0;color:#71717a;font-size:.9rem;font-weight:500;padding:0 0 8px;cursor:pointer}
+#login .auth-tab.active{color:#fff;border-bottom:2px solid #fff}
+#login .login-card label{font-size:.75rem;text-transform:uppercase;letter-spacing:.6px;color:#a1a1aa;margin:0 0 8px}
+#login .login-card input,#login .login-card select{padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.12);border-radius:10px}
+#login .login-card .btn{padding:14px;margin-top:10px;border-radius:10px}
+#login .login-card .btn.primary{background:#fff;color:#000}
+#login .login-card .login-close{position:absolute;right:0;top:0}
+#login .login-card .auth-help{font-size:.82rem;color:#71717a;margin-top:18px}
+@media(max-width:768px){#login .login-panel{width:100%;min-width:0;padding:28px 24px;background:rgba(5,5,5,.85)}#login .login-spacer{display:none}#login .login-card{max-height:calc(100svh - 56px)}}
+
 </style>
 <script type="module">import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"; window.pdfjsLib=pdfjsLib; pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -143,32 +166,43 @@ button,input,textarea,select{font-family:inherit}
 </section>
 
 <section id="login" class="hide">
-  <div class="login-card">
-    <button class="login-close" id="closeLoginBtn" aria-label="Voltar à página inicial">×</button>
-    <div class="logo">NSC<span style="color:#777">.</span> Life OS</div>
-    <p class="muted">Entre no seu espaço de organização pessoal.</p>
-    <div id="loginMsg" class="output hide"></div>
-    <div id="cloudStatus" class="muted" style="font-size:12px;margin-top:10px">☁️ Conectando ao banco...</div>
-    <label for="loginEmail">E-mail</label>
-    <input id="loginEmail" type="email" placeholder="voce@email.com">
-    <label for="loginPass">Senha</label>
-    <input id="loginPass" type="password" placeholder="Sua senha">
-    <button id="enterBtn" class="btn primary">Entrar</button>
-    <button id="showRegisterBtn" class="btn" style="width:100%;margin-top:9px">Criar uma conta</button>
-    <div id="registerBox" class="hide">
-      <label for="regName">Nome</label><input id="regName" placeholder="Seu nome">
-      <label for="regEmail">E-mail</label><input id="regEmail" type="email" placeholder="voce@email.com">
-      <label for="regPass">Senha</label><input id="regPass" type="password" placeholder="Crie uma senha">
-      <label for="regJob">O que você faz?</label>
-      <select id="regJob">
-        <option>Estudante</option><option>Motorista de aplicativo</option><option>Autônomo</option>
-        <option>CLT</option><option>CLT + Estágio</option><option>Professor</option>
-        <option>Profissional da saúde</option><option>Empresário</option><option>Outro</option>
-      </select>
-      <button id="registerBtn" class="btn primary">Solicitar acesso</button>
-      <div id="registerMsg" class="output hide"></div>
+  <canvas id="nscThreeCanvas" aria-hidden="true"></canvas>
+  <div class="login-layout">
+    <div class="login-panel">
+      <div class="login-card">
+        <button class="login-close" id="closeLoginBtn" aria-label="Voltar à página inicial">×</button>
+        <div class="logo">NSC<span style="color:#777">.</span> Life OS</div>
+        <p class="muted">Acesse seu ecossistema pessoal e mantenha sua evolução em movimento.</p>
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab active" id="authLoginTab">Entrar</button>
+          <button type="button" class="auth-tab" id="showRegisterBtn">Criar conta</button>
+        </div>
+        <div id="loginMsg" class="output hide"></div>
+        <div id="cloudStatus" class="muted" style="font-size:12px;margin:0 0 14px">☁️ Conectando ao banco...</div>
+        <div id="loginFields">
+          <label for="loginEmail">E-mail</label>
+          <input id="loginEmail" type="email" placeholder="seu@email.com" autocomplete="email">
+          <label for="loginPass">Senha</label>
+          <input id="loginPass" type="password" placeholder="Sua senha" autocomplete="current-password">
+          <button id="enterBtn" class="btn primary">Acessar sistema</button>
+          <p class="auth-help">Entre com o mesmo e-mail e senha da sua conta existente.</p>
+        </div>
+        <div id="registerBox" class="hide">
+          <label for="regName">Nome completo</label><input id="regName" placeholder="Seu nome" autocomplete="name">
+          <label for="regEmail">E-mail</label><input id="regEmail" type="email" placeholder="seu@email.com" autocomplete="email">
+          <label for="regPass">Senha</label><input id="regPass" type="password" placeholder="Crie uma senha" autocomplete="new-password">
+          <label for="regJob">O que você faz?</label>
+          <select id="regJob">
+            <option>Estudante</option><option>Motorista de aplicativo</option><option>Autônomo</option>
+            <option>CLT</option><option>CLT + Estágio</option><option>Professor</option>
+            <option>Profissional da saúde</option><option>Empresário</option><option>Outro</option>
+          </select>
+          <button id="registerBtn" class="btn primary">Solicitar acesso</button>
+          <div id="registerMsg" class="output hide"></div>
+        </div>
+      </div>
     </div>
-    <p class="muted" style="font-size:12px;margin-top:14px">Entre com seu e-mail e sua senha. Se ainda não tiver uma conta, toque em “Criar uma conta”.</p>
+    <div class="login-spacer" aria-hidden="true"></div>
   </div>
 </section>
 
@@ -508,7 +542,162 @@ function initNscAnimations(){
   }
   setupCanvas(document.getElementById('orbitCanvas'),'orbit');setupCanvas(document.getElementById('particleCanvas'),'globe');
 }
-$('enterBtn').onclick=enter;$('landingLoginBtn').onclick=$('landingStartBtn').onclick=$('landingLoginSecondary').onclick=function(){$('landing').classList.add('hide');$('login').classList.remove('hide');$('loginEmail').focus()};$('closeLoginBtn').onclick=function(){$('login').classList.add('hide');$('landing').classList.remove('hide')};$('showRegisterBtn').onclick=function(){$('registerBox').classList.toggle('hide')};$('registerBtn').onclick=registerUser;$('logoutBtn').onclick=async function(){try{await NSCCloud.auth.signOut()}catch(_){}cloudUserId=null;data=cloneDefault();simState={questions:[],index:0,answers:[],title:"",sourceName:"",cloudId:null};$('app').classList.add('hide');$('login').classList.add('hide');$('landing').classList.remove('hide')};$('profileBtn').onclick=function(){go('profile')};$('addMoneyBtn').onclick=addMoney;$('addGoalBtn').onclick=addGoal;$('addStudyBtn').onclick=addStudy;$('addWorkoutBtn').onclick=addWorkout;$('addTaskBtn').onclick=addTask;$('addSleepBtn').onclick=addSleep;$('analyzePdfBtn').onclick=analyzePdf;$('clearPdfBtn').onclick=clearPdf;$('nextQuestionBtn').onclick=nextQuestion;$('finishSimBtn').onclick=finishSim;$('taskDate').value=today();buildNav();render();initNscAnimations();
+$('enterBtn').onclick=enter;$('landingLoginBtn').onclick=$('landingStartBtn').onclick=$('landingLoginSecondary').onclick=function(){$('landing').classList.add('hide');$('login').classList.remove('hide');$('loginEmail').focus()};$('closeLoginBtn').onclick=function(){$('login').classList.add('hide');$('landing').classList.remove('hide')};$('showRegisterBtn').onclick=function(){$('registerBox').classList.remove('hide');$('loginFields').classList.add('hide');$('showRegisterBtn').classList.add('active');$('authLoginTab').classList.remove('active')};$('authLoginTab').onclick=function(){$('registerBox').classList.add('hide');$('loginFields').classList.remove('hide');$('authLoginTab').classList.add('active');$('showRegisterBtn').classList.remove('active')};$('registerBtn').onclick=registerUser;$('logoutBtn').onclick=async function(){try{await NSCCloud.auth.signOut()}catch(_){}cloudUserId=null;data=cloneDefault();simState={questions:[],index:0,answers:[],title:"",sourceName:"",cloudId:null};$('app').classList.add('hide');$('login').classList.add('hide');$('landing').classList.remove('hide')};$('profileBtn').onclick=function(){go('profile')};$('addMoneyBtn').onclick=addMoney;$('addGoalBtn').onclick=addGoal;$('addStudyBtn').onclick=addStudy;$('addWorkoutBtn').onclick=addWorkout;$('addTaskBtn').onclick=addTask;$('addSleepBtn').onclick=addSleep;$('analyzePdfBtn').onclick=analyzePdf;$('clearPdfBtn').onclick=clearPdf;$('nextQuestionBtn').onclick=nextQuestion;$('finishSimBtn').onclick=finishSim;$('taskDate').value=today();buildNav();render();initNscAnimations();
+})();
+</script>
+<script type="module">
+(() => {
+  const canvas = document.getElementById("nscThreeCanvas");
+  const login = document.getElementById("login");
+  if (!canvas || !login) return;
+
+  let renderer, scene, camera, raf = 0, disposed = false, active = false;
+  let resizeObserver;
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const layerData = [];
+  const clock = { last: 0, elapsed: 0 };
+
+  async function start() {
+    if (active || disposed) return;
+    active = true;
+    try {
+      const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js");
+      if (disposed || login.classList.contains("hide")) { active = false; return; }
+
+      scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x050608, 0.012);
+      camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 100);
+      camera.position.set(0, 8.8, 23);
+      camera.lookAt(0, 0, 0);
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.35));
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.2;
+
+      const core = new THREE.Mesh(
+        new THREE.SphereGeometry(2.05, 64, 48),
+        new THREE.MeshStandardMaterial({ color: 0x10141b, roughness: 0.8, metalness: 0.18 })
+      );
+      core.position.x = innerWidth <= 700 ? 0.4 : 3.5;
+      scene.add(core);
+      scene.add(new THREE.AmbientLight(0x8490a8, 0.28));
+      const keyLight = new THREE.PointLight(0x9bb8ff, 95, 24, 2);
+      keyLight.position.set(-4, 3, 5); scene.add(keyLight);
+      const rimLight = new THREE.PointLight(0x7a8ba9, 55, 18, 2);
+      rimLight.position.set(4, -1, -5); scene.add(rimLight);
+
+      const halo = new THREE.Mesh(new THREE.SphereGeometry(2.17, 48, 32),
+        new THREE.MeshBasicMaterial({ color: 0x7089b2, transparent: true, opacity: 0.09, side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false }));
+      halo.position.copy(core.position);
+      scene.add(halo);
+
+      const texCanvas = document.createElement("canvas");
+      texCanvas.width = texCanvas.height = 64;
+      const ctx = texCanvas.getContext("2d");
+      const gradient = ctx.createRadialGradient(32,32,0,32,32,32);
+      gradient.addColorStop(0,"rgba(255,255,255,1)");
+      gradient.addColorStop(.10,"rgba(245,248,255,.92)");
+      gradient.addColorStop(.28,"rgba(215,225,245,.42)");
+      gradient.addColorStop(.58,"rgba(180,200,235,.10)");
+      gradient.addColorStop(1,"rgba(160,185,230,0)");
+      ctx.fillStyle=gradient; ctx.fillRect(0,0,64,64);
+      const particleMap = new THREE.CanvasTexture(texCanvas);
+      particleMap.colorSpace = THREE.SRGBColorSpace;
+
+      const disk = new THREE.Group();
+      disk.rotation.x = -0.38; disk.rotation.z = 0.08; disk.position.x = core.position.x; scene.add(disk);
+      const layerSpecs = [
+        {count:22000, inner:2.30, outer:4.25, thickness:.18, size:.15, opacity:.78},
+        {count:14000, inner:3.25, outer:6.30, thickness:.36, size:.12, opacity:.55},
+        {count:6000, inner:4.60, outer:8.00, thickness:.60, size:.10, opacity:.40}
+      ];
+      for (const spec of layerSpecs) {
+        const positions = new Float32Array(spec.count*3);
+        const colors = new Float32Array(spec.count*3);
+        const radii = new Float32Array(spec.count);
+        const angles = new Float32Array(spec.count);
+        const speeds = new Float32Array(spec.count);
+        const heights = new Float32Array(spec.count);
+        const phases = new Float32Array(spec.count);
+        for (let i=0;i<spec.count;i++) {
+          const radius = THREE.MathUtils.lerp(spec.inner,spec.outer,Math.pow(Math.random(),.78));
+          const angle = Math.random()*Math.PI*2;
+          const height = (Math.random()*2-1)*spec.thickness;
+          const edgeFade = Math.min(THREE.MathUtils.smoothstep(radius,spec.inner,spec.inner+.55),1-THREE.MathUtils.smoothstep(radius,spec.outer-.85,spec.outer));
+          radii[i]=radius; angles[i]=angle; heights[i]=height; phases[i]=Math.random()*Math.PI*2;
+          speeds[i]=(.78/Math.sqrt(radius))*(.72+Math.random()*.56);
+          const brightness=Math.max(.08,edgeFade)*(.58+Math.random()*.42);
+          const color=Math.random()<.075 ? new THREE.Color(0xc6b8a8) : new THREE.Color().setHSL(.60+Math.random()*.055,.12+Math.random()*.24,.55+Math.random()*.38);
+          colors[i*3]=color.r*brightness; colors[i*3+1]=color.g*brightness; colors[i*3+2]=color.b*brightness;
+          positions[i*3]=Math.cos(angle)*radius; positions[i*3+1]=height; positions[i*3+2]=Math.sin(angle)*radius*.48;
+        }
+        const geometry=new THREE.BufferGeometry();
+        geometry.setAttribute("position",new THREE.BufferAttribute(positions,3));
+        geometry.setAttribute("color",new THREE.BufferAttribute(colors,3));
+        const material=new THREE.PointsMaterial({map:particleMap,color:0xcbd8f2,size:spec.size,sizeAttenuation:true,transparent:true,opacity:spec.opacity,depthWrite:false,blending:THREE.AdditiveBlending,vertexColors:true,alphaTest:.015});
+        const points=new THREE.Points(geometry,material); points.frustumCulled=false; disk.add(points);
+        layerData.push({positions,radii,angles,speeds,heights,phases,count:spec.count,points});
+      }
+
+      const starPositions=new Float32Array(1000*3);
+      for(let i=0;i<1000;i++){starPositions[i*3]=(Math.random()-.5)*45;starPositions[i*3+1]=(Math.random()-.5)*28;starPositions[i*3+2]=-8-Math.random()*34;}
+      const starGeometry=new THREE.BufferGeometry();
+      starGeometry.setAttribute("position",new THREE.BufferAttribute(starPositions,3));
+      scene.add(new THREE.Points(starGeometry,new THREE.PointsMaterial({color:0x8794ac,size:.045,map:particleMap,transparent:true,opacity:.42,depthWrite:false,blending:THREE.AdditiveBlending})));
+
+      const animate=(now)=>{
+        raf=requestAnimationFrame(animate);
+        if (!active || login.classList.contains("hide")) return;
+        const delta=clock.last ? Math.min((now-clock.last)/1000,.033) : .016;
+        clock.last=now;
+        if(!reducedMotion) clock.elapsed+=delta;
+        if(!reducedMotion){disk.rotation.y+=delta*.025;core.rotation.y+=delta*.018;halo.rotation.y-=delta*.012;}
+        for(const layer of layerData){
+          const p=layer.positions;
+          for(let i=0;i<layer.count;i++){
+            const angle=layer.angles[i]+clock.elapsed*layer.speeds[i], radius=layer.radii[i];
+            const wave=Math.sin(angle*2.1+layer.phases[i])*.025;
+            p[i*3]=Math.cos(angle)*(radius+wave);
+            p[i*3+1]=layer.heights[i]+Math.sin(angle*1.65+layer.phases[i])*.018;
+            p[i*3+2]=Math.sin(angle)*(radius+wave)*.48;
+          }
+          layer.points.geometry.attributes.position.needsUpdate=true;
+        }
+        renderer.render(scene,camera);
+      };
+      clock.last=0; raf=requestAnimationFrame(animate);
+      resizeObserver = new ResizeObserver(() => {
+        if(!renderer || !camera) return;
+        camera.aspect=innerWidth/innerHeight; camera.position.x = innerWidth <= 700 ? 0.4 : 0; camera.updateProjectionMatrix();
+        core.position.x = innerWidth <= 700 ? 0.4 : 3.5; halo.position.copy(core.position); disk.position.x = core.position.x;
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.35)); renderer.setSize(innerWidth,innerHeight);
+      });
+      resizeObserver.observe(document.documentElement);
+    } catch (error) {
+      console.error("NSC 3D background failed to load:", error);
+      canvas.style.background="radial-gradient(ellipse at 72% 45%, #111722 0%, #090b10 40%, #050608 76%)";
+      active=false;
+    }
+  }
+
+  function stop() {
+    active=false;
+    if(raf) cancelAnimationFrame(raf);
+    raf=0; clock.last=0;
+    if(resizeObserver){resizeObserver.disconnect();resizeObserver=null;}
+    if(renderer){renderer.dispose();renderer=null;}
+    layerData.length=0;
+    scene=null; camera=null;
+  }
+  const observer = new MutationObserver(() => {
+    if(login.classList.contains("hide")) stop();
+    else start();
+  });
+  observer.observe(login,{attributes:true,attributeFilter:["class"]});
+  window.addEventListener("pagehide",()=>{disposed=true;stop();},{once:true});
+  if(!login.classList.contains("hide")) start();
 })();
 </script>
 </body>
