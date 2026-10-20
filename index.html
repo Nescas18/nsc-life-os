@@ -114,9 +114,9 @@ button,input,textarea,select{font-family:inherit}
 }
 
 /* Preview-only: Three.js orbital background inside the login screen */
-#login{position:relative;isolation:isolate;overflow:hidden;background:#030405}
+#login{position:fixed;inset:0;isolation:isolate;overflow:hidden;background:rgba(3,4,7,.18);backdrop-filter:none}
 #login .nsc-orbital-canvas{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:0!important;pointer-events:none!important}
-#login .login-card{position:relative;z-index:2;background:rgba(12,13,16,.76);backdrop-filter:blur(15px)}
+#login .login-card{position:relative;z-index:2;background:rgba(8,10,15,.76);backdrop-filter:blur(8px);border-color:rgba(180,195,220,.24);box-shadow:0 24px 90px rgba(0,0,0,.55)}
 @media(prefers-reduced-motion:reduce){#login .login-card{backdrop-filter:none}}
 
 </style>
@@ -520,243 +520,154 @@ $('enterBtn').onclick=enter;$('landingLoginBtn').onclick=$('landingStartBtn').on
 })();
 </script>
 <script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js";
 
-    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js";
+const loginSection = document.getElementById("login");
+if (loginSection && !loginSection.querySelector(".nsc-orbital-canvas")) {
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 100);
+  camera.position.set(0, 6.8, 21);
+  camera.lookAt(0, 0, 0);
 
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x030405);
-    scene.fog = new THREE.FogExp2(0x030405, 0.018);
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setClearColor(0x030407, 0);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.domElement.className = "nsc-orbital-canvas";
+  renderer.domElement.style.cssText = "position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:0";
+  loginSection.prepend(renderer.domElement);
 
-    const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 120);
-    camera.position.set(0, 8.2, 22);
-    camera.lookAt(0, 0, 0);
+  scene.add(new THREE.AmbientLight(0x75839c, 1.05));
+  const keyLight = new THREE.DirectionalLight(0xc4d6ff, 2.6);
+  keyLight.position.set(-5, 7, 9); scene.add(keyLight);
+  const rimLight = new THREE.PointLight(0x789eff, 75, 24, 2);
+  rimLight.position.set(4, 2, -3); scene.add(rimLight);
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: false,
-      powerPreference: "high-performance"
-    });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
-    renderer.domElement.className = "nsc-orbital-canvas";
-    renderer.domElement.style.cssText = "position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:0";
-    const loginSection = document.getElementById("login");
-    loginSection.prepend(renderer.domElement);
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(2.05, 96, 72),
+    new THREE.MeshStandardMaterial({ color: 0x090c12, roughness: 0.88, metalness: 0.08 })
+  );
+  core.position.set(2.7, 0.05, 0);
+  scene.add(core);
 
-    // Núcleo sombreado com iluminação de borda e volume.
-    const core = new THREE.Mesh(
-      new THREE.SphereGeometry(2.05, 64, 48),
-      new THREE.MeshStandardMaterial({
-        color: 0x11151c,
-        roughness: 0.82,
-        metalness: 0.18
-      })
-    );
-    scene.add(core);
+  const halo = new THREE.Mesh(
+    new THREE.SphereGeometry(2.13, 64, 48),
+    new THREE.MeshBasicMaterial({ color: 0x5275b7, transparent: true, opacity: 0.12, side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  halo.position.copy(core.position); scene.add(halo);
 
-    scene.add(new THREE.AmbientLight(0x536078, 0.42));
-    const rimLight = new THREE.PointLight(0x9bb8ff, 85, 20, 2);
-    rimLight.position.set(-4, 3, 5);
-    scene.add(rimLight);
+  // Soft radial texture prevents square/hard-edged particles.
+  const spriteCanvas = document.createElement("canvas");
+  spriteCanvas.width = spriteCanvas.height = 64;
+  const sctx = spriteCanvas.getContext("2d");
+  const grad = sctx.createRadialGradient(32,32,0,32,32,32);
+  grad.addColorStop(0,"rgba(255,255,255,1)");
+  grad.addColorStop(.12,"rgba(226,237,255,.92)");
+  grad.addColorStop(.34,"rgba(173,199,255,.35)");
+  grad.addColorStop(1,"rgba(120,160,255,0)");
+  sctx.fillStyle=grad; sctx.fillRect(0,0,64,64);
+  const sprite = new THREE.CanvasTexture(spriteCanvas);
 
-    const warmLight = new THREE.PointLight(0x8a6d5c, 35, 16, 2);
-    warmLight.position.set(4, -2, -4);
-    scene.add(warmLight);
+  const disk = new THREE.Group();
+  disk.position.copy(core.position);
+  disk.rotation.x = -0.34;
+  disk.rotation.z = -0.06;
+  scene.add(disk);
 
-    // Halo sutil no contorno do núcleo.
-    const halo = new THREE.Mesh(
-      new THREE.SphereGeometry(2.18, 48, 32),
-      new THREE.MeshBasicMaterial({
-        color: 0x5875a5,
-        transparent: true,
-        opacity: 0.075,
-        side: THREE.BackSide,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      })
-    );
-    scene.add(halo);
+  const COUNT = 30000;
+  const positions = new Float32Array(COUNT*3);
+  const colors = new Float32Array(COUNT*3);
+  const sizes = new Float32Array(COUNT);
+  const radii = new Float32Array(COUNT);
+  const angles = new Float32Array(COUNT);
+  const heights = new Float32Array(COUNT);
+  const speeds = new Float32Array(COUNT);
 
-    // Shader de partículas: tamanho e opacidade modulados pela posição no disco.
-    const particleVertex = `
-      attribute float aSize;
-      attribute float aAlpha;
-      attribute vec3 aColor;
-      varying float vAlpha;
-      varying vec3 vColor;
+  for(let i=0;i<COUNT;i++){
+    // Dense, broad accretion disk with extra mass near the inner edge.
+    const u=Math.random();
+    const radius=2.25 + Math.pow(u,1.75)*6.8;
+    const angle=Math.random()*Math.PI*2;
+    radii[i]=radius; angles[i]=angle;
+    heights[i]=(Math.random()+Math.random()-1)*(.08 + radius*.018);
+    speeds[i]=0.82/Math.pow(radius,1.32) * (0.78+Math.random()*.44);
+    const hue=.57+Math.random()*.09;
+    const col=new THREE.Color().setHSL(hue,.28+Math.random()*.3,.62+Math.random()*.34);
+    colors.set([col.r,col.g,col.b],i*3);
+    sizes[i]=1.0+Math.random()*2.8;
+    positions[i*3]=Math.cos(angle)*radius;
+    positions[i*3+1]=heights[i];
+    positions[i*3+2]=Math.sin(angle)*radius*.43;
+  }
+  const geometry=new THREE.BufferGeometry();
+  geometry.setAttribute("position",new THREE.BufferAttribute(positions,3));
+  geometry.setAttribute("aColor",new THREE.BufferAttribute(colors,3));
+  geometry.setAttribute("aSize",new THREE.BufferAttribute(sizes,1));
+  const material=new THREE.ShaderMaterial({
+    uniforms:{uSprite:{value:sprite},uPixelRatio:{value:renderer.getPixelRatio()}},
+    vertexShader:`
+      attribute vec3 aColor; attribute float aSize;
+      varying vec3 vColor; varying float vDepth;
       uniform float uPixelRatio;
-      void main() {
-        vAlpha = aAlpha;
-        vColor = aColor;
-        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-        gl_Position = projectionMatrix * mvPosition;
-        gl_PointSize = clamp(aSize * uPixelRatio * (180.0 / -mvPosition.z), 1.0, 9.0);
-      }
-    `;
-    const particleFragment = `
-      varying float vAlpha;
-      varying vec3 vColor;
-      void main() {
-        vec2 p = gl_PointCoord - 0.5;
-        float d = length(p);
-        float core = smoothstep(0.24, 0.0, d);
-        float glow = smoothstep(0.5, 0.08, d) * 0.34;
-        float alpha = (core + glow) * vAlpha;
-        if (alpha < 0.012) discard;
-        gl_FragColor = vec4(vColor, alpha);
-      }
-    `;
+      void main(){
+        vColor=aColor;
+        vec4 mv=modelViewMatrix*vec4(position,1.0);
+        vDepth=clamp((-mv.z-8.0)/20.0,0.28,1.0);
+        gl_Position=projectionMatrix*mv;
+        gl_PointSize=clamp(aSize*uPixelRatio*(220.0/-mv.z),1.0,18.0);
+      }`,
+    fragmentShader:`
+      uniform sampler2D uSprite; varying vec3 vColor; varying float vDepth;
+      void main(){
+        vec4 tex=texture2D(uSprite,gl_PointCoord);
+        gl_FragColor=vec4(vColor,tex.a*0.82*vDepth);
+        if(gl_FragColor.a<0.012) discard;
+      }`,
+    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending
+  });
+  const points=new THREE.Points(geometry,material);
+  points.frustumCulled=false; disk.add(points);
 
-    const disk = new THREE.Group();
-    scene.add(disk);
-    disk.rotation.x = -0.22;
-    disk.rotation.z = 0.08;
+  // Fine background dust, kept subtle so the accretion disk remains dominant.
+  const starCount=1100, starPos=new Float32Array(starCount*3);
+  for(let i=0;i<starCount;i++){
+    starPos[i*3]=(Math.random()-.5)*48;
+    starPos[i*3+1]=(Math.random()-.5)*26;
+    starPos[i*3+2]=-8-Math.random()*32;
+  }
+  const starGeo=new THREE.BufferGeometry();
+  starGeo.setAttribute("position",new THREE.BufferAttribute(starPos,3));
+  scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0x9baed1,size:.045,transparent:true,opacity:.32,depthWrite:false})));
 
-    const layers = [
-      { count: 18000, minR: 2.35, maxR: 4.15, height: 0.18, speed: 0.23, size: 1.5, opacity: 0.82 },
-      { count: 12000, minR: 3.1,  maxR: 6.4,  height: 0.34, speed: 0.14, size: 1.15, opacity: 0.62 },
-      { count: 6000,  minR: 4.4,  maxR: 8.2,  height: 0.58, speed: 0.085, size: 0.9, opacity: 0.45 }
-    ];
-
-    const orbitLayers = [];
-
-    for (const layer of layers) {
-      const positions = new Float32Array(layer.count * 3);
-      const colors = new Float32Array(layer.count * 3);
-      const sizes = new Float32Array(layer.count);
-      const alphas = new Float32Array(layer.count);
-      const radii = new Float32Array(layer.count);
-      const angles = new Float32Array(layer.count);
-      const angularSpeeds = new Float32Array(layer.count);
-      const verticals = new Float32Array(layer.count);
-
-      for (let i = 0; i < layer.count; i++) {
-        // Distribuição radial mais densa junto ao núcleo, sem formar uma linha rígida.
-        const t = Math.pow(Math.random(), 0.72);
-        const radius = THREE.MathUtils.lerp(layer.minR, layer.maxR, t);
-        const angle = Math.random() * Math.PI * 2;
-        const vertical = (Math.random() + Math.random() - 1) * layer.height;
-
-        radii[i] = radius;
-        angles[i] = angle;
-        verticals[i] = vertical;
-        angularSpeeds[i] = layer.speed * (2.35 / radius) * (0.72 + Math.random() * 0.56);
-
-        const edge = Math.min(
-          THREE.MathUtils.smoothstep(radius, layer.minR, layer.minR + 0.55),
-          1 - THREE.MathUtils.smoothstep(radius, layer.maxR - 0.9, layer.maxR)
-        );
-        const irregularity = 0.68 + Math.random() * 0.32;
-        alphas[i] = layer.opacity * Math.max(0.08, edge) * irregularity;
-        sizes[i] = layer.size * (0.45 + Math.random() * 1.2);
-
-        // Variação fria com raros pontos mais claros.
-        const color = new THREE.Color().setHSL(
-          0.58 + Math.random() * 0.08,
-          0.12 + Math.random() * 0.28,
-          0.48 + Math.random() * 0.46
-        );
-        colors[i * 3] = color.r;
-        colors[i * 3 + 1] = color.g;
-        colors[i * 3 + 2] = color.b;
-
-        positions[i * 3] = Math.cos(angle) * radius;
-        positions[i * 3 + 1] = vertical;
-        positions[i * 3 + 2] = Math.sin(angle) * radius * 0.44;
-      }
-
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
-      geometry.setAttribute("aSize", new THREE.BufferAttribute(sizes, 1));
-      geometry.setAttribute("aAlpha", new THREE.BufferAttribute(alphas, 1));
-
-      const material = new THREE.ShaderMaterial({
-        uniforms: { uPixelRatio: { value: renderer.getPixelRatio() } },
-        vertexShader: particleVertex,
-        fragmentShader: particleFragment,
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending
-      });
-
-      const points = new THREE.Points(geometry, material);
-      points.frustumCulled = false;
-      disk.add(points);
-      orbitLayers.push({ positions, radii, angles, angularSpeeds, verticals, count: layer.count });
+  const clock=new THREE.Clock();
+  const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let elapsed=0, raf=0;
+  function animate(){
+    raf=requestAnimationFrame(animate);
+    if(loginSection.classList.contains("hide")) return;
+    const dt=Math.min(clock.getDelta(),.04);
+    if(!reduced) elapsed+=dt;
+    const attr=geometry.attributes.position, p=attr.array;
+    for(let i=0;i<COUNT;i++){
+      const a=angles[i]+(reduced?0:elapsed*speeds[i]);
+      const r=radii[i];
+      p[i*3]=Math.cos(a)*r;
+      p[i*3+1]=heights[i]+(reduced?0:Math.sin(a*1.8+i*.013)*.012);
+      p[i*3+2]=Math.sin(a)*r*.43;
     }
-
-    // Poeira fina de fundo, separada do disco para reforçar profundidade.
-    const starCount = 900;
-    const starPositions = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount; i++) {
-      starPositions[i * 3] = (Math.random() - 0.5) * 44;
-      starPositions[i * 3 + 1] = (Math.random() - 0.5) * 26;
-      starPositions[i * 3 + 2] = -6 - Math.random() * 34;
-    }
-    const starGeometry = new THREE.BufferGeometry();
-    starGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
-    const stars = new THREE.Points(
-      starGeometry,
-      new THREE.PointsMaterial({
-        color: 0x8c9bb4,
-        size: 0.035,
-        transparent: true,
-        opacity: 0.48,
-        depthWrite: false
-      })
-    );
-    scene.add(stars);
-
-    const clock = new THREE.Clock();
-    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let elapsed = 0;
-
-    function animate() {
-      requestAnimationFrame(animate);
-      if (loginSection.classList.contains("hide")) return;
-      const delta = Math.min(clock.getDelta(), 0.033);
-      if (!reducedMotion) elapsed += delta;
-
-      for (let l = 0; l < orbitLayers.length; l++) {
-        const layer = orbitLayers[l];
-        const attr = disk.children[l].geometry.attributes.position;
-        const pos = attr.array;
-
-        for (let i = 0; i < layer.count; i++) {
-          const angle = layer.angles[i] + elapsed * layer.angularSpeeds[i];
-          const radius = layer.radii[i];
-          const wobble = Math.sin(angle * 2.0 + i * 0.017) * 0.025;
-
-          pos[i * 3] = Math.cos(angle) * (radius + wobble);
-          pos[i * 3 + 1] = layer.verticals[i] + Math.sin(angle * 1.7 + i) * 0.018;
-          pos[i * 3 + 2] = Math.sin(angle) * (radius + wobble) * 0.44;
-        }
-        attr.needsUpdate = true;
-      }
-
-      if (!reducedMotion) {
-        core.rotation.y = elapsed * 0.025;
-        halo.rotation.y = -elapsed * 0.018;
-      }
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    function resize() {
-      camera.aspect = innerWidth / innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
-      renderer.setSize(innerWidth, innerHeight);
-      for (const child of disk.children) {
-        child.material.uniforms.uPixelRatio.value = renderer.getPixelRatio();
-      }
-    }
-    window.addEventListener("resize", resize, { passive: true });
-  
+    attr.needsUpdate=true;
+    if(!reduced){core.rotation.y=elapsed*.025; halo.rotation.y=-elapsed*.018;}
+    renderer.render(scene,camera);
+  }
+  animate();
+  function resize(){
+    camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+    renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5)); renderer.setSize(innerWidth,innerHeight);
+    material.uniforms.uPixelRatio.value=renderer.getPixelRatio();
+  }
+  window.addEventListener("resize",resize,{passive:true});
+}
 </script>
 </body>
 </html>
