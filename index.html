@@ -89,6 +89,7 @@ main{padding:20px 16px 30px}.s8,.s6,.s4,.s3{grid-column:span 12}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -128,14 +129,27 @@ main{padding:20px 16px 30px}.s8,.s6,.s4,.s3{grid-column:span 12}
 /* ============ CAMADA DE DADOS (trocar por Supabase aqui) ============ */
 const mem={};
 const LS={get(k){try{return localStorage.getItem(k)}catch(e){return mem[k]??null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){mem[k]=v}}};
+const SUPABASE_URL="https://pmjmmfmggjqtamoybobq.supabase.co";
+const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtam1tZm1nZ2pxdGFtb3lib2JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwOTE5MjAsImV4cCI6MjA3OTY2NzkyMH0.m8p0MzlR_1_EZ5V1ALTG-w15ZW6vBzbig9rTXGyEBCk";
+const cloud=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const Auth={
-  users(){try{return JSON.parse(LS.get('nsc_users')||'{}')}catch(e){return{}}},
-  hash(s){return btoa(unescape(encodeURIComponent(s)))}, // placeholder: Supabase cuida disso
-  async signUp(name,email,pass){const u=this.users();if(u[email])throw new Error('Este e-mail já está cadastrado.');u[email]={name,pass:this.hash(pass)};LS.set('nsc_users',JSON.stringify(u));return{email,name}},
-  async signIn(email,pass){const u=this.users()[email];if(!u||u.pass!==this.hash(pass))throw new Error('E-mail ou senha incorretos.');return{email,name:u.name}},
-  session(){try{return JSON.parse(LS.get('nsc_session'))}catch(e){return null}},
-  start(u){LS.set('nsc_session',JSON.stringify(u))},
-  end(){LS.set('nsc_session','null')}
+ async signUp(name,email,pass){
+   const {data,error}=await cloud.auth.signUp({email,password:pass,options:{data:{name}}});
+   if(error)throw error;
+   if(!data.session)throw new Error("Conta criada. Confirme o e-mail e depois entre.");
+   return {email:data.user.email,name:name||data.user.user_metadata?.name||email.split("@")[0],id:data.user.id};
+ },
+ async signIn(email,pass){
+   const {data,error}=await cloud.auth.signInWithPassword({email,password:pass});
+   if(error)throw new Error(error.message==="Invalid login credentials"?"E-mail ou senha incorretos. Verifique se essa conta já existe no Supabase.":error.message);
+   return {email:data.user.email,name:data.user.user_metadata?.name||data.user.email.split("@")[0],id:data.user.id};
+ },
+ async session(){
+   const {data}=await cloud.auth.getSession();
+   const s=data.session;
+   return s?.user?{email:s.user.email,name:s.user.user_metadata?.name||s.user.email.split("@")[0],id:s.user.id}:null;
+ },
+ async end(){await cloud.auth.signOut()}
 };
 let user=null,db=null;
 const empty=()=>({tx:[],goals:[],workouts:[],tasks:[],sleep:[],days:{}});
@@ -153,11 +167,14 @@ function switchTab(mode){
 async function handleAuth(e,mode){
   e.preventDefault();
   const f=new FormData(e.target),err=document.getElementById('auth-err');
+  const submit=e.target.querySelector('button[type="submit"]');
   const email=f.get('email').trim().toLowerCase();
+  err.textContent='';submit.disabled=true;submit.textContent='Aguarde...';
   try{
     const u=mode==='login'?await Auth.signIn(email,f.get('pass')):await Auth.signUp(f.get('name').trim(),email,f.get('pass'));
-    Auth.start(u);enter(u);
-  }catch(x){err.textContent=x.message}
+    enter(u);
+  }catch(x){err.textContent=x.message||'Não foi possível autenticar.'}
+  finally{submit.disabled=false;submit.textContent=mode==='login'?'Acessar Sistema':'Criar Minha Conta'}
 }
 
 /* ============ CENA 3D DO LOGIN (base preservada) ============ */
@@ -345,7 +362,7 @@ function render(){
 /* ============ EVENTOS ============ */
 document.addEventListener('click',e=>{
   const go=e.target.closest('[data-go]');if(go){tab=go.dataset.go;render();return}
-  if(e.target.closest('[data-logout]')){Auth.end();location.reload();return}
+  if(e.target.closest('[data-logout]')){Auth.end().finally(()=>location.reload());return}
   const d=e.target.closest('[data-del]');
   if(d){const[c,id]=d.dataset.del.split(':');db[c]=db[c].filter(x=>x.id!==id);Store.save();render();return}
   const g=e.target.closest('[data-goal]');
@@ -375,8 +392,7 @@ function enter(u){
   $('#app').classList.add('on');
   render();
 }
-const s=Auth.session();
-if(s&&s.email)enter(s);
+Auth.session().then(s=>{if(s&&s.email)enter(s)}).catch(e=>console.error('Falha ao restaurar sessão:',e));
 </script>
 </body>
 </html>
