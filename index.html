@@ -141,7 +141,7 @@ button,input,textarea,select{font-family:inherit}
 </head>
 <body>
 
-<section id="landing" class="landing">
+<section id="landing" class="landing hide">
   <header class="landing-nav">
     <div class="landing-brand">NSC<span>.</span> Life OS</div>
     <div class="landing-links"><a href="#aboutNsc">O sistema</a><a href="#landingStats">Recursos</a><button class="landing-btn" id="landingLoginBtn">Entrar na plataforma ↗</button></div>
@@ -165,7 +165,7 @@ button,input,textarea,select{font-family:inherit}
   <footer class="landing-foot"><span>ROTINA</span><span>ESTUDOS</span><span>FINANÇAS</span><span>PROGRESSO</span></footer>
 </section>
 
-<section id="login" class="hide">
+<section id="login">
   <canvas id="nscThreeCanvas" aria-hidden="true"></canvas>
   <div class="login-layout">
     <div class="login-panel">
@@ -197,8 +197,7 @@ button,input,textarea,select{font-family:inherit}
             <option>CLT</option><option>CLT + Estágio</option><option>Professor</option>
             <option>Profissional da saúde</option><option>Empresário</option><option>Outro</option>
           </select>
-          <button id="registerBtn" class="btn primary">Solicitar acesso</button>
-          <div id="registerMsg" class="output hide"></div>
+          <button id="registerBtn" class="btn primary">Solicitar acesso</button>          <div id="registerMsg" class="output hide"></div>
         </div>
       </div>
     </div>
@@ -397,8 +396,7 @@ async function cloudLoad(uid){
     }
   }catch(e){console.error("NSC cloud load",e)}finally{cloudHydrating=false;render();}
 }
-async function cloudSaveMoney(entry){if(!cloudUserId||cloudHydrating)return null;var r=await NSCCloud.from("money_entries").insert({user_id:cloudUserId,entry_type:entry.type,amount:entry.value,category:entry.cat,description:entry.desc,occurred_at:entry.date}).select().single();if(r.error){console.error(r.error);return null}return r.data}
-async function cloudSaveStudy(entry){if(!cloudUserId||cloudHydrating)return null;var r=await NSCCloud.from("study_sessions").insert({user_id:cloudUserId,subject:entry.subject,minutes:entry.minutes,questions:entry.questions,correct:entry.correct,notes:entry.note||"",studied_on:entry.date}).select().single();if(r.error){console.error(r.error);return null}return r.data}
+async function cloudSaveMoney(entry){if(!cloudUserId||cloudHydrating)return null;var r=await NSCCloud.from("money_entries").insert({user_id:cloudUserId,entry_type:entry.type,amount:entry.value,category:entry.cat,description:entry.desc,occurred_at:entry.date}).select().single();if(r.error){console.error(r.error);return null}return r.data}async function cloudSaveStudy(entry){if(!cloudUserId||cloudHydrating)return null;var r=await NSCCloud.from("study_sessions").insert({user_id:cloudUserId,subject:entry.subject,minutes:entry.minutes,questions:entry.questions,correct:entry.correct,notes:entry.note||"",studied_on:entry.date}).select().single();if(r.error){console.error(r.error);return null}return r.data}
 async function cloudCreateSim(){if(!cloudUserId)return null;var payload={status:"in_progress",index:0,answers:[],questions:simState.questions,sourceName:simState.sourceName};var r=await NSCCloud.from("study_simulations").insert({user_id:cloudUserId,title:simState.title,total_questions:simState.questions.length,correct_questions:0,topics:[],analysis:payload,simulated_on:today()}).select().single();if(r.error){console.error(r.error);return null}simState.cloudId=r.data.id;return r.data}
 async function cloudUpdateSim(status){if(!cloudUserId||!simState.cloudId)return null;var correct=simState.answers.filter(function(a){return a.correct}).length,topics={};simState.answers.forEach(function(a){var q=simState.questions[a.index]||{},topic=q.subject||q.topic||q.section||"Geral";if(!topics[topic])topics[topic]={answered:0,correct:0};topics[topic].answered++;if(a.correct)topics[topic].correct++;});var topicArr=Object.keys(topics).map(function(k){return {topic:k,answered:topics[k].answered,correct:topics[k].correct,pct:Math.round(topics[k].correct/topics[k].answered*100)}});var analysis={status:status,index:simState.index,answers:simState.answers,questions:simState.questions,sourceName:simState.sourceName,finishedAt:status==="finished"?new Date().toISOString():null,weakTopics:topicArr.slice().sort(function(a,b){return a.pct-b.pct}).slice(0,5)};var r=await NSCCloud.from("study_simulations").update({total_questions:simState.questions.length,correct_questions:correct,topics:topicArr,analysis:analysis,simulated_on:today()}).eq("id",simState.cloudId).eq("user_id",cloudUserId);if(r.error)console.error(r.error);return r}
 async function enter(){var email=val("loginEmail").toLowerCase(),pass=val("loginPass");if(!email||!pass){showLoginMsg("Digite seu e-mail e sua senha.");return}try{var res=await NSCCloud.auth.signInWithPassword({email:email,password:pass});if(res.error)throw res.error;var uid=res.data.user.id,prof=await NSCCloud.from("profiles").select("*").eq("id",uid).single();if(prof.error)throw prof.error;if(prof.data.status==="pending"){await NSCCloud.auth.signOut();showLoginMsg("🟡 Sua conta está aguardando aprovação do administrador.");return}if(prof.data.status==="blocked"){await NSCCloud.auth.signOut();showLoginMsg("🔴 Esta conta está bloqueada.");return}data.user={name:prof.data.name||"Usuário",email:prof.data.email||email,role:prof.data.role||"user",occupation:prof.data.occupation||"",accountId:uid};save();openApp();await cloudLoad(uid);if(prof.data.role==="admin")showAdminNav();go(prof.data.role==="admin"?"admin":"today")}catch(e){showLoginMsg(e.message||"Não foi possível entrar.")}}
