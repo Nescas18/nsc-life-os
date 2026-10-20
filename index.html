@@ -153,7 +153,45 @@ const Auth={
 };
 let user=null,db=null;
 const empty=()=>({tx:[],goals:[],workouts:[],tasks:[],sleep:[],days:{}});
-const Store={load(){try{db=Object.assign(empty(),JSON.parse(LS.get('nsc_db_'+user.email)||'{}'))}catch(e){db=empty()}},save(){LS.set('nsc_db_'+user.email,JSON.stringify(db))}};
+let cloudSaveQueue=Promise.resolve();
+const mergeData=(a,b)=>{
+  const out=Object.assign(empty(),a||{});
+  const remote=b||{};
+  ['tx','goals','workouts','tasks','sleep'].forEach(k=>{
+    const seen=new Set((out[k]||[]).map(x=>String(x.id)));
+    (remote[k]||[]).forEach(x=>{if(!seen.has(String(x.id))){out[k].push(x);seen.add(String(x.id))}});
+  });
+  out.days=Object.assign({},out.days||{},remote.days||{});
+  return out;
+};
+const Store={
+ async load(){
+   let local={};
+   try{local=JSON.parse(LS.get('nsc_db_'+user.email)||'{}')||{}}catch(e){}
+   db=Object.assign(empty(),local);
+   if(!user.id)return;
+   try{
+     const {data,error}=await cloud.from('lifeos_user_data').select('data,updated_at').eq('user_id',user.id).maybeSingle();
+     if(error)throw error;
+     if(data&&data.data){
+       const merged=mergeData(local,data.data);
+       db=merged;
+       LS.set('nsc_db_'+user.email,JSON.stringify(db));
+       if(JSON.stringify(merged)!==JSON.stringify(data.data))await this.save();
+     }else if(Object.keys(local).length){await this.save()}
+   }catch(e){console.error('Sincronização indisponível; mantendo dados locais:',e)}
+ },
+ save(){
+   const snapshot=JSON.parse(JSON.stringify(db||empty()));
+   if(user?.email)LS.set('nsc_db_'+user.email,JSON.stringify(snapshot));
+   if(!user?.id)return Promise.resolve();
+   cloudSaveQueue=cloudSaveQueue.catch(()=>{}).then(async()=>{
+     const {error}=await cloud.from('lifeos_user_data').upsert({user_id:user.id,data:snapshot,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+     if(error)throw error;
+   }).catch(e=>{console.error('Falha ao sincronizar dados:',e)});
+   return cloudSaveQueue;
+ }
+};
 
 /* ============ AUTH UI ============ */
 function switchTab(mode){
@@ -385,11 +423,13 @@ document.addEventListener('submit',e=>{
 });
 
 /* ============ ENTRADA NO APP ============ */
-function enter(u){
-  user=u;Store.load();
+async function enter(u){
+  user=u;
   loginOn=false;
   $('#auth').style.display='none';container.style.display='none';
   $('#app').classList.add('on');
+  $('#view').innerHTML='<div class="head"><h1>Carregando seus dados...</h1><p>Sincronizando sua conta</p></div>';
+  await Store.load();
   render();
 }
 Auth.session().then(s=>{if(s&&s.email)enter(s)}).catch(e=>console.error('Falha ao restaurar sessão:',e));
