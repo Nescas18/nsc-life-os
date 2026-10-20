@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#090b0f">
 <title>NSC Life OS</title>
 <style>
-:root{--bg:#090b0f;--card:#11151b;--card2:#171c24;--line:#28313e;--txt:#f4f7fb;--muted:#9ba7b8;--accent:#7c9cff;--ok:#65d39b;--warn:#f0c36e;--danger:#ef8080}
+:root{--bg:#08090b;--card:#101113;--card2:#17181b;--line:#292a2d;--txt:#f4f3f0;--muted:#96979b;--accent:#d8d6d0;--ok:#91b8a0;--warn:#d7bd86;--danger:#d98b8b}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 body{min-height:100vh}
@@ -56,6 +56,49 @@ h1{font-size:30px;margin:0 0 5px}.date{color:var(--muted)}
 .legend{display:grid;gap:7px;font-size:12px;color:var(--muted)}
 .legend b{color:var(--txt)}
 .bottom{display:none}
+
+/* NSC editorial redesign */
+html{scroll-behavior:smooth} body{background:#08090b;overflow-x:hidden}
+button,input,textarea,select{font-family:inherit}
+.logo{letter-spacing:-.055em;font-weight:800}
+.landing{min-height:100svh;background:#08090b;color:#f4f3f0;position:relative;isolation:isolate;overflow:hidden}
+.landing:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.23;background-image:radial-gradient(#858585 .65px,transparent .65px);background-size:5px 5px;mask-image:linear-gradient(to bottom,black,transparent 34%)}
+.landing-nav{height:76px;max-width:1490px;margin:auto;padding:0 clamp(20px,5vw,76px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #292a2d;position:relative;z-index:2}
+.landing-brand{font-size:22px;font-weight:850;letter-spacing:-1.2px}.landing-brand span{font-weight:400;color:#8d8d8d}
+.landing-links{display:flex;gap:28px;align-items:center;color:#a6a6a6;font-size:13px}.landing-links a{color:inherit;text-decoration:none}.landing-links a:hover{color:#fff}
+.landing-btn{border:1px solid #303134;background:#0d0e10;color:#f7f6f2;padding:12px 19px;border-radius:12px;font-weight:650;transition:background .2s,border-color .2s}.landing-btn:hover{background:#191a1d;border-color:#666}
+.landing-grid{max-width:1490px;margin:auto;display:grid;grid-template-columns:1fr 1fr;min-height:min(650px,calc(100svh - 180px));border-left:1px solid #292a2d;border-right:1px solid #292a2d;position:relative}
+.landing-copy{padding:clamp(38px,7vw,105px) clamp(22px,3vw,50px);display:flex;flex-direction:column;justify-content:center;border-right:1px solid #292a2d;position:relative;z-index:1}
+.eyebrow{font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;letter-spacing:.19em;color:#85868a;margin-bottom:24px}
+.landing-title{font-family:Georgia,"Times New Roman",serif;font-size:clamp(46px,5.3vw,78px);line-height:.99;font-weight:400;letter-spacing:-.065em;max-width:600px;margin:0 0 26px}
+.landing-title em{font-style:normal;color:#8d8d8d}
+.landing-desc{font-size:15px;line-height:1.7;color:#a4a4a6;max-width:380px;margin:0 0 28px}
+.landing-actions{display:flex;gap:10px;flex-wrap:wrap}.landing-actions .landing-btn.primary{background:#f0efec;color:#111;border-color:#f0efec}.landing-actions .landing-btn.primary:hover{background:#d6d5d1}
+.landing-note{font-size:11px;color:#737478;margin-top:17px;line-height:1.6}
+.orbit-stage{position:relative;min-height:420px;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at 50% 50%,#191a1d 0%,#0a0b0d 42%,#08090b 75%)}
+.orbit-stage:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#08090b 0%,transparent 20%,transparent 80%,#08090b 100%);opacity:.5}
+#orbitCanvas{position:absolute;width:100%;height:100%;inset:0;display:block}
+.orbit-caption{position:absolute;bottom:24px;right:24px;font:10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;color:#777;z-index:1}
+.landing-stats{max-width:1490px;margin:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) 1.2fr;border:1px solid #292a2d;border-top:0;position:relative}
+.landing-stat{padding:22px clamp(18px,3vw,45px);border-right:1px solid #292a2d;min-height:98px}.landing-stat:last-child{border:0}.landing-stat strong{display:block;font:28px/1 Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.04em;margin-bottom:10px}.landing-stat span{display:block;color:#898a8d;font-size:11px;line-height:1.45}.landing-foot{display:flex;justify-content:flex-end;align-items:center;gap:24px;padding:20px clamp(20px,5vw,76px);font-size:12px;color:#9b9b9d}
+#login.hide{display:none!important}
+#login{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:20px;background:#050506eF;backdrop-filter:blur(14px)}
+.login-card{width:min(450px,100%);max-height:calc(100svh - 36px);overflow:auto;background:#0c0d0f;border:1px solid #343538;border-radius:18px;padding:clamp(22px,4vw,34px);box-shadow:0 30px 120px #000b;position:relative}
+.login-card .logo{font-size:23px}.login-card>p:first-of-type{font-family:Georgia,"Times New Roman",serif;font-size:20px;color:#e6e5e1;line-height:1.3}
+.login-close{position:absolute;right:15px;top:15px;background:transparent;border:1px solid #303134;color:#aaa;border-radius:10px;width:34px;height:34px;font-size:18px}
+.login-card label{color:#a2a2a4}.login-card input,.login-card select{background:#101113;border-color:#303134;border-radius:10px}.login-card input:focus,.login-card select:focus{border-color:#777;box-shadow:0 0 0 3px #fff1}
+.login-card .btn{border-radius:10px}.login-card .btn.primary{background:#efeee9;color:#101010}.login-card .btn:not(.primary){background:#121315}
+/* dashboard orb hero */
+.today-hero{min-height:220px;border:1px solid #2c2d30;border-radius:17px;margin-bottom:14px;overflow:hidden;position:relative;background:radial-gradient(ellipse at 78% 50%,#202124 0%,#111214 35%,#0d0e10 75%);display:flex;align-items:center;padding:26px clamp(18px,3vw,34px)}
+.today-hero-copy{position:relative;z-index:2;max-width:54%}.today-hero .eyebrow{margin-bottom:12px}.today-hero h2{font:clamp(27px,3vw,39px)/1.05 Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.05em;margin:0 0 12px}.today-hero p{font-size:13px;line-height:1.6;color:#a3a3a5;max-width:330px;margin:0}.today-hero canvas{position:absolute;right:0;top:0;width:58%;height:100%;pointer-events:auto}
+.card{background:#101113;border-color:#292a2d;border-radius:14px;box-shadow:none}.item{background:#0c0d0f;border-color:#292a2d;border-radius:10px}.nav button{border-radius:9px}.nav button:hover,.nav button.active{background:#1b1c1f}.btn{border-radius:10px}.bar{background:#28292c}.daybar i{background:#c8c7c2}
+@media(max-width:760px){
+ .landing-nav{height:64px;padding:0 18px}.landing-brand{font-size:19px}.landing-links{gap:8px}.landing-links a{display:none}.landing-links .landing-btn{padding:10px 12px;font-size:12px}
+ .landing-grid{grid-template-columns:1fr;border-left:0;border-right:0;min-height:auto}.landing-copy{padding:54px 22px 32px;border-right:0}.landing-title{font-size:clamp(46px,13vw,66px);max-width:470px}.landing-desc{font-size:14px;max-width:440px}.orbit-stage{min-height:300px;grid-row:1}.landing-copy{grid-row:2}.landing-stats{grid-template-columns:repeat(3,minmax(0,1fr));margin:0 14px}.landing-stat{padding:16px 12px;min-height:86px}.landing-stat strong{font-size:22px}.landing-stat span{font-size:10px}.landing-stat:nth-child(4){display:none}.landing-foot{padding:17px 20px;justify-content:center}
+ .today-hero{min-height:250px;align-items:flex-start;padding-top:24px}.today-hero-copy{max-width:68%}.today-hero canvas{width:75%;height:100%;right:-12%}.today-hero h2{font-size:29px}.today-hero p{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
 @media(max-width:760px){
   aside{display:none}
   main{margin:0;width:100%;padding:18px 14px 92px}
@@ -63,8 +106,9 @@ h1{font-size:30px;margin:0 0 5px}.date{color:var(--muted)}
   h1{font-size:24px}
   .grid{grid-template-columns:1fr;gap:11px}
   .card,.card.wide,.card.full{grid-column:1/-1}
-  .bottom{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;z-index:20;left:10px;right:10px;bottom:10px;background:#141922f5;border:1px solid var(--line);backdrop-filter:blur(15px);border-radius:18px;padding:6px}
-  .bottom button{background:transparent;border:0;color:var(--muted);padding:7px 2px;border-radius:12px;font-size:10px;min-height:48px}
+  .bottom{display:grid;display:flex;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;position:fixed;z-index:20;left:8px;right:8px;bottom:8px;background:#111214f5;border:1px solid var(--line);backdrop-filter:blur(15px);border-radius:15px;padding:5px;gap:2px}
+  .bottom::-webkit-scrollbar{display:none}
+  .bottom button{background:transparent;border:0;color:var(--muted);padding:7px 2px;border-radius:10px;font-size:10px;min-height:48px;min-width:62px;flex:1 0 62px}
   .bottom button.active{background:var(--card2);color:var(--txt)}
   .chart{height:165px}
 }
@@ -74,10 +118,35 @@ h1{font-size:30px;margin:0 0 5px}.date{color:var(--muted)}
 </head>
 <body>
 
-<section id="login">
+<section id="landing" class="landing">
+  <header class="landing-nav">
+    <div class="landing-brand">NSC<span>.</span> Life OS</div>
+    <div class="landing-links"><a href="#aboutNsc">O sistema</a><a href="#landingStats">Recursos</a><button class="landing-btn" id="landingLoginBtn">Entrar na plataforma ↗</button></div>
+  </header>
+  <div class="landing-grid" id="aboutNsc">
+    <div class="landing-copy">
+      <div class="eyebrow">Seu sistema pessoal · 2026/27</div>
+      <h1 class="landing-title">Sua vida.<br>Em <em>movimento.</em></h1>
+      <p class="landing-desc">Estudos, rotina, metas e dinheiro em um só lugar. Um espaço para acompanhar o que importa e transformar intenção em progresso.</p>
+      <div class="landing-actions"><button class="landing-btn primary" id="landingStartBtn">Começar agora <span aria-hidden="true">↗</span></button><button class="landing-btn" id="landingLoginSecondary">Já tenho uma conta</button></div>
+      <p class="landing-note">Um painel pessoal para organizar o presente e acompanhar sua evolução, um dia de cada vez.</p>
+    </div>
+    <div class="orbit-stage"><canvas id="orbitCanvas" aria-label="Animação abstrata de um planeta com anéis orbitais"></canvas><div class="orbit-caption">NSC SYSTEM / 001</div></div>
+  </div>
+  <div class="landing-stats" id="landingStats">
+    <div class="landing-stat"><strong>Uma visão</strong><span>Rotina, metas e prioridades conectadas</span></div>
+    <div class="landing-stat"><strong>Todo dia</strong><span>Registre seu progresso e veja a evolução</span></div>
+    <div class="landing-stat"><strong>Seu ritmo</strong><span>Um espaço organizado para seus objetivos</span></div>
+    <div class="landing-stat"><strong>NSC / Life OS</strong><span>Seu centro de comando pessoal</span></div>
+  </div>
+  <footer class="landing-foot"><span>ROTINA</span><span>ESTUDOS</span><span>FINANÇAS</span><span>PROGRESSO</span></footer>
+</section>
+
+<section id="login" class="hide">
   <div class="login-card">
-    <div class="logo"><span>🧠</span> NSC Life OS</div>
-    <p class="muted">Seu painel pessoal de rotina, estudos e dinheiro.</p>
+    <button class="login-close" id="closeLoginBtn" aria-label="Voltar à página inicial">×</button>
+    <div class="logo">NSC<span style="color:#777">.</span> Life OS</div>
+    <p class="muted">Entre no seu espaço de organização pessoal.</p>
     <div id="loginMsg" class="output hide"></div>
     <div id="cloudStatus" class="muted" style="font-size:12px;margin-top:10px">☁️ Conectando ao banco...</div>
     <label for="loginEmail">E-mail</label>
@@ -118,6 +187,7 @@ h1{font-size:30px;margin:0 0 5px}.date{color:var(--muted)}
   </div>
 
   <section id="today" class="screen active">
+    <div class="today-hero"><div class="today-hero-copy"><div class="eyebrow">NSC LIFE OS / HOJE</div><h2>Um passo de cada vez.</h2><p>Organize suas prioridades, acompanhe seu ritmo e mantenha o que importa em movimento.</p></div><canvas id="particleCanvas" aria-label="Globo interativo de partículas"></canvas></div>
     <div class="grid">
       <div class="card wide">
         <h2>📌 Hoje</h2>
@@ -275,7 +345,7 @@ function parseNum(s){return Number(String(s||"").replace(/\./g,"").replace(",","
 function duration(bed,wake){var a=bed.split(":"),b=wake.split(":"),x=+a[0]*60+ +a[1],y=+b[0]*60+ +b[1];if(y<=x)y+=1440;return y-x}
 function go(id){document.querySelectorAll(".screen").forEach(function(x){x.classList.remove("active")});var target=$(id);if(target)target.classList.add("active");document.querySelectorAll("[data-nav]").forEach(function(x){x.classList.toggle("active",x.getAttribute("data-nav")===id)});window.scrollTo({top:0,behavior:"smooth"})}
 var nav=[["today","🏠","Hoje"],["money","💰","Dinheiro"],["goals","🎯","Metas"],["study","📚","Estudos"],["workout","🏋️","Treino"],["tasks","📅","Tarefas"],["sleep","😴","Sono"],["progress","📈","Progresso"]];
-function buildNav(){ $("sideNav").innerHTML=nav.map(function(n){return '<button type="button" data-nav="'+n[0]+'">'+n[1]+' '+n[2]+'</button>'}).join(""); $("bottomNav").innerHTML=nav.slice(0,5).map(function(n){return '<button type="button" data-nav="'+n[0]+'"><div style="font-size:16px">'+n[1]+'</div>'+n[2]+'</button>'}).join(""); document.querySelectorAll("[data-nav]").forEach(function(b){b.onclick=function(){go(b.getAttribute("data-nav"))}})}
+function buildNav(){ $("sideNav").innerHTML=nav.map(function(n){return '<button type="button" data-nav="'+n[0]+'">'+n[1]+' '+n[2]+'</button>'}).join(""); $("bottomNav").innerHTML=nav.map(function(n){return '<button type="button" data-nav="'+n[0]+'"><div style="font-size:16px">'+n[1]+'</div>'+n[2]+'</button>'}).join(""); document.querySelectorAll("[data-nav]").forEach(function(b){b.onclick=function(){go(b.getAttribute("data-nav"))}})}
 function showAdminNav(){if(document.querySelector('[data-nav="admin"]'))return;var b=document.createElement("button");b.type="button";b.setAttribute("data-nav","admin");b.textContent="👑 Administração";$("sideNav").appendChild(b);b.onclick=function(){go("admin")}}
 function showLoginMsg(msg){$("loginMsg").textContent=msg;$("loginMsg").classList.remove("hide")}
 async function cloudLoad(uid){
@@ -298,7 +368,7 @@ async function cloudSaveStudy(entry){if(!cloudUserId||cloudHydrating)return null
 async function cloudCreateSim(){if(!cloudUserId)return null;var payload={status:"in_progress",index:0,answers:[],questions:simState.questions,sourceName:simState.sourceName};var r=await NSCCloud.from("study_simulations").insert({user_id:cloudUserId,title:simState.title,total_questions:simState.questions.length,correct_questions:0,topics:[],analysis:payload,simulated_on:today()}).select().single();if(r.error){console.error(r.error);return null}simState.cloudId=r.data.id;return r.data}
 async function cloudUpdateSim(status){if(!cloudUserId||!simState.cloudId)return null;var correct=simState.answers.filter(function(a){return a.correct}).length,topics={};simState.answers.forEach(function(a){var q=simState.questions[a.index]||{},topic=q.subject||q.topic||q.section||"Geral";if(!topics[topic])topics[topic]={answered:0,correct:0};topics[topic].answered++;if(a.correct)topics[topic].correct++;});var topicArr=Object.keys(topics).map(function(k){return {topic:k,answered:topics[k].answered,correct:topics[k].correct,pct:Math.round(topics[k].correct/topics[k].answered*100)}});var analysis={status:status,index:simState.index,answers:simState.answers,questions:simState.questions,sourceName:simState.sourceName,finishedAt:status==="finished"?new Date().toISOString():null,weakTopics:topicArr.slice().sort(function(a,b){return a.pct-b.pct}).slice(0,5)};var r=await NSCCloud.from("study_simulations").update({total_questions:simState.questions.length,correct_questions:correct,topics:topicArr,analysis:analysis,simulated_on:today()}).eq("id",simState.cloudId).eq("user_id",cloudUserId);if(r.error)console.error(r.error);return r}
 async function enter(){var email=val("loginEmail").toLowerCase(),pass=val("loginPass");if(!email||!pass){showLoginMsg("Digite seu e-mail e sua senha.");return}try{var res=await NSCCloud.auth.signInWithPassword({email:email,password:pass});if(res.error)throw res.error;var uid=res.data.user.id,prof=await NSCCloud.from("profiles").select("*").eq("id",uid).single();if(prof.error)throw prof.error;if(prof.data.status==="pending"){await NSCCloud.auth.signOut();showLoginMsg("🟡 Sua conta está aguardando aprovação do administrador.");return}if(prof.data.status==="blocked"){await NSCCloud.auth.signOut();showLoginMsg("🔴 Esta conta está bloqueada.");return}data.user={name:prof.data.name||"Usuário",email:prof.data.email||email,role:prof.data.role||"user",occupation:prof.data.occupation||"",accountId:uid};save();openApp();await cloudLoad(uid);if(prof.data.role==="admin")showAdminNav();go(prof.data.role==="admin"?"admin":"today")}catch(e){showLoginMsg(e.message||"Não foi possível entrar.")}}
-function openApp(){$("login").classList.add("hide");$("app").classList.remove("hide")}
+function openApp(){$("landing").classList.add("hide");$("login").classList.add("hide");$("app").classList.remove("hide")}
 async function registerUser(){var name=val("regName"),email=val("regEmail").toLowerCase(),pass=val("regPass"),job=val("regJob");if(!name||!email||!pass)return alert("Preencha nome, e-mail e senha.");if(pass.length<6)return alert("A senha precisa ter pelo menos 6 caracteres.");try{var res=await NSCCloud.auth.signUp({email:email,password:pass,options:{data:{name:name,occupation:job}}});if(res.error)throw res.error;$("registerMsg").textContent="🟡 Cadastro enviado! Sua conta ficará aguardando aprovação do administrador.";$("registerMsg").classList.remove("hide");["regName","regEmail","regPass"].forEach(function(id){$(id).value=""});try{await NSCCloud.auth.signOut()}catch(_){}}catch(e){alert(e.message||"Não foi possível criar a conta.")}}
 async function renderAdmin(){var current=await NSCCloud.auth.getUser();if(!current.data.user)return;var me=await NSCCloud.from("profiles").select("role,status").eq("id",current.data.user.id).single();if(me.error||me.data.role!=="admin"||me.data.status!=="approved")return;var q=await NSCCloud.from("profiles").select("*").order("created_at",{ascending:false});if(q.error){$("adminUsers").innerHTML='<div class="muted">Não foi possível carregar os usuários.</div>';return}var arr=q.data||[],pending=arr.filter(function(a){return a.status==="pending"}),approved=arr.filter(function(a){return a.status==="approved"});setText("adminTotal",arr.length);setText("adminPending",pending.length);setText("adminApproved",approved.length);$("adminUsers").innerHTML=arr.length?arr.map(function(a){var buttons=a.status==="pending"?'<button class="btn primary" data-approve-cloud="'+a.id+'">✓ Aprovar</button><button class="btn" data-block-cloud="'+a.id+'">✕ Recusar</button>':a.status==="blocked"?'<button class="btn primary" data-approve-cloud="'+a.id+'">✓ Reativar</button>':'<button class="btn" data-block-cloud="'+a.id+'">⛔ Bloquear</button>';var badge=a.status==="approved"?"🟢 Aprovado":a.status==="blocked"?"🔴 Bloqueado":"🟡 Pendente";return '<div class="item"><div class="between"><div><b>'+esc(a.name||"Sem nome")+'</b><br><small class="muted">'+esc(a.email||"")+' • '+esc(a.occupation||"Não informado")+'</small></div><b>'+badge+'</b></div><div class="actions">'+buttons+'</div></div>'}).join(""):'<div class="muted">Nenhuma conta cadastrada.</div>';document.querySelectorAll("[data-approve-cloud]").forEach(function(b){b.onclick=async function(){var r=await NSCCloud.from("profiles").update({status:"approved"}).eq("id",b.getAttribute("data-approve-cloud"));if(r.error)alert(r.error.message);await renderAdmin()}});document.querySelectorAll("[data-block-cloud]").forEach(function(b){b.onclick=async function(){var r=await NSCCloud.from("profiles").update({status:"blocked"}).eq("id",b.getAttribute("data-block-cloud"));if(r.error)alert(r.error.message);await renderAdmin()}})}
 async function addMoney(){var desc=val("moneyDesc"),value=parseNum(val("moneyValue")),type=val("moneyType");if(!desc||value<=0)return alert("Informe descrição e valor.");var low=desc.toLowerCase(),cat="Outros";if(/gasolina|combustível|combustivel|estacionamento/.test(low))cat="Transporte";else if(/teclado|computador|notebook|celular|mouse|monitor/.test(low))cat="Tecnologia";else if(/bombom|comida|lanche|almoço|almoco|janta|restaurante/.test(low))cat="Alimentação";else if(/presente|namorada|namorado/.test(low))cat="Presentes";var entry={id:Date.now(),date:today(),desc:desc,value:value,type:type,cat:cat};if(cloudUserId){var row=await cloudSaveMoney(entry);if(!row)return alert("Não consegui salvar no banco. Tente novamente.");entry.id=row.id}data.money.push(entry);["moneyDesc","moneyValue"].forEach(function(id){$(id).value=""});save()}
@@ -412,7 +482,33 @@ function renderWorkout(){var arr=data.workout.slice().reverse().slice(0,30);$('w
 function renderTasks(){var arr=data.tasks.slice().sort(function(a,b){return a.date.localeCompare(b.date)});$('taskList').innerHTML=arr.length?arr.map(function(x){return '<div class="item between"><span style="'+(x.done?"text-decoration:line-through;opacity:.6":"")+'"><b>'+esc(x.text)+'</b><br><small class="muted">'+x.date+'</small></span><button class="btn '+(x.done?"primary":"")+'" data-task="'+x.id+'">'+(x.done?"✓":"Concluir")+'</button></div>'}).join(""):'<div class="muted">Nenhuma tarefa.</div>';document.querySelectorAll('[data-task]').forEach(function(b){b.onclick=function(){toggleTask(Number(b.getAttribute('data-task')))}})}
 function renderSleep(){var arr=data.sleep.slice().reverse().slice(0,20),total=arr.reduce(function(a,x){return a+duration(x.bed,x.wake)},0),avg=arr.length?Math.round(total/arr.length):0;setText('sleepAvg',Math.floor(avg/60)+"h "+(avg%60)+"min");$('sleepList').innerHTML=arr.length?arr.map(function(x){var d=duration(x.bed,x.wake);return '<div class="item"><b>'+x.date+'</b><br><small class="muted">'+x.bed+' → '+x.wake+' • '+Math.floor(d/60)+'h '+d%60+'min</small></div>'}).join(""):'<div class="muted">Nenhum sono registrado.</div>'}
 function renderProgress(){var start=new Date("2026-09-03T00:00:00"),todayD=new Date(today()+"T00:00:00"),diff=Math.floor((todayD-start)/86400000)+1;diff=Math.max(1,Math.min(365,diff));setText('annualDay',"Dia "+diff+"/365");$('annualBar').style.width=Math.round(diff/365*100)+"%";var cd=Math.max(1,Math.min(75,diff));setText('challengeDay',"Dia "+cd+"/75");$('challengeBar').style.width=Math.round(cd/75*100)+"%"}
-$('enterBtn').onclick=enter;$('showRegisterBtn').onclick=function(){$('registerBox').classList.toggle('hide')};$('registerBtn').onclick=registerUser;$('logoutBtn').onclick=async function(){try{await NSCCloud.auth.signOut()}catch(_){}cloudUserId=null;data=cloneDefault();simState={questions:[],index:0,answers:[],title:"",sourceName:"",cloudId:null};$('app').classList.add('hide');$('login').classList.remove('hide')};$('profileBtn').onclick=function(){go('profile')};$('addMoneyBtn').onclick=addMoney;$('addGoalBtn').onclick=addGoal;$('addStudyBtn').onclick=addStudy;$('addWorkoutBtn').onclick=addWorkout;$('addTaskBtn').onclick=addTask;$('addSleepBtn').onclick=addSleep;$('analyzePdfBtn').onclick=analyzePdf;$('clearPdfBtn').onclick=clearPdf;$('nextQuestionBtn').onclick=nextQuestion;$('finishSimBtn').onclick=finishSim;$('taskDate').value=today();buildNav();render();
+
+function initNscAnimations(){
+  function setupCanvas(canvas,kind){if(!canvas)return;var ctx=canvas.getContext('2d');if(!ctx)return;var w=0,h=0,dpr=1,frame=0,mouse={x:-9999,y:-9999,downUntil:0},points=[];var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function resize(){var r=canvas.getBoundingClientRect();w=Math.max(1,r.width);h=Math.max(1,r.height);dpr=Math.min(window.devicePixelRatio||1,1.7);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);var count=kind==='orbit'?680:360;points=[];for(var i=0;i<count;i++){var z=Math.random()*2-1,a=Math.random()*Math.PI*2,rr=Math.sqrt(1-z*z);points.push({x:rr*Math.cos(a),y:z,z:rr*Math.sin(a),phase:Math.random()*Math.PI*2,size:.45+Math.random()*.75})}}
+    function pointer(e){var r=canvas.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top}canvas.addEventListener('pointermove',pointer,{passive:true});canvas.addEventListener('pointerleave',function(){mouse.x=-9999;mouse.y=-9999},{passive:true});canvas.addEventListener('pointerdown',function(e){pointer(e);mouse.downUntil=performance.now()+460},{passive:true});
+    function draw(t){if(!document.body.contains(canvas))return;frame++;ctx.clearRect(0,0,w,h);var cx=w*(kind==='orbit'?.52:.69),cy=h*.5;var scale=Math.min(w,h)*(kind==='orbit'?.34:.39);var rot=reduced?-.25:t*.00016;var click=Math.max(0,1-(t-mouse.downUntil+460)/460);if(mouse.downUntil<t)click=0;
+      if(kind==='orbit'){
+        // Orbital trails and a dark central planet, drawn as a lightweight live canvas scene.
+        ctx.save();ctx.translate(cx,cy);ctx.rotate(-.27+Math.sin(t*.00013)*.035);
+        for(var ring=0;ring<17;ring++){var rx=scale*(.66+ring*.033),ry=scale*(.16+ring*.008);ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);ctx.strokeStyle='rgba(208,207,201,'+(0.035+(ring%4)*.012)+')';ctx.lineWidth=.7;ctx.stroke()}
+        for(var k=0;k<760;k++){var a=k*2.399963+ t*.00015*(k%2?1:-1),rad=scale*(.58+(k%131)/131*.55),x=Math.cos(a)*rad,y=Math.sin(a)*rad*.245;var glow=.18+((Math.sin(k*12.31)+1)*.21);ctx.beginPath();ctx.arc(x,y,.35+(k%4)*.12,0,Math.PI*2);ctx.fillStyle='rgba(231,229,222,'+glow+')';ctx.fill()}
+        var grad=ctx.createRadialGradient(-scale*.07,-scale*.09,1,0,0,scale*.16);grad.addColorStop(0,'#28292b');grad.addColorStop(.65,'#090a0b');grad.addColorStop(1,'#020203');ctx.beginPath();ctx.arc(0,0,scale*.16,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();ctx.restore();
+        // faint vertical and horizontal editorial guide lines
+        ctx.strokeStyle='rgba(150,150,150,.08)';ctx.beginPath();ctx.moveTo(w*.5,0);ctx.lineTo(w*.5,h);ctx.moveTo(0,h*.5);ctx.lineTo(w,h*.5);ctx.stroke();
+      }else{
+        var rotY=reduced?0:t*.00032,rotX=-.12;var projected=[];for(var i=0;i<points.length;i++){var p=points[i],x=p.x*Math.cos(rotY)-p.z*Math.sin(rotY),z=p.x*Math.sin(rotY)+p.z*Math.cos(rotY),y=p.y*Math.cos(rotX)-z*Math.sin(rotX),zz=p.y*Math.sin(rotX)+z*Math.cos(rotX);var px=cx+x*scale,py=cy+y*scale;var dx=px-mouse.x,dy=py-mouse.y,dist=Math.sqrt(dx*dx+dy*dy),push=dist<78?(1-dist/78)*25:0;if(push){px+=dx/(dist||1)*push;py+=dy/(dist||1)*push}if(click){var ddx=px-cx,ddy=py-cy,dd=Math.sqrt(ddx*ddx+ddy*ddy)||1;px+=ddx/dd*click*24;py+=ddy/dd*click*24}projected.push({x:px,y:py,z:zz,size:p.size,phase:p.phase})}
+        projected.sort(function(a,b){return a.z-b.z});for(var j=0;j<projected.length;j++){var q=projected[j],alpha=.24+(q.z+1)*.31;ctx.beginPath();ctx.arc(q.x,q.y,q.size*(.72+(q.z+1)*.22),0,Math.PI*2);ctx.fillStyle='rgba(231,231,226,'+alpha+')';ctx.fill()}
+        // subtle latitude rings
+        ctx.save();ctx.translate(cx,cy);ctx.rotate(-.12);ctx.strokeStyle='rgba(210,210,205,.09)';for(var r=1;r<=3;r++){ctx.beginPath();ctx.ellipse(0,0,scale*.93,scale*(r*.12),0,0,Math.PI*2);ctx.stroke()}ctx.restore();
+      }
+      if(!reduced)requestAnimationFrame(draw)
+    }
+    resize();if('ResizeObserver' in window){new ResizeObserver(resize).observe(canvas)}else window.addEventListener('resize',resize);requestAnimationFrame(draw)
+  }
+  setupCanvas(document.getElementById('orbitCanvas'),'orbit');setupCanvas(document.getElementById('particleCanvas'),'globe');
+}
+$('enterBtn').onclick=enter;$('landingLoginBtn').onclick=$('landingStartBtn').onclick=$('landingLoginSecondary').onclick=function(){$('landing').classList.add('hide');$('login').classList.remove('hide');$('loginEmail').focus()};$('closeLoginBtn').onclick=function(){$('login').classList.add('hide');$('landing').classList.remove('hide')};$('showRegisterBtn').onclick=function(){$('registerBox').classList.toggle('hide')};$('registerBtn').onclick=registerUser;$('logoutBtn').onclick=async function(){try{await NSCCloud.auth.signOut()}catch(_){}cloudUserId=null;data=cloneDefault();simState={questions:[],index:0,answers:[],title:"",sourceName:"",cloudId:null};$('app').classList.add('hide');$('login').classList.add('hide');$('landing').classList.remove('hide')};$('profileBtn').onclick=function(){go('profile')};$('addMoneyBtn').onclick=addMoney;$('addGoalBtn').onclick=addGoal;$('addStudyBtn').onclick=addStudy;$('addWorkoutBtn').onclick=addWorkout;$('addTaskBtn').onclick=addTask;$('addSleepBtn').onclick=addSleep;$('analyzePdfBtn').onclick=analyzePdf;$('clearPdfBtn').onclick=clearPdf;$('nextQuestionBtn').onclick=nextQuestion;$('finishSimBtn').onclick=finishSim;$('taskDate').value=today();buildNav();render();initNscAnimations();
 })();
 </script>
 </body>
