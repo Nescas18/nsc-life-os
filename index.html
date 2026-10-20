@@ -550,6 +550,7 @@ $('enterBtn').onclick=enter;$('landingLoginBtn').onclick=$('landingStartBtn').on
         new THREE.SphereGeometry(2.05, 64, 48),
         new THREE.MeshStandardMaterial({ color: 0x10141b, roughness: 0.8, metalness: 0.18 })
       );
+      core.position.x = innerWidth <= 700 ? 0.4 : 3.5;
       scene.add(core);
       scene.add(new THREE.AmbientLight(0x8490a8, 0.28));
       const keyLight = new THREE.PointLight(0x9bb8ff, 95, 24, 2);
@@ -559,6 +560,7 @@ $('enterBtn').onclick=enter;$('landingLoginBtn').onclick=$('landingStartBtn').on
 
       const halo = new THREE.Mesh(new THREE.SphereGeometry(2.17, 48, 32),
         new THREE.MeshBasicMaterial({ color: 0x7089b2, transparent: true, opacity: 0.09, side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false }));
+      halo.position.copy(core.position);
       scene.add(halo);
 
       const texCanvas = document.createElement("canvas");
@@ -575,7 +577,7 @@ $('enterBtn').onclick=enter;$('landingLoginBtn').onclick=$('landingStartBtn').on
       particleMap.colorSpace = THREE.SRGBColorSpace;
 
       const disk = new THREE.Group();
-      disk.rotation.x = -0.38; disk.rotation.z = 0.08; scene.add(disk);
+      disk.rotation.x = -0.38; disk.rotation.z = 0.08; disk.position.x = core.position.x; scene.add(disk);
       const layerSpecs = [
         {count:22000, inner:2.30, outer:4.25, thickness:.18, size:.15, opacity:.78},
         {count:14000, inner:3.25, outer:6.30, thickness:.36, size:.12, opacity:.55},
@@ -638,7 +640,8 @@ $('enterBtn').onclick=enter;$('landingLoginBtn').onclick=$('landingStartBtn').on
       clock.last=0; raf=requestAnimationFrame(animate);
       resizeObserver = new ResizeObserver(() => {
         if(!renderer || !camera) return;
-        camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+        camera.aspect=innerWidth/innerHeight; camera.position.x = innerWidth <= 700 ? 0.4 : 0; camera.updateProjectionMatrix();
+        core.position.x = innerWidth <= 700 ? 0.4 : 3.5; halo.position.copy(core.position); disk.position.x = core.position.x;
         renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.35)); renderer.setSize(innerWidth,innerHeight);
       });
       resizeObserver.observe(document.documentElement);
