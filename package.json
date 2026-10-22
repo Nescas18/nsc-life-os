@@ -1,0 +1,17 @@
+{
+  "name": "nsc-life-os-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Build mobile wrapper for NSC Life OS",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "mobile:sync": "npm run build && cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3"
+  }
+}
