@@ -708,7 +708,7 @@ const num=(v,d=1)=>(isFinite(v)?v:0).toLocaleString('pt-BR',{minimumFractionDigi
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 let tt,lastSig='',lastT=0;
-const APPS={uber:{n:'Uber',i:'🚗',c:'#e5534b'},n99:{n:'99',i:'🚕',c:'#f5c518'}},PASS_CATALOG={uber:[{id:'time24',label:'Passe por tempo · 24h',price:29,days:1},{id:'time72',label:'Passe por tempo · 72h',price:77,days:3},{id:'earn196',label:'Passe de ganhos · R$ 196',price:32,days:7},{id:'earn552',label:'Passe de ganhos · R$ 552',price:85,days:7}],n99:[{id:'time1',label:'Pacote de tempo · 1 dia ilimitado',price:28.99,days:1},{id:'time3',label:'Pacote de tempo · 3 dias ilimitado',price:74.99,days:3},{id:'earn200',label:'Pacote de ganhos · R$ 200 (180 dias)',price:27.99,days:180},{id:'earn600',label:'Pacote de ganhos · R$ 600 (180 dias)',price:69.99,days:180}]},appOf=t=>t.app||'uber';
+const APPS={uber:{n:'Uber',i:'🚗',c:'#e5534b'},n99:{n:'99',i:'🚕',c:'#f5c518'}},PASS_CATALOG={uber:[{id:'time24',label:'Passe por tempo · 24h',price:29,days:1},{id:'time72',label:'Passe por tempo · 72h',price:77,days:3},{id:'earn196',label:'Passe de ganhos · R$ 196',price:32,days:1},{id:'earn552',label:'Passe de ganhos · R$ 552',price:85,days:1}],n99:[{id:'time1',label:'Pacote de tempo · 1 dia ilimitado',price:28.99,days:1},{id:'time3',label:'Pacote de tempo · 3 dias ilimitado',price:74.99,days:3},{id:'earn200',label:'Pacote de ganhos · R$ 200 (180 dias)',price:27.99,days:180},{id:'earn600',label:'Pacote de ganhos · R$ 600 (180 dias)',price:69.99,days:180}]},appOf=t=>t.app||'uber';
 const APPN=a=>APPS[a]?APPS[a].n:'Geral';
 let lm='in',pday=null,fper='m',fFrom='',fTo='',rper='m';
 const pd=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
@@ -770,10 +770,12 @@ const active=(a,d)=>db.jr.some(j=>j.app===a&&j.d===d&&hasAct(j))||db.tx.some(t=>
 /* Passes por aplicativo: o custo é rateado pelos dias ativos na validade registrada. */
 const passOf=(a,wk)=>db.tx.find(t=>t.type==='pass'&&appOf(t)===a&&(t.wk||wkStart(t.d))===wk);
 function selectedPass(a){const p=(cfg().pass||{})[a]||{},list=PASS_CATALOG[a]||[];return list.find(x=>x.id===p.packageId)||list[0]}
-function ensurePass(a,d){const p=(cfg().pass||{})[a],opt=selectedPass(a);if(!p||!p.on||!APPS[a]||!opt)return;const wk=wkStart(d),base='pass-'+a+'-'+wk;if(passOf(a,wk)||(db._del[base]&&db._del[base]!=='auto'))return;
+function ensurePass(a,d){const p=(cfg().pass||{})[a],opt=selectedPass(a);if(!p||!p.on||!APPS[a]||!opt)return;
+ const covered=db.tx.some(t=>t.type==='pass'&&appOf(t)===a&&d>=t.d&&d<=addD(t.d,Math.max(1,Number(t.validDays)||7)-1));
+ if(covered)return;const wk=wkStart(d),base='pass-'+a+'-'+d;if(db.tx.some(t=>t.id===base)||(db._del[base]&&db._del[base]!=='auto'))return;
  const price=Number(opt.price)||0,days=Number(opt.days)||1;db.tx.push({id:db._del[base]?base+'-'+uid():base,d,type:'pass',desc:opt.label+' · '+APPS[a].n,v:price,app:a,wk,validDays:days,packageId:opt.id,at:Date.now()})}
 function reconcilePass(a,wk,force){const p=passOf(a,wk);if(!p||!APPS[a])return;if(force||![...Array(7)].some((_,i)=>active(a,addD(wk,i)))){db.tx=db.tx.filter(x=>x!==p);db._del[p.id]='auto';if(!db._del['pass-'+a+'-'+wk])db._del['pass-'+a+'-'+wk]='auto'}}
-function passShare(a,f,t){let s=0;db.tx.filter(x=>x.type==='pass'&&appOf(x)===a).forEach(p=>{const n=Math.max(1,Number(p.validDays)||7),days=[...Array(n)].map((_,i)=>addD(p.d,i)),act=days.filter(d=>active(a,d)),base=act.length?act:days,daily=(Number(p.v)||0)/base.length;base.forEach(d=>{if(inR(d,f,t))s+=daily})});return Math.round(s*100)/100}
+function passShare(a,f,t){let s=0;db.tx.filter(x=>x.type==='pass'&&appOf(x)===a).forEach(p=>{const n=Math.max(1,Number(p.validDays)||7),daily=(Number(p.v)||0)/n;for(let i=0;i<n;i++){const d=addD(p.d,i);if(inR(d,f,t))s+=daily}});return Math.round(s*100)/100}
 const ownDaily=()=>{const o=cfg().own||{};return((+o.parcela||0)+(+o.deprec||0)+(+o.outros||0))/30.4375+((+o.seguro||0)+(+o.ipva||0))/365};
 /* parte dos gastos gerais (do veículo) atribuída a cada app: por km quando os dois apps têm km, senão por faturamento */
 function shareOf(a,f,t){const st=x=>{const jr=db.jr.filter(j=>j.app===x&&inR(j.d,f,t)),ins=db.tx.filter(z=>z.type==='in'&&appOf(z)===x&&inR(z.d,f,t));return{km:jr.reduce((s,j)=>s+(jrKm(j)||0),0),inc:sum(ins),act:jr.some(hasAct)||ins.length>0}};
