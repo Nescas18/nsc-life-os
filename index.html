@@ -251,11 +251,10 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
       <button class="tab-btn" id="btn-tab-register" onclick="switchTab('register')">Criar Conta</button>
     </div>
     <form id="form-login" onsubmit="handleAuth(event,'login')">
-      <div class="form-group"><label for="li-email">E-mail</label><input id="li-email" name="email" type="email" autocomplete="email" placeholder="seu@email.com" required /></div>
-      <div class="form-group"><label for="li-pass">Senha</label><div class="pw"><input id="li-pass" name="pass" type="password" autocomplete="current-password" placeholder="••••••••" required /><button type="button" class="eye" onclick="togglePw(this)" aria-label="Mostrar senha" aria-pressed="false">👁</button></div></div>
+      <div class="form-group"><label for="li-email">E-mail</label><input id="li-email" name="email" type="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="email" placeholder="seu@email.com" required /></div>
+      <div class="form-group"><label for="li-pass">Senha</label><div class="pw"><input id="li-pass" name="pass" type="password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="••••••••" required /><button type="button" class="eye" onclick="togglePw(this)" aria-label="Mostrar senha" aria-pressed="false">👁</button></div></div>
       <button type="submit" class="btn-submit">Acessar Sistema</button>
       <div class="form-footer"><button type="button" class="forgot-link" onclick="forgotPw()">Esqueceu a senha?</button></div>
-      <p class="brand-subtitle" id="demo-hint" style="margin-top:22px;font-size:.82rem">Acesso de demonstração: <b style="color:#fff">demo@nsclife.com</b> / <b style="color:#fff">nsc12345</b></p>
     </form>
     <form id="form-register" style="display:none" onsubmit="handleAuth(event,'register')">
       <div class="form-group"><label for="re-name">Nome Completo</label><input id="re-name" name="name" type="text" autocomplete="name" placeholder="Seu nome" required /></div>
@@ -282,13 +281,13 @@ const LS={get(k){try{return localStorage.getItem(k)}catch(e){return mem[k]??null
 const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error('Não foi possível carregar '+src));document.head.appendChild(s)});
 /* Supabase opcional: ativado só quando supabaseUrl + supabaseAnonKey estão configurados (ver LEIA-ME). */
 const Cloud={on:!!(C.supabaseUrl&&C.supabaseAnonKey),sb:null,
-  async init(){if(!this.on)return false;if(this.sb)return true;if(!window.supabase)await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js');this.sb=window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey);return true},
+  async init(){if(!this.on)return false;if(this.sb)return true;if(!window.supabase)await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js');this.sb=window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return true},
   async pull(id){const{data,error}=await this.sb.from('lifeos_user_data').select('data,updated_at').eq('user_id',id).maybeSingle();if(error)throw error;return data&&data.data},
   async push(id,doc){const{error}=await this.sb.from('lifeos_user_data').upsert({user_id:id,data:doc,updated_at:new Date().toISOString()});if(error)throw error}
 };
 const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
 const Auth={
-  users(){let u;try{u=JSON.parse(LS.get('nsc_users')||'{}')}catch(e){u={}}if(!u['demo@nsclife.com'])u['demo@nsclife.com']={name:'Romulo',pass:this.hash('nsc12345')};return u},
+  users(){let u;try{u=JSON.parse(LS.get('nsc_users')||'{}')}catch(e){u={}}return u},
   hash(s){return btoa(unescape(encodeURIComponent(s)))}, // formato antigo: só é aceito para migrar contas existentes
   async kdf(pass,salt){if(!(window.crypto&&crypto.subtle))return null;const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveBits']);return hex(await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:120000,hash:'SHA-256'},k,256))},
   async mk(pass){const salt=hex(crypto.getRandomValues(new Uint8Array(16))),h=await this.kdf(pass,salt);return h?'p2$'+salt+'$'+h:this.hash(pass)},
@@ -297,6 +296,7 @@ const Auth={
     if(Cloud.on){await Cloud.init();const{data,error}=await Cloud.sb.auth.signUp({email,password:pass,options:{data:{name}}});if(error)throw new Error(cloudErr(error));if(!data.session){const e=new Error('Conta criada. Confirme o e-mail que enviamos e depois entre.');e.info=true;throw e}return{email,name,id:data.user.id}}
     const u=this.users();if(u[email])throw new Error('Este e-mail já está cadastrado.');u[email]={name,pass:await this.mk(pass)};LS.set('nsc_users',JSON.stringify(u));return{email,name}},
   async signIn(email,pass){
+    email=String(email||'').trim().toLowerCase();pass=String(pass??'').trim();
     if(Cloud.on){await Cloud.init();const{data,error}=await Cloud.sb.auth.signInWithPassword({email,password:pass});if(error)throw new Error(cloudErr(error));const m=data.user.user_metadata||{};return{email,name:m.name||email.split('@')[0],id:data.user.id}}
     const all=this.users(),u=all[email];if(!u||!await this.check(u.pass,pass))throw new Error('E-mail ou senha incorretos.');
     if(!u.pass.startsWith('p2$')&&window.crypto&&crypto.subtle){u.pass=await this.mk(pass);LS.set('nsc_users',JSON.stringify(all))} // migra o formato antigo
@@ -565,10 +565,11 @@ function switchTab(mode){
 async function handleAuth(e,mode){
   e.preventDefault();
   const f=new FormData(e.target),err=document.getElementById('auth-err'),b=e.target.querySelector('[type=submit]');
-  const email=f.get('email').trim().toLowerCase();
+  const email=String(f.get('email')||'').trim().toLowerCase();
+  const pass=String(f.get('pass')??'').trim();
   err.textContent='';err.classList.remove('info');b.disabled=true;
   try{
-    const u=mode==='login'?await Auth.signIn(email,f.get('pass')):await Auth.signUp(f.get('name').trim(),email,f.get('pass'));
+    const u=mode==='login'?await Auth.signIn(email,pass):await Auth.signUp(f.get('name').trim(),email,pass);
     Auth.start(u);enter(u,true,mode==='register');
   }catch(x){err.textContent=x.message||'Não foi possível concluir. Tente novamente.';err.classList.toggle('info',!!x.info)}
   finally{b.disabled=false}
@@ -576,8 +577,6 @@ async function handleAuth(e,mode){
 async function forgotPw(){const err=document.getElementById('auth-err'),em=document.getElementById('li-email').value.trim().toLowerCase();err.classList.add('info');
   if(Cloud.on&&!em){err.classList.remove('info');err.textContent='Digite seu e-mail no campo acima e clique novamente.';return}
   try{err.textContent=await Auth.reset(em)}catch(x){err.classList.remove('info');err.textContent=x.message}}
-if(Cloud.on){const h=document.getElementById('demo-hint');if(h)h.style.display='none'}
-
 /* ============ CENA 3D DO LOGIN (base preservada) ============ */
 const container=document.getElementById('canvas-container');
 const LOWPOWER=(navigator.hardwareConcurrency||8)<=4||(navigator.deviceMemory||8)<=2;
