@@ -1,0 +1,6 @@
+{
+  "appId": "com.nscai.lifeos",
+  "appName": "NSC Life OS",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
