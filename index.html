@@ -1366,9 +1366,8 @@ function dupDialog(a,d,v,ex,editId){pendInc={a,d,v,editId};modal(`<h2>Já existe
 let obSel=null,acIdx=-1;
 function openOnboard(){const v=db.vehicle||{},c=cfg();obSel=v.catId?catById(v.catId):null;const en=v.energy||'flex',ml=measured('L'),mk=measured('kWh');
   const o=(m,cur)=>Object.entries(m).map(([k,n])=>`<option value="${k}" ${k===cur?'selected':''}>${n}</option>`).join('');
-  modal(`<h2>${db.vehicle?'Editar veículo':'Vamos configurar seu NSC'}</h2><p class="sub" style="margin-bottom:18px">Esses dados alimentam o custo por km, o resumo do veículo e os lembretes de manutenção.</p>
+  modal(`<h2>${db.vehicle?'Editar veículo':'Cadastrar veículo'}</h2><p class="sub" style="margin-bottom:18px">Cadastre os dados do veículo para calcular consumo, custo por km e lembretes de manutenção. Você pode fazer isso depois.</p>
   <form data-form="ob" autocomplete="off" novalidate>
-  <div class="f"><label for="ob-name">Seu nome</label><input id="ob-name" name="name" value="${esc(user.name)}" required></div>
   <div class="f acw"><label for="vq">Veículo: busque por marca, modelo, versão ou motorização</label><input id="vq" role="combobox" aria-expanded="false" aria-controls="aclist" aria-autocomplete="list" value="${obSel?esc(obSel.brand+' '+obSel.model+' '+obSel.ver):''}" placeholder="Ex.: onix turbo, dolphin, corolla hybrid"><div class="ac" id="aclist" role="listbox"></div></div>
   <label class="chkl" style="margin:-4px 0 14px"><input type="checkbox" name="custom" value="1" data-obcustom ${v.custom?'checked':''}> Não encontrei meu veículo na lista</label>
   <div id="obcustom" class="row wrap" style="display:${v.custom?'flex':'none'}"><div class="f"><label>Marca</label><input name="brand" value="${v.custom?esc(v.brand):''}"></div><div class="f"><label>Modelo</label><input name="model" value="${v.custom?esc(v.model):''}"></div><div class="f"><label>Carroceria</label><select name="body">${o(BODY,v.body||'hatch')}</select></div></div>
@@ -1379,7 +1378,7 @@ function openOnboard(){const v=db.vehicle||{},c=cfg();obSel=v.catId?catById(v.ca
   <div class="row wrap"><div class="f" data-en="flex gas hev phev"><label>Preço do combustível (R$/L)</label><input name="price" inputmode="decimal" value="${num(c.price,2)}"></div><div class="f" data-en="ev phev"><label>Preço da energia (R$/kWh)</label><input name="kwh" inputmode="decimal" value="${num(c.kwh,2)}"></div><div class="f" data-en="ev phev"><label>Perdas na recarga (%)</label><input name="loss" inputmode="numeric" value="${c.loss}"></div></div>
   <div class="f"><label>Quilometragem atual do veículo (km, opcional)</label><input name="odo" inputmode="numeric" value="${v.odo!=null&&v.odo!==''?Math.round(v.odo):''}" placeholder="Quilometragem não informada"></div>
   <div class="err" id="oberr" role="alert"></div>
-  <div class="row wrap"><button class="btn">Salvar</button>${db.vehicle?mclose:'<button type="button" class="btn ghost" data-obskip>Configurar depois</button>'}</div></form>`);
+  <div class="row wrap"><button class="btn">Salvar veículo</button><button type="button" class="btn ghost" data-obskip>Deixar para depois</button>${mclose}</div></form>`);
   obSync()}
 function obSync(){const f=$('#mbox form[data-form=ob]');if(!f)return;const en=f.energy.value;
   f.querySelectorAll('[data-en]').forEach(el=>el.style.display=el.dataset.en.split(' ').includes(en)?'':'none');
@@ -1410,7 +1409,6 @@ function obSave(f){const err=$('#oberr'),cu=!!f.custom,c=db.cfg,P=v=>parseDec(v)
   if(en!=='ev'){c.kml=P(f.kml);const pr=P(f.price);if(pr>0)c.price=pr;c.fuel=f.fuel}
   if(en==='ev'||en==='phev'){c.kmkwh=P(f.kmkwh);const kw=P(f.kwh);if(kw>0)c.kwh=kw;c.loss=clamp(P(f.loss)||0,0,50)}
   if(en==='phev')c.evShare=clamp(P(f.evShare)||0,0,100);
-  const nm=(f.name||'').trim();if(nm&&nm!==user.name)Auth.rename(nm);
   delete c.obSkip;return true}
 
 /* ============ EVENTOS ============ */
@@ -1424,7 +1422,7 @@ document.addEventListener('click',e=>{
   if(T.id==='modal'){closeModal();return}
   const pk=T.closest('[data-pick]');if(pk){obPick(pk.dataset.pick);return}
   if(T.closest('[data-close]')){closeModal();return}
-  if(T.closest('[data-obskip]')){db.cfg.obSkip=true;Store.save();closeModal();render();toast('Você pode cadastrar o veículo depois em Uber ou 99 → Editar veículo.');return}
+  if(T.closest('[data-obskip]')){db.cfg.obSkip=true;Store.save();closeModal();render();toast('Tudo certo. Você pode cadastrar o veículo depois na aba Uber ou 99.');return}
   const go=T.closest('[data-go]');if(go){tab=go.dataset.go;if($('#modal.on'))closeModal();render();$('main').scrollTop=0;return}
   if(T.closest('[data-onboard]')){openOnboard();return}
   if(T.closest('[data-more]')){openSheet();return}
@@ -1589,7 +1587,7 @@ function enter(u,anim){
   const done=()=>{stopLogin();$('#auth').style.display='none';container.style.display='none';const a=$('#app');a.classList.add('on');if(anim&&!RM.matches)a.classList.add('reveal');render();if(anim)requestAnimationFrame(()=>requestAnimationFrame(()=>a.classList.remove('reveal')));
     Store.pull();
     if(UBER_RET){tab='uber';render();const m={connected:'Conta Uber conectada. Use "Sincronizar" para importar os dados oficiais.',access_pending:'Conta Uber conectada, mas a Uber ainda não liberou o acesso aos dados.',denied:UBER_MSG.access_denied,error:UBER_MSG[UBER_RET.reason]||'Não foi possível conectar a Uber.'}[UBER_RET.r];if(m)toast(m);UBER_RET.r='';}
-    else if(!db.vehicle&&!db.cfg.obSkip)setTimeout(openOnboard,anim?500:0)};
+    /* O cadastro do veículo é opcional e fica disponível nas abas Uber e 99. */};
   if(!anim||RM.matches){done();return}
   loginZoom();$('#auth').classList.add('leaving');container.classList.add('leaving');setTimeout(done,950);
 }
