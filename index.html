@@ -283,7 +283,9 @@ const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement('scri
 const Cloud={on:!!(C.supabaseUrl&&C.supabaseAnonKey),sb:null,
   async init(){if(!this.on)return false;if(this.sb)return true;if(!window.supabase)await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js');this.sb=window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return true},
   async pull(id){const{data,error}=await this.sb.from('lifeos_user_data').select('data,updated_at').eq('user_id',id).maybeSingle();if(error)throw error;return data&&data.data},
-  async push(id,doc){const{error}=await this.sb.from('lifeos_user_data').upsert({user_id:id,data:doc,updated_at:new Date().toISOString()});if(error)throw error}
+  async push(id,doc){const{error}=await this.sb.from('lifeos_user_data').upsert({user_id:id,data:doc,updated_at:new Date().toISOString()});if(error)throw error},
+  async publishRank(row){const{error}=await this.sb.from('driver_global_ranking').upsert(row,{onConflict:'user_id'});if(error)throw error},
+  async readRanks(f,t){const{data,error}=await this.sb.from('driver_global_ranking').select('user_id,display_name,vehicle,period_start,period_end,revenue,operating_profit,highlighted_app,updated_at').eq('period_start',f).eq('period_end',t).order('operating_profit',{ascending:false}).limit(100);if(error)throw error;return data||[]}
 };
 const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
 const Auth={
@@ -1049,12 +1051,28 @@ function mountGauge(){const el=$('.gauge[data-f]');if(!el)return;const f=clamp(+
   requestAnimationFrame(()=>requestAnimationFrame(()=>{gp.style.strokeDashoffset=GLEN*(1-f);nd.style.transform=`rotate(${-90+180*f}deg)`}))}
 
 /* ============ RANKING LOCAL ============ */
+let globalRankCache=[],globalRankKey='',globalRankLoading='';
+async function refreshGlobalRanking(f,t){
+ if(!Cloud.on||!user||!user.id)return;
+ const key=f+'|'+t;if(globalRankKey===key||globalRankLoading===key)return;globalRankLoading=key;
+ try{
+  await Cloud.init();
+  const c=CS(f,t),u=AS('uber',f,t),n=AS('n99',f,t);
+  await Cloud.publishRank({user_id:user.id,display_name:user.name,vehicle:vehShort(db.vehicle)||'Veículo não cadastrado',period_start:f,period_end:t,revenue:c.inc,operating_profit:c.op,highlighted_app:u.op===n.op?null:(u.op>n.op?'Uber':'99'),updated_at:new Date().toISOString()});
+  globalRankCache=await Cloud.readRanks(f,t);globalRankKey=key;
+ }catch(e){console.warn('Ranking global indisponível',e)}finally{globalRankLoading='';if(tab==='ranking')render()}
+}
 function rankOf(dbx,name,f,t,me){const saved=db;try{db=dbx;migrate();const c=CS(f,t),u=AS('uber',f,t),n=AS('n99',f,t),act=c.inc>0||c.jr.some(hasAct);
-    return{name,veh:vehShort(db.vehicle)||'Veículo não cadastrado',op:c.op,best:u.op===n.op?'—':u.op>n.op?'Uber':'99',act,me}}finally{db=saved}}
-function rankRows(f,t){const rows=[rankOf(db,user.name,f,t,true)];
-  if(!Cloud.on){let users={};try{users=JSON.parse(LS.get('nsc_users')||'{}')}catch(e){}
-    Object.keys(users).forEach(em=>{if(em===user.email)return;let d;try{d=JSON.parse(LS.get('nsc_db_'+em)||'null')}catch(e){d=null}if(!d||!d.cfg||d.cfg.rankShare!==true)return;rows.push(rankOf(Object.assign(empty(),d),users[em].name||em.split('@')[0],f,t,false))})}
-  return rows.filter(r=>r.act).sort((a,b)=>b.op-a.op)}
+    return{name,veh:vehShort(db.vehicle)||'Veículo não cadastrado',op:c.op,revenue:c.inc,best:u.op===n.op?'—':u.op>n.op?'Uber':'99',act,me}}finally{db=saved}}
+function rankRows(f,t){if(Cloud.on){
+ const rows=globalRankCache.filter(r=>r.period_start===f&&r.period_end===t).map(r=>({name:r.display_name,veh:r.vehicle||'Veículo não cadastrado',op:Number(r.operating_profit)||0,revenue:Number(r.revenue)||0,best:r.highlighted_app||'—',act:true,me:r.user_id===user.id}));
+ if(!rows.some(r=>r.me)){const mine=rankOf(db,user.name,f,t,true);if(mine.act)rows.push(mine)}
+ return rows.sort((a,b)=>b.op-a.op)
+ }
+ const rows=[rankOf(db,user.name,f,t,true)];
+ let users={};try{users=JSON.parse(LS.get('nsc_users')||'{}')}catch(e){}
+ Object.keys(users).forEach(em=>{if(em===user.email)return;let d;try{d=JSON.parse(LS.get('nsc_db_'+em)||'null')}catch(e){d=null}if(!d||!d.cfg||d.cfg.rankShare!==true)return;rows.push(rankOf(Object.assign(empty(),d),users[em].name||em.split('@')[0],f,t,false))});
+ return rows.filter(r=>r.act).sort((a,b)=>b.op-a.op)}
 
 Object.assign(V,{
 financas(){
@@ -1114,10 +1132,11 @@ conquistas(){const R=achEval(),rec=records();
   return`<div class="grid"><div class="c s12"><h3>Conquistas verificáveis</h3><p class="sub" style="margin-bottom:10px">Cada conquista tem critério claro e mostra a evidência registrada. Não premiamos mais horas ao volante, direção arriscada ou menos descanso.</p><div class="list">${R.map(a=>{const got=db.ach[a.id];return`<div class="it" style="align-items:flex-start"><span style="font-size:1.4rem;opacity:${got?1:.3}">${a.i}</span><div class="g"><b>${a.n}</b> ${got?'<span class="tag ok">conquistada em '+fmtD(got.d)+'</span>':'<span class="tag">em aberto</span>'}<small>Critério: ${a.crit}</small><small>${got?'Evidência: '+esc(got.ev):a.r.prog?'Progresso: '+esc(a.r.prog):''}</small></div></div>`}).join('')}</div></div>
   <div class="c s12"><h3>Recordes pessoais</h3><div class="kpis">${rec.map(r=>kpi(r[0],r[1],r[2])).join('')}</div></div></div>`},
 ranking(){const[f,t]=range(rper),rows=rankRows(f,t),me=rows.find(r=>r.me),others=rows.length-(me?1:0),share=cfg().rankShare===true;
+  if(Cloud.on)refreshGlobalRanking(f,t);
   return`<div class="finbar">${seg('rper',rper,PERIODS)}<span class="sub">${fmtD(f)}${f!==t?' – '+fmtD(t):''}</span></div><div class="grid">
-  <div class="c s12"><h3>${Cloud.on?'Ranking individual':'Ranking local deste dispositivo'}</h3>
-   <div class="scope"><b>Escopo:</b> ${Cloud.on?'apenas você. Um ranking entre motoristas exige um servidor com participantes que autorizem o compartilhamento (ver LEIA-ME).':`você${others?' e '+others+' outra(s) conta(s) deste dispositivo que ativaram o compartilhamento':''}. Não é uma competição com motoristas da Uber ou da 99.`} Posição calculada pelo lucro operacional do período, com o mesmo método para todos.</div>
-   ${rows.length?`<div class="list">${rows.map((r,i)=>`<div class="it rk${r.me?' me':''}"><b class="pos1">${i+1}º</b><div class="g"><b>${i+1}º lugar · ${esc(r.veh)} · ${esc(r.name)}</b>${r.me?' <span class="tag ok">você</span>':''}<small>App destaque: ${r.best}</small></div><b class="${r.op>=0?'pos':'neg'}">${brl(r.op)}</b></div>`).join('')}</div>`
+  <div class="c s12"><h3>${Cloud.on?'Ranking global de motoristas':'Ranking local deste dispositivo'}</h3>
+   <div class="scope"><b>Escopo:</b> ${Cloud.on?'participantes que abriram o ranking no mesmo período. Mostra nome, veículo e valores agregados de faturamento e lucro, sem expor os lançamentos individuais.':`você${others?' e '+others+' outra(s) conta(s) deste dispositivo que ativaram o compartilhamento':''}. Não é uma competição com motoristas da Uber ou da 99.`} Posição calculada pelo lucro operacional do período, com o mesmo método para todos.</div>
+   ${rows.length?`<div class="list">${rows.map((r,i)=>`<div class="it rk${r.me?' me':''}"><b class="pos1">${i+1}º</b><div class="g"><b>${i+1}º lugar · ${esc(r.veh)} · ${esc(r.name)}</b>${r.me?' <span class="tag ok">você</span>':''}<small>Faturamento: ${brl(r.revenue||0)} · App destaque: ${r.best}</small></div><b class="${r.op>=0?'pos':'neg'}">${brl(r.op)}</b></div>`).join('')}</div>`
    :`<p class="empty">Sem registros válidos neste período. Registre faturamento ou jornada nas abas Uber e 99 para aparecer no ranking.</p>`}
    ${!Cloud.on?`<label class="chkl" style="margin-top:14px"><input type="checkbox" data-rankshare ${share?'checked':''}> Compartilhar meu nome, veículo e lucro operacional com outras contas deste dispositivo</label>`:''}
    ${!me&&rows.length?'<p class="note">Você não aparece porque não tem registros neste período.</p>':''}</div></div>`},
