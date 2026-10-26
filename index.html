@@ -12,6 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="NESC" />
 <link rel="manifest" href="/manifest.webmanifest" />
 <link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
 <link rel="icon" type="image/png" href="/icon-192.png" sizes="192x192" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <!-- Open Graph / prévia ao compartilhar (WhatsApp, Telegram, redes sociais) -->
@@ -48,6 +49,7 @@ body,html{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .layout-container{position:relative;z-index:2;display:flex;width:100vw;height:100%;pointer-events:none}
 .left-panel{pointer-events:auto;width:45%;min-width:380px;max-width:520px;height:100%;display:flex;flex-direction:column;justify-content:center;padding:calc(20px + var(--sat)) 60px calc(20px + var(--sab));overflow-y:auto;background:linear-gradient(90deg,rgba(5,5,5,.95) 0%,rgba(5,5,5,.7) 70%,rgba(5,5,5,0) 100%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .right-panel{flex:1;height:100%}
+.brand-mark{width:64px;height:64px;border-radius:16px;display:block;margin-bottom:18px}
 .brand-title{font-size:2.8rem;font-weight:600;letter-spacing:-1.2px;line-height:1.1;margin-bottom:12px;background:linear-gradient(180deg,#fff 0%,#a1a1aa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .brand-subtitle{font-size:.95rem;color:#71717a;margin-bottom:32px;line-height:1.5}
 .auth-tabs{display:flex;gap:16px;margin-bottom:24px;border-bottom:1px solid var(--line);padding-bottom:8px}
@@ -277,6 +279,7 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
 
 <div class="layout-container" id="auth">
   <div class="left-panel">
+    <img class="brand-mark" src="/icon-192.png" width="64" height="64" alt="NESC" />
     <h1 class="brand-title">NESC</h1>
     <p class="brand-subtitle">Acesse seu ecossistema ou crie uma nova conta para começar.</p>
     <div class="auth-tabs" role="tablist">
