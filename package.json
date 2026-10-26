@@ -5,7 +5,9 @@
   "description": "Build mobile wrapper for NESC",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "mobile:sync": "npm run build && cap sync android"
+    "mobile:sync": "npm run build && cap sync android",
+    "test": "node tests/finance.spec.mjs",
+    "test:ui": "node tests/ui.spec.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
