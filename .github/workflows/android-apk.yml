@@ -1,4 +1,4 @@
-name: Build NSC Life OS Android APK
+name: Build NESC Android APK
 
 on:
   workflow_dispatch:

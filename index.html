@@ -5,7 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#030305" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<title>NSC Life OS</title>
+<title>NESC</title>
+<meta name="description" content="Seu ecossistema pessoal de ferramentas e produtividade." />
+<link rel="canonical" href="https://indexnscai.vercel.app/" />
+<meta name="application-name" content="NESC" />
+<meta name="apple-mobile-web-app-title" content="NESC" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/icon-192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<!-- Open Graph / prévia ao compartilhar (WhatsApp, Telegram, redes sociais) -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="NESC" />
+<meta property="og:title" content="NESC" />
+<meta property="og:description" content="Seu ecossistema pessoal de ferramentas e produtividade." />
+<meta property="og:url" content="https://indexnscai.vercel.app/" />
+<meta property="og:image" content="https://indexnscai.vercel.app/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="NESC" />
+<meta property="og:locale" content="pt_BR" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="NESC" />
+<meta name="twitter:description" content="Seu ecossistema pessoal de ferramentas e produtividade." />
+<meta name="twitter:image" content="https://indexnscai.vercel.app/og-image.png" />
+<script>
+/* Link limpo: remove só parâmetros de RASTREAMENTO da barra de endereço, sem redirecionar nem recarregar.
+   Preserva o restante da query (ex.: ?code= do Supabase, ?uber=, ?tab=) e o fragmento (#access_token do
+   Supabase), então não quebra login, convite nem redirecionamentos. */
+(function(){try{
+  var u=new URL(location.href),track=["utm_source","utm_medium","utm_campaign","utm_term","utm_content","utm_id","utm_name","fbclid","gclid","gbraid","wbraid","msclkid","igshid","mc_eid","mc_cid","twclid","ttclid","yclid","_hsenc","_hsmi"],chg=false;
+  track.forEach(function(k){if(u.searchParams.has(k)){u.searchParams.delete(k);chg=true;}});
+  if(chg&&window.history&&history.replaceState){var q=u.searchParams.toString();history.replaceState(null,"",u.pathname+(q?"?"+q:"")+u.hash);}
+}catch(e){}})();
+</script>
 <style>
 :root{--bg:#030305;--panel:rgba(255,255,255,.035);--panel2:rgba(255,255,255,.06);--line:rgba(255,255,255,.09);--tx:#f4f4f5;--mut:#8a8a94;--ac:#e4e4e7;--ok:#5ad19a;--bad:#f0716b;--warn:#e9b95b;--uber:#e5534b;--n99:#f5c518;--app:#e4e4e7;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);color-scheme:dark;box-sizing:border-box}
 html{scroll-padding-top:var(--sat)}
@@ -244,7 +277,7 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
 
 <div class="layout-container" id="auth">
   <div class="left-panel">
-    <h1 class="brand-title">NSC Life OS</h1>
+    <h1 class="brand-title">NESC</h1>
     <p class="brand-subtitle">Acesse seu ecossistema ou crie uma nova conta para começar.</p>
     <div class="auth-tabs" role="tablist">
       <button class="tab-btn active" id="btn-tab-login" onclick="switchTab('login')">Entrar</button>
@@ -1142,7 +1175,7 @@ produtividade(){
   <div class="c s4"><h3>Faixas historicamente mais rentáveis</h3>${best.length?best.map((o,i)=>`<div class="alert"><span class="tag ok">${i+1}º</span><div class="g">${o.n}<small style="display:block;color:var(--mut)">${nph(o)} · ${o.obs} dias observados</small></div></div>`).join(''):empt('Ainda não há faixas com pelo menos 3 dias de observação.')}<p class="note">Baseado só nos seus registros. Não representa a demanda das plataformas.</p></div>
   </div>`},
 ia(){const sug=['Quanto lucrei nos últimos 7 dias?','Qual aplicativo me deu maior lucro por hora?','Quanto preciso guardar para a parcela do carro?','Estou gastando demais com combustível?','Quanto gastei com manutenção este mês?','Qual foi meu custo médio por quilômetro?','Qual é minha previsão de saldo para o final do mês?','Quais são meus horários mais rentáveis?'];
-  return`<div class="grid"><div class="c s8"><h3>Assistente financeiro</h3><div class="chat" id="chat">${chat.length?chat.map(m=>`<div class="msg ${m.me?'me':'ai'}">${m.h}</div>`).join(''):`<div class="msg ai">Pergunte sobre seus ganhos, custos, contas e manutenção. Respondo com os números calculados pelo próprio NSC a partir dos seus registros, indicando o período usado e o que é estimativa.</div>`}</div>
+  return`<div class="grid"><div class="c s8"><h3>Assistente financeiro</h3><div class="chat" id="chat">${chat.length?chat.map(m=>`<div class="msg ${m.me?'me':'ai'}">${m.h}</div>`).join(''):`<div class="msg ai">Pergunte sobre seus ganhos, custos, contas e manutenção. Respondo com os números calculados pelo próprio NESC a partir dos seus registros, indicando o período usado e o que é estimativa.</div>`}</div>
    <form data-form="ask" class="row"><input name="q" placeholder="Digite sua pergunta…" aria-label="Pergunta" autocomplete="off" required><button class="btn" style="flex:0 0 auto">Perguntar</button></form>
    <div class="chips" style="margin-top:12px">${sug.map(s=>`<button type="button" data-ask="${esc(s)}" style="flex:1 1 220px;padding:9px 10px;text-align:left">${s}</button>`).join('')}</div></div>
    <div class="c s4"><h3>Como funciona</h3><p class="sub">O assistente local roda no seu dispositivo, usa o mesmo motor de cálculos das outras abas e só acessa os dados da sua conta. Não inventa números: quando falta dado, ele diz.</p>
@@ -1334,7 +1367,7 @@ function openUberDisconnect(){modal(`<h2>Desconectar a Uber</h2><p class="sub" s
 const TABS=[['hoje','🏠','Hoje',1],['uber','🚗','Uber',1],['n99','🚕','99',1],['financas','💰','Finanças',1],['produtividade','⏱️','Produtividade'],['ia','✨','Assistente IA'],['conquistas','🏆','Conquistas'],['ranking','🏁','Ranking'],['metas','🎯','Metas']];
 let tab='hoje';
 function renderNav(){const cur=TABS.find(t=>t[0]===tab);
-  $('#nav').innerHTML=`<div class="logo">NSC Life OS</div>`+TABS.map(t=>`<button class="nav ${t[0]===tab?'on':''} ${t[3]?'':'sec'}" data-go="${t[0]}" ${t[0]===tab?'aria-current="page"':''}><span aria-hidden="true">${t[1]}</span>${t[2]}</button>`).join('')+`<button class="nav more ${cur[3]?'':'on'}" data-more aria-label="Mais seções"><span aria-hidden="true">☰</span>${cur[3]?'Mais':cur[2]}</button><div class="spacer"></div><div class="user"><b>${esc(user.name)}</b><button data-account>Conta e dados</button> · <button data-logout>Sair</button><span class="sync" id="sync">Dados: ${Store.sync}</span></div>`;
+  $('#nav').innerHTML=`<div class="logo">NESC</div>`+TABS.map(t=>`<button class="nav ${t[0]===tab?'on':''} ${t[3]?'':'sec'}" data-go="${t[0]}" ${t[0]===tab?'aria-current="page"':''}><span aria-hidden="true">${t[1]}</span>${t[2]}</button>`).join('')+`<button class="nav more ${cur[3]?'':'on'}" data-more aria-label="Mais seções"><span aria-hidden="true">☰</span>${cur[3]?'Mais':cur[2]}</button><div class="spacer"></div><div class="user"><b>${esc(user.name)}</b><button data-account>Conta e dados</button> · <button data-logout>Sair</button><span class="sync" id="sync">Dados: ${Store.sync}</span></div>`;
 }
 function render(){if(!user||!db)return;if(!V[tab]||!TABS.some(t=>t[0]===tab))tab='hoje';
   const T=TABS.find(t=>t[0]===tab),app=APPS[tab];
@@ -1347,7 +1380,7 @@ function render(){if(!user||!db)return;if(!V[tab]||!TABS.some(t=>t[0]===tab))tab
 function modal(h){$('#mbox').innerHTML=h;const m=$('#modal');m.classList.add('on');const f=m.querySelector('input:not([type=hidden]):not([type=radio]),select,button');if(f)setTimeout(()=>f.focus(),30)}
 function closeModal(){$('#modal').classList.remove('on');$('#mbox').innerHTML=''}
 const mclose='<button type="button" class="btn ghost" data-close>Cancelar</button>';
-function openSheet(){modal(`<h2>Seções</h2><p class="sub" style="margin-bottom:14px">Todas as áreas do NSC Life OS</p><div class="sheetgrid">${TABS.map(t=>`<button class="nav ${t[0]===tab?'on':''}" data-go="${t[0]}"><span style="font-size:1.3rem">${t[1]}</span>${t[2]}</button>`).join('')}<button class="nav" data-account><span style="font-size:1.3rem">👤</span>Conta e dados</button><button class="nav" data-logout><span style="font-size:1.3rem">↩︎</span>Sair</button></div><button class="btn ghost" data-close style="width:100%;margin-top:14px">Fechar</button>`)}
+function openSheet(){modal(`<h2>Seções</h2><p class="sub" style="margin-bottom:14px">Todas as áreas do NESC</p><div class="sheetgrid">${TABS.map(t=>`<button class="nav ${t[0]===tab?'on':''}" data-go="${t[0]}"><span style="font-size:1.3rem">${t[1]}</span>${t[2]}</button>`).join('')}<button class="nav" data-account><span style="font-size:1.3rem">👤</span>Conta e dados</button><button class="nav" data-logout><span style="font-size:1.3rem">↩︎</span>Sair</button></div><button class="btn ghost" data-close style="width:100%;margin-top:14px">Fechar</button>`)}
 /* caminho secundário para backup, exportação e importação */
 function openAccount(){modal(`<h2>Conta e dados</h2><p class="sub" style="margin-bottom:16px">${esc(user.name)} · ${esc(user.email)} · <span>Dados: ${esc(Store.sync)}</span></p>
   <div class="row wrap" style="margin-bottom:14px"><button type="button" class="btn ghost" data-onboard>Editar veículo</button><button type="button" class="btn ghost" data-own>Custos fixos do veículo</button></div>
@@ -1389,7 +1422,7 @@ function openResMove(id,sg){const r=db.reserves.find(x=>x.id===id);if(!r)return;
   modal(`<h2>${sg>0?'Guardar na reserva':'Retirar da reserva'}</h2><p class="sub" style="margin-bottom:14px">${esc(r.name)} · saldo da reserva ${brl(resBal(r))}</p><form data-form="resmv" novalidate><input type="hidden" name="id" value="${id}"><input type="hidden" name="sg" value="${sg}"><div class="f"><label>Valor (R$)</label><input name="v" inputmode="decimal" autocomplete="off" required></div><div class="err" data-err></div><div class="row wrap"><button class="btn">Confirmar</button>${mclose}</div></form>`)}
 function openCash(){const c=cashNow();modal(`<h2>Saldo em conta</h2><p class="sub" style="margin-bottom:14px">Informe quanto você tem hoje na conta. Os próximos lançamentos atualizam esse saldo automaticamente.</p><form data-form="cash" novalidate><div class="f"><label>Saldo atual (R$)</label><input name="v" inputmode="decimal" autocomplete="off" value="${c!=null?num(c,2):''}" required></div><div class="err" data-err></div><div class="row wrap"><button class="btn">Salvar</button>${mclose}</div></form>`)}
 function openOwn(){const o=cfg().own||{};modal(`<h2>Custos fixos do veículo</h2><p class="sub" style="margin-bottom:14px">Usados só no "resultado completo", rateados por dia. Se a parcela também estiver em Contas a pagar, o pagamento entra no caixa uma vez só (pela conta).</p><form data-form="own" novalidate><div class="row wrap">${[['parcela','Parcela (R$/mês)'],['seguro','Seguro (R$/mês)'],['ipva','IPVA + licenciamento (R$/ano)'],['deprec','Depreciação (R$/mês)'],['outros','Outros fixos (R$/mês)']].map(([q,n])=>`<div class="f"><label>${n}</label><input name="${q}" inputmode="decimal" autocomplete="off" value="${+o[q]?num(+o[q],2):''}"></div>`).join('')}</div><div class="err" data-err></div><div class="row wrap"><button class="btn">Salvar</button>${mclose}</div></form>`)}
-function openBatt(){modal(`<h2>Bateria de tração</h2><p class="sub" style="margin-bottom:14px">O NSC não mede a saúde da bateria. Registre o valor informado por uma fonte; ele fica identificado.</p><form data-form="batt" novalidate><div class="row wrap"><div class="f"><label>Data</label><input name="d" type="date" value="${TODAY()}" max="${TODAY()}"></div><div class="f"><label>Saúde (SoH %)</label><input name="soh" inputmode="decimal" required></div><div class="f"><label>Origem</label><select name="src"><option>Aplicativo do fabricante</option><option>Diagnóstico em concessionária</option><option>Scanner OBD</option><option>Outra (manual)</option></select></div></div><div class="err" data-err></div><div class="row wrap"><button class="btn">Registrar leitura</button>${mclose}</div></form>`)}
+function openBatt(){modal(`<h2>Bateria de tração</h2><p class="sub" style="margin-bottom:14px">O NESC não mede a saúde da bateria. Registre o valor informado por uma fonte; ele fica identificado.</p><form data-form="batt" novalidate><div class="row wrap"><div class="f"><label>Data</label><input name="d" type="date" value="${TODAY()}" max="${TODAY()}"></div><div class="f"><label>Saúde (SoH %)</label><input name="soh" inputmode="decimal" required></div><div class="f"><label>Origem</label><select name="src"><option>Aplicativo do fabricante</option><option>Diagnóstico em concessionária</option><option>Scanner OBD</option><option>Outra (manual)</option></select></div></div><div class="err" data-err></div><div class="row wrap"><button class="btn">Registrar leitura</button>${mclose}</div></form>`)}
 function openEdit(id){const x=db.tx.find(t=>t.id===id);if(!x||x.type==='pass')return;if(x.src==='uber_api'){toast('Registros oficiais da Uber não são editados; você pode removê-los.');return}const inc=x.type==='in';
   modal(`<h2>Editar ${inc?'ganho':'gasto'}</h2><form data-form="edtx" novalidate><input type="hidden" name="id" value="${id}">
   ${inc?`<div class="f"><label>Aplicativo</label>${rseg('app',appOf(x)==='n99'?'n99':'uber',{uber:'Uber',n99:'99'})}</div>`:`<div class="f"><label>Tipo de gasto</label>${rseg('type',x.type,{fuel:'Combustível/energia',maint:'Manutenção',other:'Outros gastos'})}</div>`}

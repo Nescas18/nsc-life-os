@@ -1,4 +1,4 @@
-// Configuração pública do Supabase para o NSC Life OS.
+// Configuração pública do Supabase para o NESC.
 // A chave anon/publishable é própria para uso no navegador; nunca coloque service_role aqui.
 window.NSC_CONFIG = Object.assign({}, window.NSC_CONFIG || {}, {
   supabaseUrl: 'https://pmjmmfmggjqtamoybobq.supabase.co',

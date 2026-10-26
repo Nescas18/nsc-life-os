@@ -2,7 +2,7 @@
   "name": "nsc-life-os-mobile",
   "version": "1.0.0",
   "private": true,
-  "description": "Build mobile wrapper for NSC Life OS",
+  "description": "Build mobile wrapper for NESC",
   "scripts": {
     "build": "node scripts/build.mjs",
     "mobile:sync": "npm run build && cap sync android"
