@@ -202,7 +202,9 @@ await test("11. Editar e excluir lançamento (com passe automático)", async (ke
   let s = await cs(o.page, T);
   eq("faturamento após salvar", s.inc, 200); eq("passe de 24h lançado", s.pass, 29); eq("lucro operacional", s.op, 171);
   const id = await o.page.evaluate(() => db.tx.find((x) => x.type === "in").id);
+  await o.page.waitForTimeout(150);
   await o.page.click(`[data-edit="${id}"]`);
+  await o.page.waitForSelector("#modal.on #mbox form[data-form=edtx]");
   await o.page.fill('#mbox form[data-form=edtx] input[name=v]', "250,00");
   await o.page.click('#mbox form[data-form=edtx] button.btn');
   s = await cs(o.page, T); eq("faturamento após editar", s.inc, 250); eq("lucro após editar", s.op, 221);
@@ -417,6 +419,102 @@ await test("Horas J: revisão só sugere correção coerente (6,30 → 6h30), nu
   });
   if (!r.s378 || r.s378.to !== 390) throw new Error("6h18 deveria sugerir 6h30: " + JSON.stringify(r.s378));
   if (r.s390 || r.s400 || r.sOk) throw new Error("sugestão indevida: " + JSON.stringify(r));
+});
+
+// ---------- Combustível: consumo do dia (km/L) e prioridade registrado → manual → padrão ----------
+const est = (page, f, t) => page.evaluate(([f, t]) => { const s = CS(f, t); return { energy: s.energy, estFuel: s.estFuel, lit: s.litersEst, missing: s.estMissing, manual: s.estManual, op: s.op }; }, [f, t || f]);
+await test("Combustível K: 180 km a 12 km/L informado no dia e R$ 6,00/L → 15 L e R$ 90,00 estimados", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF, kml: 10, price: 6 }, tx: [tx({ d: T, type: "in", app: "uber", v: 300 })], jr: [{ id: "j", d: T, app: "uber", v: 2, min: 300, periods: [], km: 180, kml: 12 }] });
+  const e = await est(o.page, T);
+  eq("custo estimado", e.estFuel, 90); eq("litros estimados", e.lit, 15); eq("usa consumo do dia", e.manual, true);
+  eq("lucro operacional não desconta estimativa", e.op, 300); eq("energia registrada", e.energy, 0);
+});
+await test("Combustível L: sem consumo do dia, usa o padrão do veículo (180 km ÷ 10 km/L × 6 = R$ 108)", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF, kml: 10, price: 6 }, jr: [{ id: "j", d: T, app: "uber", v: 2, min: 300, periods: [], km: 180 }] });
+  const e = await est(o.page, T);
+  eq("custo estimado", e.estFuel, 108); eq("consumo padrão", e.manual, false);
+});
+await test("Combustível M: gasto real registrado prevalece; km/L do dia não cria segunda despesa", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF, kml: 10, price: 6 }, tx: [tx({ d: T, type: "in", app: "uber", v: 300 }), tx({ d: T, type: "fuel", app: "veic", v: 95, unit: "L" })], jr: [{ id: "j", d: T, app: "uber", v: 2, min: 300, periods: [], km: 180, kml: 12 }] });
+  const e = await est(o.page, T);
+  eq("energia = registrado", e.energy, 95); eq("sem estimativa", e.estFuel, 0); eq("lucro", e.op, 205);
+});
+await test("Combustível N: km sem preço do litro → não estima e avisa (nada inventado)", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF, kml: 10, price: 0 }, jr: [{ id: "j", d: T, app: "uber", v: 2, min: 60, periods: [], km: 50 }] });
+  const e = await est(o.page, T);
+  eq("custo", e.estFuel, 0); eq("aviso de dados insuficientes", e.missing, true);
+  const e2 = await (async () => { await setDb(o.page, { cfg: { pass: OFF, kml: 10, price: 6 }, jr: [{ id: "j", d: T, app: "uber", v: 2, min: 60, periods: [] }] }); return est(o.page, T); })();
+  eq("sem km não há estimativa", e2.estFuel, 0); eq("sem km não é 'dados insuficientes'", e2.missing, false);
+});
+await test("Combustível O: km/L do dia inválido é recusado no formulário", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF, kml: 10, price: 6 } });
+  await o.page.evaluate(() => { tab = "uber"; lm = "jr"; render(); });
+  const r = await o.page.evaluate(() => { const f = document.querySelector('#view form[data-form="jr"]'); f.hh.value = "5"; f.mm.value = "0"; f.kmlDay.value = "0,5"; f.requestSubmit(); return { err: f.querySelector("[data-err]").textContent, n: db.jr.length }; });
+  if (!/Consumo do dia inválido/.test(r.err) || r.n !== 0) throw new Error(JSON.stringify(r));
+  const r2 = await o.page.evaluate(() => { const f = document.querySelector('#view form[data-form="jr"]'); f.kmlDay.value = "12,4"; f.requestSubmit(); return db.jr.map((j) => j.kml); });
+  eq("gravado na jornada", r2[0], 12.4);
+  eq("padrão do veículo intacto", await o.page.evaluate(() => cfg().kml), 10);
+});
+
+// ---------- Promoções manuais ----------
+const submitInc = (page, v, promo, mode) => page.evaluate(([v, promo, mode]) => { const f = document.querySelector('#view form[data-form="inc"]'); f.v.value = v; f.promo.value = promo; f.querySelector(`input[name=promoMode][value=${mode}]`).checked = true; f.requestSubmit(); return { err: f.querySelector("[data-err]").textContent }; }, [v, promo, mode]);
+await test("Promoção A: 'já está no valor' guarda o detalhe sem somar de novo (300 com 50 de promoção = 300)", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF } });
+  await o.page.evaluate(() => { tab = "uber"; render(); });
+  await submitInc(o.page, "300", "50", "in");
+  const r = await o.page.evaluate((t) => { const s = CS(t, t); return { inc: s.inc, promo: s.promo, n: db.tx.length }; }, T);
+  eq("faturamento", r.inc, 300); eq("promoção detalhada", r.promo, 50); eq("um lançamento", r.n, 1);
+});
+await test("Promoção B: 'é um valor a mais' vira lançamento próprio, somado uma vez (300 + 50 = 350)", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF } });
+  await o.page.evaluate(() => { tab = "n99"; render(); });
+  await submitInc(o.page, "300", "50", "add");
+  const r = await o.page.evaluate((t) => { const s = CS(t, t); return { inc: s.inc, promo: s.promo, n: db.tx.length, kinds: db.tx.map((x) => x.kind || "") }; }, T);
+  eq("faturamento", r.inc, 350); eq("promoções", r.promo, 50); eq("dois lançamentos", r.n, 2);
+});
+await test("Promoção C: incluída maior que o ganho é recusada; promoção sozinha 'a mais' é aceita", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF } });
+  await o.page.evaluate(() => { tab = "uber"; render(); });
+  const e = await submitInc(o.page, "40", "50", "in");
+  if (!/não pode ser maior/.test(e.err)) throw new Error("esperava recusa: " + e.err);
+  await submitInc(o.page, "", "25,50", "add");
+  const r = await o.page.evaluate((t) => ({ inc: CS(t, t).inc, n: db.tx.length }), T);
+  eq("só a promoção", r.inc, 25.5); eq("um lançamento", r.n, 1);
+});
+await test("Promoção D: substituir o ganho do dia não apaga a promoção 'a mais' nem a duplica", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 200 }), tx({ d: T, type: "in", app: "uber", v: 30, kind: "promo", promo: 30, desc: "Promoção/incentivo Uber" })] });
+  await o.page.evaluate(() => { tab = "uber"; render(); });
+  await submitInc(o.page, "260", "", "in");
+  await o.page.click('[data-dup="replace"]');
+  const r = await o.page.evaluate((t) => { const s = CS(t, t); return { inc: s.inc, promo: s.promo }; }, T);
+  eq("faturamento = 260 + 30", r.inc, 290); eq("promoção preservada", r.promo, 30);
+});
+
+await test("Histórico compacto: explicação recolhida, dias sem registro com contagem real, lista completa e ação na data certa", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  // relógio em 26/10 (segunda). Seg–sex habituais; registros em 19 e 20/10; 22/10 marcado como não trabalhado → pendentes 21 e 23/10 (24–25 fim de semana, 26 é hoje)
+  await setDb(o.page, { cfg: { pass: OFF, workDays: [1, 2, 3, 4, 5] }, tx: [tx({ d: "2026-10-19", type: "in", app: "uber", v: 100 }), tx({ d: "2026-10-20", type: "in", app: "uber", v: 100 })], off: { "2026-10-22": { v: true, at: 1 } } });
+  await o.page.evaluate(() => { tab = "historico"; hf.per = "m"; render(); });
+  const r = await o.page.evaluate(() => ({ open: document.querySelector(".hexp").open, n: document.querySelector(".pendn")?.textContent, rows: [...document.querySelectorAll(".pendc .pendr")].map((x) => x.querySelector("[data-pendrec]").dataset.pendrec), visible: [...document.querySelectorAll(".pendc > .pendl .pendr")].length }));
+  eq("explicação começa recolhida", r.open, false);
+  if (r.rows.includes("2026-10-22")) throw new Error("dia marcado como não trabalhado apareceu: " + r.rows);
+  if (r.rows.some((d) => d >= T)) throw new Error("hoje/futuro tratado como esquecido: " + r.rows);
+  eq("pendentes esperados", r.rows.slice().sort().join(","), "2026-10-21,2026-10-23");
+  eq("contagem", r.n, r.rows.length + " dias"); if (r.visible > 2) throw new Error("mais de 2 datas visíveis sem expandir");
+  const first = r.rows[0];
+  await o.page.click(`.pendc [data-offday="${first}"]`);
+  const after = await o.page.evaluate((d) => ({ off: isOff(d), still: [...document.querySelectorAll(".pendc [data-pendrec]")].some((b) => b.dataset.pendrec === d) }), first);
+  eq("marcado como não trabalhado", after.off, true); eq("sai do aviso", after.still, false);
+  return r.rows.length + " dia(s) pendente(s): " + r.rows.join(", ");
 });
 
 await browser.close();

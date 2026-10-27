@@ -58,6 +58,8 @@ body,html{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .layout-container{position:relative;z-index:2;display:flex;width:100vw;height:100%;pointer-events:none}
 .left-panel{pointer-events:auto;width:46%;min-width:400px;max-width:560px;height:100%;display:flex;flex-direction:column;justify-content:safe center;padding:calc(28px + var(--sat)) 56px calc(28px + var(--sab));overflow-y:auto;background:linear-gradient(90deg,rgba(4,4,5,.96) 0%,rgba(4,4,5,.82) 62%,rgba(4,4,5,0) 100%)}
 .right-panel{flex:1;height:100%}
+.navlist{display:contents}.navcur{display:none}
+@media(prefers-reduced-motion:reduce){aside{transition:none!important}.navlist>*{animation:none!important}}
 .auth-wrap{width:100%;max-width:420px}
 .brand-row{display:flex;align-items:center;gap:12px;margin-bottom:26px}
 .brand-mark{width:44px;height:44px;border-radius:12px;display:block;box-shadow:0 6px 24px rgba(226,178,80,.18)}
@@ -106,7 +108,7 @@ form.shake{animation:shake .38s}
 .auth-areas span.on{color:var(--gold);border-color:var(--gold-line)}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* APP */
-#app{display:none;position:absolute;inset:0;z-index:3;--rail:72px;background:radial-gradient(ellipse 80% 60% at 85% -10%,rgba(160,112,30,.16),transparent 60%),radial-gradient(ellipse 60% 50% at -10% 110%,rgba(120,84,24,.12),transparent 60%),linear-gradient(180deg,#0b0905 0%,#060606 45%,#040405 100%)}
+#app{display:none;position:absolute;inset:0;z-index:3;--rail:72px;--bar:56px;background:radial-gradient(ellipse 80% 60% at 85% -10%,rgba(160,112,30,.16),transparent 60%),radial-gradient(ellipse 60% 50% at -10% 110%,rgba(120,84,24,.12),transparent 60%),linear-gradient(180deg,#0b0905 0%,#060606 45%,#040405 100%)}
 #bgfx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.9}
 @media(max-width:360px){#app{--rail:64px}}
 #app.on{display:flex}
@@ -299,6 +301,11 @@ form[data-etype="fuel"] [data-nofuel]{display:none}form[data-etype] [data-show]{
 .chips2{display:flex;flex-wrap:wrap;gap:6px}.chips2 button{min-height:38px;padding:7px 13px;border-radius:20px;border:1px solid var(--line2);background:rgba(255,255,255,.03);color:var(--tx2);font-size:.82rem;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
 .chips2 button:hover{color:var(--tx);border-color:var(--gold-line)}.chips2 button.on{background:var(--gold-a);border-color:var(--gold-line);color:var(--gold-hi);font-weight:600}
 .hfil{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}.hfil .row.wrap>*{flex:1 1 170px}
+.hexp{margin-top:12px}.hexp summary{cursor:pointer;color:var(--gold-hi);font-size:.82rem;list-style:none;display:inline-flex;align-items:center;gap:6px;min-height:36px}.hexp summary::-webkit-details-marker{display:none}.hexp summary::after{content:'⌄';transition:transform .2s}.hexp[open] summary::after{transform:rotate(180deg)}.hexp p{color:var(--mut);font-size:.8rem;line-height:1.5;margin:4px 0 0}
+.pendc{border-color:var(--gold-line);background:linear-gradient(90deg,rgba(226,178,80,.08),rgba(226,178,80,.015))}
+.pendh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.pendh h3{margin:0 0 2px}.pendh p{margin:0;color:var(--mut);font-size:.82rem}.pendn{font-size:1.35rem;color:var(--gold-hi);white-space:nowrap;font-variant-numeric:tabular-nums}
+.pendl{display:flex;flex-direction:column;margin-top:8px}.pendr{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;padding:9px 0;border-top:1px solid var(--line);font-size:.86rem}.pendb{display:flex;gap:6px;flex-wrap:wrap}
+.pendmore summary{cursor:pointer;color:var(--gold-hi);font-size:.82rem;min-height:40px;display:flex;align-items:center;border-top:1px solid var(--line)}
 .htab{width:100%;border-collapse:collapse;font-size:.86rem}
 .htab th{text-align:left;font-weight:560;color:var(--mut);font-size:.74rem;padding:8px 10px;border-bottom:1px solid var(--line2);white-space:nowrap}
 .htab td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -310,12 +317,15 @@ form[data-etype="fuel"] [data-nofuel]{display:none}form[data-etype] [data-show]{
 .ctab{width:100%;border-collapse:collapse;font-size:.86rem;min-width:360px}.ctab th{text-align:left;font-weight:560;color:var(--mut);font-size:.74rem;padding:8px 10px;border-bottom:1px solid var(--line2)}.ctab td{padding:10px;border-bottom:1px solid var(--line)}.ctab .hv{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 @media(max-width:760px){
 .htab thead{display:none}.htab,.htab tbody{display:block}
-.htab tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.htab tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;padding:10px 2px;border-bottom:1px solid var(--line)}
 .htab td{display:block;padding:0;border:0}
 .htab td.hd{grid-column:1;grid-row:1;font-weight:560;min-width:0;overflow-wrap:anywhere}.htab td.hv{grid-column:2;grid-row:1}
-.htab td[data-l=Data]{grid-column:1/-1;grid-row:2;font-size:.76rem;color:var(--mut)}
-.htab td[data-l=Categoria]{grid-column:1/-1;grid-row:3}.htab td[data-l=App],.htab td[data-l=Km],.htab td.ha{display:none}
-.htab td[data-l=Categoria] .hm{display:inline;color:var(--mut);font-size:.76rem;margin-left:6px}}
+.htab td[data-l=Data]{grid-column:1;grid-row:2;font-size:.76rem;color:var(--mut);align-self:center}
+.htab td[data-l=Categoria]{grid-column:2;grid-row:2;justify-self:end;white-space:nowrap}.htab td[data-l=App],.htab td[data-l=Km],.htab td.ha{display:none}
+.htab td[data-l=Categoria] .hm{display:inline;color:var(--mut);font-size:.76rem;margin-left:6px}
+.hfil .chips2{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px}.hfil .chips2::-webkit-scrollbar{display:none}.hfil .chips2 button{flex:0 0 auto;min-height:36px;padding:6px 12px}
+.hfil .row.wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px}.hfil #hq{grid-column:1/-1}.hfil select{font-size:15px;min-height:42px;padding-top:8px;padding-bottom:8px}
+.pendr{flex-direction:column;align-items:stretch}.pendb .btn{flex:1 1 0}}
 .btn.danger{background:var(--bad);color:#1b0606;box-shadow:none}.btn.ghost.danger{background:rgba(239,111,102,.1);color:#ffb3ad;box-shadow:inset 0 0 0 1px rgba(239,111,102,.35)}
 .it.goal .bar{margin-top:8px}
 /* resumo do dia */
@@ -347,25 +357,30 @@ form[data-etype="fuel"] [data-nofuel]{display:none}form[data-etype] [data-show]{
 @media(max-width:480px){.kv{grid-template-columns:minmax(0,1fr);gap:2px}.kv>span:nth-child(odd){margin-top:8px}.hb span:first-child{flex-basis:84px}}
 @media(max-width:900px){
 .left-panel{width:100%;min-width:100%;max-width:none;justify-content:flex-start;align-items:center;padding:calc(clamp(110px,24vh,230px) + var(--sat)) 20px calc(24px + var(--sab));background:linear-gradient(180deg,rgba(4,4,5,0) 0%,rgba(4,4,5,.55) clamp(110px,22vh,210px),rgba(4,4,5,.94) clamp(260px,46vh,440px))}.right-panel{display:none}.auth-card{padding:18px}.brand-row{margin-bottom:18px}.brand-subtitle{margin-bottom:20px}
-aside{width:var(--rail);padding:calc(10px + var(--sat)) 6px calc(10px + var(--sab)) calc(6px + env(safe-area-inset-left,0px));gap:2px;border-right:1px solid var(--line)}
-.logo{padding:2px 0 10px;justify-content:center}.logo b,.user,.spacer,.navsep b{display:none}
-.navtop{flex-direction:column;gap:6px;margin-bottom:6px}
-aside .nav{flex-direction:column;justify-content:center;gap:3px;padding:8px 2px 7px;text-align:center;min-height:54px;border-radius:10px}aside .nav .nl{display:none}aside .nav .ns{display:block;font-size:.6rem;line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-aside .nav.on{box-shadow:inset 0 0 0 1px var(--gold-line);background:var(--gold-a)}
-.navsep{margin:6px 6px;height:1px;padding:0;background:var(--line)}
-#app.navx aside{position:fixed;left:0;top:0;bottom:0;width:240px;z-index:16;background:linear-gradient(180deg,#0e0c08,#060606);box-shadow:24px 0 60px rgba(0,0,0,.6);padding-left:calc(10px + env(safe-area-inset-left,0px));padding-right:10px}
-#app.navx aside .nav{flex-direction:row;justify-content:flex-start;text-align:left;gap:12px;min-height:46px;padding:10px 12px}#app.navx aside .nav .nl{display:inline}#app.navx aside .nav .ns{display:none}
-#app.navx .logo{justify-content:flex-start;padding-left:8px}#app.navx .logo b,#app.navx .navsep b,#app.navx .user{display:block}#app.navx .navsep{height:auto;background:none}#app.navx .navtop{flex-direction:row}
+/* celular: sem faixa lateral. Barra superior fina + painel que desce com todas as seções */
+#app.on{flex-direction:column}
+aside{position:fixed;top:0;left:0;right:0;width:auto;display:block;max-height:calc(var(--bar) + var(--sat));padding:var(--sat) calc(12px + env(safe-area-inset-right,0px)) 0 calc(12px + env(safe-area-inset-left,0px));overflow:hidden;z-index:16;border-right:none;border-bottom:1px solid var(--line);background:rgba(9,8,6,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:max-height .34s var(--ease),background .3s}
+.navtop{height:var(--bar);flex-direction:row;align-items:center;gap:10px;margin:0}
+.logo{padding:0;gap:9px;flex:0 0 auto}.logo b{display:inline;font-size:.84rem}
+.navcur{display:block;flex:1;min-width:0;text-align:right;color:var(--tx2);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.navtog{width:44px;height:44px;flex:0 0 auto}
+.navlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:6px 0 calc(16px + var(--sab))}
+aside .nav{min-height:48px;padding:10px 12px;gap:10px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.02)}aside .nav .ns{display:none}aside .nav .nl{display:inline;font-size:.86rem}
+aside .nav.on{border-color:var(--gold-line);background:var(--gold-a);color:var(--gold-hi)}
+.navsep{grid-column:1/-1;margin:8px 2px 0;padding:0;border:none}.navsep b{display:block;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.navlist .spacer{display:none}.navlist .user{display:block;grid-column:1/-1;margin-top:6px;padding:12px 4px 0;border-top:1px solid var(--line)}
+#app.navx aside{max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain;background:rgba(10,9,6,.97);box-shadow:0 24px 60px rgba(0,0,0,.6)}
+#app.navx .navlist>*{animation:navin .28s var(--ease) both;animation-delay:calc(var(--i,0)*16ms + 40ms)}
+@keyframes navin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 #app.navx #navbk{display:block}
-#app.navx main{margin-left:var(--rail)}
-main{padding:calc(16px + var(--sat)) 14px calc(28px + var(--sab))}.s8,.s6,.s4,.s3,.s9{grid-column:span 12}
+main{padding:calc(var(--bar) + var(--sat) + 14px) 14px calc(28px + var(--sab))}.s8,.s6,.s4,.s3,.s9{grid-column:span 12}
 .s3.k2,.s6.k2{grid-column:span 6}
 .hero{min-height:0;padding:14px 16px;gap:10px}.hero h2{font-size:1.25rem;margin:0}.hero p{display:none}.eyebrow{margin-bottom:6px}#globe{width:96px;height:96px}
 .stats{grid-template-columns:repeat(2,minmax(0,1fr))}.head{gap:10px;margin-bottom:16px}.intro{font-size:.86rem}
 .rs{grid-template-columns:repeat(2,minmax(0,1fr))}.rs .rs-main,.rs .gl{grid-column:1/-1}.rs b{font-size:1.12rem}.rs .rs-main b{font-size:1.7rem}
 .head h1{font-size:1.4rem}
 input,select,textarea{font-size:16px}
-.toast{bottom:calc(16px + var(--sab));left:calc(50% + var(--rail)/2)}
+.toast{bottom:calc(16px + var(--sab));left:50%}
 .mrow summary{grid-template-columns:minmax(0,1fr) auto}.mrow .mi{grid-column:1/-1}.mrow summary .btn{grid-column:1/-1;justify-self:start}
 .finbar .btn{margin-left:0;width:100%}
 .gauge{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center}.gauge .gleg{justify-content:center}
@@ -1450,18 +1465,23 @@ function shareOf(a,f,t){const st=x=>{const jr=db.jr.filter(j=>j.app===x&&inR(j.d
 /* energia, calculada DIA A DIA: no dia com abastecimento/recarga registrado vale o valor real; nos demais dias com km,
    a estimativa por km; sem km nem abastecimento, não é calculada. Nunca soma real + estimativa no mesmo dia, e o total
    de um período é a soma dos seus dias. Combustível é custo do veículo: entre Uber e 99 é dividido pela participação de cada app no dia. */
-function energyRange(apps,f,t,perApp){const k=ckm(),c=cfg(),fu={},km={};
+/* custo estimado de uma jornada por km. Prioridade: consumo informado no dia (km/L) → consumo padrão do veículo.
+   Sem km informado não há estimativa (nunca inventamos distância). Sem preço/consumo, o custo fica 0 e a tela avisa. */
+function jrEst(j,k,c){const km=jrKm(j);if(!(km>0))return null;const kd=+j.kml>0?+j.kml:0;
+  const fuelK=kd>0?(c.price>0?c.price/kd:0)*(1-k.share):k.fuel,kl=kd||(+c.kml||0);
+  return{km,cost:km*(fuelK+k.el),lit:k.share<1&&kl>0?km*(1-k.share)/kl:0,manual:kd>0}}
+function energyRange(apps,f,t,perApp){const k=ckm(),c=cfg(),fu={},km={},ec={},ld={};let manual=false;
   db.tx.forEach(x=>{if(x.type==='fuel'&&inR(x.d,f,t))(fu[x.d]=fu[x.d]||[]).push(x)});
-  db.jr.forEach(j=>{if(apps.includes(j.app)&&inR(j.d,f,t)){const v=jrKm(j);if(v!=null)km[j.d]=(km[j.d]||0)+v}});
-  let real=0,est=0,estKm=0,lReg=0,kReg=0;
+  db.jr.forEach(j=>{if(apps.includes(j.app)&&inR(j.d,f,t)){const e=jrEst(j,k,c);if(e){km[j.d]=(km[j.d]||0)+e.km;ec[j.d]=(ec[j.d]||0)+e.cost;ld[j.d]=(ld[j.d]||0)+e.lit;if(e.manual)manual=true}}});
+  let real=0,est=0,estKm=0,estLit=0,lReg=0,kReg=0;
   new Set([...Object.keys(fu),...Object.keys(km)]).forEach(d=>{const fx=fu[d]||[],w=perApp?shareOf(apps[0],d,d):1,r=sum(fx)*w;
     if(r>0){real+=r;fx.forEach(x=>{const q=(+x.qty||0)*w;if((x.unit||'L')==='kWh')kReg+=q;else lReg+=q})}
-    else if(km[d]>0){est+=km[d]*k.total;estKm+=km[d]}});
+    else if(km[d]>0){est+=ec[d];estKm+=km[d];estLit+=ld[d]}});
   /* registrado × estimado: se o período tem QUALQUER abastecimento/recarga registrado, ele cobre o combustível e
      nenhuma estimativa por km é calculada (evita contar o mesmo combustível duas vezes). Sem registro no período,
      a estimativa existe só como informação à parte: nunca entra no lucro operacional. */
-  if(Object.keys(fu).length){est=0;estKm=0}
-  return{real,est,v:real,mode:real>0?'real':est>0?'est':'none',estKm,lReg,kReg,litersEst:k.share<1&&c.kml>0?estKm*(1-k.share)/c.kml:0,kwhEst:k.share>0&&c.kmkwh>0?estKm*k.share/c.kmkwh:0}}
+  const estMissing=!Object.keys(fu).length&&estKm>0&&!(est>0);if(Object.keys(fu).length){est=0;estKm=0;estLit=0}
+  return{real,est,v:real,mode:real>0?'real':est>0?'est':'none',estKm,estMissing,estManual:manual&&est>0,lReg,kReg,litersEst:estLit,kwhEst:k.share>0&&c.kmkwh>0?estKm*k.share/c.kmkwh:0}}
 function stats(apps,f,t,sh,perApp){const k=ckm(),tx=db.tx.filter(x=>inR(x.d,f,t)),jr=db.jr.filter(j=>apps.includes(j.app)&&inR(j.d,f,t)),w=x=>apps.includes(appOf(x))?1:appOf(x)==='veic'?sh:0;
   const ins=tx.filter(x=>x.type==='in'&&apps.includes(appOf(x))),inc=sum(ins),min=driverMin(jr);
   const kmL=jr.map(jrKm).filter(x=>x!=null),km=kmL.reduce((s,x)=>s+x,0),kmKnown=kmL.length>0,trL=jr.map(jrTrips).filter(x=>x!=null),n=trL.length?trL.reduce((s,x)=>s+x,0):null;
@@ -1469,7 +1489,7 @@ function stats(apps,f,t,sh,perApp){const k=ckm(),tx=db.tx.filter(x=>inR(x.d,f,t)
   const pass=apps.reduce((s,a)=>s+passShare(a,f,t),0),other=part('other'),maint=part('maint'),days=dDiff(f,t)+1,ownInfo=ownBreakdown(f,t),own=ownInfo.total*sh,passInfo=passBreakdown(apps,f,t);
   /* cada componente é arredondado para centavos antes de compor o resultado: o que aparece na tela sempre fecha a conta */
   const E=r2(en.real),P=r2(pass),O=r2(other),M=r2(maint),W=r2(own),opCost=r2(E+P+O),op=r2(inc-opCost),full=r2(op-M-W),hr=min/60,estFuel=r2(en.est),opEst=r2(op-estFuel);
-  return{tx,jr,ins,inc,min,hr,km,kmKnown,n,energy:E,eReal:E,eEst:estFuel,estFuel,opEst,pass:P,other:O,maint:M,own:W,emode:en.mode,passInfo,ownInfo,opCost,op,full,days,sh,lReg:en.lReg,kReg:en.kReg,litersEst:en.litersEst,kwhEst:en.kwhEst,k}}
+  return{tx,jr,ins,inc,promo:promoOf(ins),min,hr,km,kmKnown,n,energy:E,eReal:E,eEst:estFuel,estFuel,opEst,estMissing:en.estMissing,estManual:en.estManual,estKm:en.estKm,pass:P,other:O,maint:M,own:W,emode:en.mode,passInfo,ownInfo,opCost,op,full,days,sh,lReg:en.lReg,kReg:en.kReg,litersEst:en.litersEst,kwhEst:en.kwhEst,k}}
 /* estatísticas de um app (Uber ou 99) no período [f,t] */
 function AS(a,f,t){return stats([a],f,t,shareOf(a,f,t),true)}
 /* consolidado Uber + 99 + gastos gerais do veículo, sem duplicar lançamentos */
@@ -1635,6 +1655,9 @@ const dateLabel=()=>{const s=new Date().toLocaleDateString('pt-BR',{weekday:'lon
 const dailyGoals=()=>db.goals.filter(g=>g.kind==='dia');
 const goalsDone=()=>dailyGoals().filter(g=>g.last===TODAY()).length;
 const hm=fmtDur;
+const pendRow=d=>`<div class="pendr"><span><b>${WD[pd(d).getDay()]}</b> ${fmtD(d)}</span><span class="pendb"><button type="button" class="btn sm" data-pendrec="${d}">Registrar dia</button><button type="button" class="btn ghost sm" data-offday="${d}">Não trabalhei nesse dia</button></span></div>`;
+/* de onde vem a estimativa: km do período e consumo usado (do dia, quando informado, ou o padrão do veículo) */
+const estBasis=s=>num(s.estKm||s.km,0)+' km '+(s.estManual?'com o consumo (km/L) informado na jornada':'× '+brl(s.k.total)+'/km (consumo padrão do veículo)');
 const empt=t=>`<p class="empty">${t}</p>`;
 const del=(col,id)=>`<button type="button" class="x" data-del="${col}:${id}" aria-label="Remover">✕</button>`;
 const edt=id=>`<button type="button" class="x" data-edit="${id}" aria-label="Editar">✎</button>`;
@@ -1690,6 +1713,10 @@ function maintSection(){const v=db.vehicle;if(!v)return'';const od=odoNow(),st=c
 function incForm(a,d,inModal){const ex=APPS[a]?db.tx.filter(t=>t.type==='in'&&appOf(t)===a&&t.d===d):[];
   return`<form data-form="inc" novalidate>${inModal?`<div class="f"><label>Aplicativo</label>${rseg('app',a,{uber:'Uber',n99:'99'})}</div>`:`<input type="hidden" name="app" value="${a}">`}
    <div class="row wrap fpair"><div class="f"><label for="inc-v-${inModal?'m':'p'}">Valor faturado no dia (R$)</label><input id="inc-v-${inModal?'m':'p'}" name="v" inputmode="decimal" autocomplete="off" placeholder="Ex.: 250,50" required></div><div class="f"><label for="inc-d-${inModal?'m':'p'}">Data</label><input id="inc-d-${inModal?'m':'p'}" name="d" type="date" value="${d}" max="${TODAY()}" ${inModal?'':'data-pdate'} required></div></div>
+   <details class="sec"><summary>Promoção ou incentivo (opcional)</summary>
+    <div class="f"><label for="inc-p-${inModal?'m':'p'}">Valor da promoção (R$)</label><input id="inc-p-${inModal?'m':'p'}" name="promo" inputmode="decimal" autocomplete="off" placeholder="Ex.: 35,00"></div>
+    <div class="f"><label>Esse valor…</label>${rseg('promoMode','in',{in:'Já está no valor acima',add:'É um valor a mais'})}</div>
+    <p class="note" style="margin-top:0">"Já está no valor acima": o NESC só guarda quanto do faturamento foi promoção, sem somar de novo. "É um valor a mais": vira um lançamento próprio de promoção, somado uma única vez.</p></details>
    ${ex.length&&!inModal?`<p class="note" style="margin-top:0">Já registrado em ${fmtD(d)}: ${brl(sum(ex))} (${ex.length} lançamento${ex.length>1?'s':''}). Ao salvar, você escolhe se substitui ou acrescenta.</p>`:''}
    <div class="err" data-err></div><button class="btn">Salvar ganho</button></form>`}
 function jrForm(a,d){const ex=db.jr.filter(j=>j.app===a&&j.d===d),one=ex.length===1&&ex[0].v===2?ex[0]:null,per=ex.every(j=>j.v===2)?ex.flatMap(j=>j.periods||[]):[],min=ex.reduce((s,j)=>s+jrMin(j),0);
@@ -1705,6 +1732,7 @@ function jrForm(a,d){const ex=db.jr.filter(j=>j.app===a&&j.d===d),one=ex.length=
    <div class="row wrap" data-km="total"><div class="f"><label>Total percorrido (km)</label><input name="km" inputmode="decimal" autocomplete="off" value="${mode==='total'&&kmL.length?kmL.reduce((s,x)=>s+x,0):''}"></div></div>
    <div data-km="odo"><div class="row wrap"><div class="f"><label>Hodômetro no início</label><input name="odoIni" inputmode="numeric" autocomplete="off" value="${one&&one.odoIni!=null?one.odoIni:''}"></div><div class="f"><label>Hodômetro no fim</label><input name="odoFim" inputmode="numeric" autocomplete="off" value="${one&&one.odoFim!=null?one.odoFim:''}"></div></div>
     <label class="chkl"><input type="checkbox" name="odoExc" value="1" ${one&&one.odoExc?'checked':''}> As leituras são de veículos diferentes ou foram corrigidas (não calcular a diferença)</label></div>
+   ${energyKind()==='ev'?'':`<div class="f"><label for="jr-kml-${a}">Consumo do veículo no dia (km/L, opcional)</label><input id="jr-kml-${a}" name="kmlDay" inputmode="decimal" autocomplete="off" placeholder="${cfg().kml>0?'Padrão do veículo: '+num(cfg().kml,1):'Ex.: 12,4'}" value="${one&&+one.kml>0?num(one.kml,1):''}"><small class="sub">Só para a estimativa de combustível deste dia (km ÷ km/L × preço do litro). Não muda o consumo padrão do veículo e não entra no lucro quando houver abastecimento registrado.</small></div>`}
    <div class="f"><label>Observações (opcional)</label><input name="notes" autocomplete="off" value="${esc(notes)}"></div>
    <div class="err" data-err></div><button class="btn">${ex.length?'Atualizar jornada do dia':'Salvar jornada do dia'}</button>${ex.length?`<p class="note">Já existe jornada em ${fmtD(d)}. Salvar atualiza o registro do dia, sem duplicar.</p>`:''}</form>`}
 const periodRow=p=>`<div class="prow"><input type="time" name="ps" value="${p&&p.s||''}" aria-label="Início do período"><span>às</span><input type="time" name="pe" value="${p&&p.e||''}" aria-label="Fim do período"><button type="button" class="x" data-rmper aria-label="Remover período">✕</button></div>`;
@@ -1801,10 +1829,10 @@ const tc=s.opCost+s.maint+s.own;
 return `<div class="daynav"><button type="button" class="nb" data-pday="-1" aria-label="Dia anterior">‹</button><input type="date" value="${d}" max="${TODAY()}" data-pdate aria-label="Data exibida"><button type="button" class="nb" data-pday="1" aria-label="Próximo dia" ${isT?'disabled':''}>›</button>${isT?'<span class="sub">Hoje</span>':'<button type="button" class="btn ghost sm" data-pday="0">Voltar para hoje</button>'}</div>
 <div class="grid">${UBER_CARD_VISIBLE&&a==='uber'?uberCard():''}
 <div class="s12"><div class="kpis">
- ${kpi('Faturamento bruto',brl(s.inc),cx(s.inc,p.inc,{good:1}),'hl')}
+ ${kpi('Faturamento bruto',brl(s.inc),cx(s.inc,p.inc,{good:1})+(s.promo>0?' · '+brl(s.promo)+' de promoções':''),'hl')}
  ${kpi('Custos operacionais',brl(s.opCost),fuelTerm().toLowerCase()+' '+emTag(s.emode)+'<br>'+cx(s.opCost,p.opCost,{good:-1}))}
  ${kpi('Lucro operacional',`<span class="${s.op>=0?'pos':'neg'}">${brl(s.op)}</span>`,cx(s.op,p.op,{good:1}),'hl')}
- ${s.estFuel>0?kpi(fuelTerm()+' estimado',brl(s.estFuel),num(s.km,1)+' km × '+brl(s.k.total)+'/km · fora do lucro; registre o abastecimento'):''}
+ ${s.estFuel>0?kpi(fuelTerm()+' estimado',brl(s.estFuel),estBasis(s)+' · fora do lucro; registre o abastecimento'):''}
  ${kpi('Resultado completo',`<span class="${s.full>=0?'pos':'neg'}">${brl(s.full)}</span>`,'com manutenção e custos fixos')}
  ${kpi('Tempo online',s.min>0?hm(s.min):'—',s.min>0?cx(s.min,p.min>0?p.min:0,{fmt:hm}):'informe as horas na jornada')}
  ${kpi('Viagens',s.n!=null?s.n:'—',s.n!=null?cx(s.n,p.n,{fmt:x=>String(x)}):'opcional')}
@@ -1877,7 +1905,7 @@ financas(){
    <p class="note">Mesmo motor de cálculo das outras telas. Lucro operacional = faturamento − combustível/energia − passes rateados − outros gastos. Resultado completo também desconta manutenção e custos fixos.</p></div>`;
   return`<div class="finbar">${seg('fper',fper,FPER)}${fper==='c'?`<div class="row" style="flex:1 1 280px"><input type="date" data-ffrom value="${f}" max="${T}" aria-label="Data inicial"><input type="date" data-fto value="${t}" max="${T}" aria-label="Data final"></div>`:''}<span class="sub">${fmtD(f)}${f!==t?' – '+fmtD(t):''}</span><button class="btn" data-addrec>+ Adicionar registro</button></div>
   <div class="grid">${cmpCard}
-  <div class="c s3 k2"><h3>Faturamento registrado</h3><div class="big">${brl(cs.inc)}</div><div class="sub">Uber + 99 no período</div></div>
+  <div class="c s3 k2"><h3>Faturamento registrado</h3><div class="big">${brl(cs.inc)}</div><div class="sub">Uber + 99 no período${cs.promo>0?' · dos quais '+brl(cs.promo)+' em promoções':''}</div></div>
   <div class="c s3 k2"><h3>Gastos registrados</h3><div class="big">${brl(cs.expTot)}</div><div class="sub">combustível, manutenção, outros e passes</div></div>
   <div class="c s3 k2"><h3>Lucro operacional</h3><div class="big ${cs.op>=0?'pos':'neg'}">${brl(cs.op)}</div><div class="sub">só despesas registradas ${emTag(cs.emode)}</div>${estLine(cs)}</div>
   <div class="c s3 k2"><h3>Resultado completo</h3><div class="big ${cs.full>=0?'pos':'neg'}">${brl(cs.full)}</div><div class="sub">com manutenção e custos fixos · <button type="button" class="lnk" data-own>configurar custos fixos</button></div></div>
@@ -1890,7 +1918,7 @@ financas(){
   <div class="c s6"><h3>Como o resultado é calculado</h3>
    ${crow('Faturamento',cs.inc,Math.max(cs.inc,1))}${crow(`− Combustível/energia registrado`,cs.energy,Math.max(cs.inc,1))}${crow('− Passes (rateados)',cs.pass,Math.max(cs.inc,1))}<div class="note" style="margin-top:8px"><b>Detalhamento do rateio dos passes</b><br>${cs.passInfo.length?cs.passInfo.map(p=>esc(p.label)+' ('+fmtD(p.start)+' a '+fmtD(p.end)+'): '+brl(p.price)+(p.idle?' sem dia trabalhado na validade, lançado na data de início':' ÷ '+p.work+' dia(s) trabalhado(s) na validade = '+brl(p.daily)+'/dia')+' × '+p.used+' dia(s) no período = '+brl(p.amount)).join('<br>'):'Nenhum passe com custo atribuído ao período selecionado.'}<br>Total de passes rateados: ${brl(cs.pass)}. Cada passe é dividido entre os dias com atividade no app dentro da validade; dias sem registro não recebem custo de passe.</div>${crow('− Outros gastos',cs.other,Math.max(cs.inc,1))}
    ${crow('<b>= Lucro operacional</b>',cs.op,Math.max(cs.inc,1),'tot')}${crow('− Manutenção',cs.maint,Math.max(cs.inc,1))}${crow('− Custos fixos do veículo',cs.own,Math.max(cs.inc,1))}<div class="note" style="margin-top:8px"><b>Detalhamento dos custos fixos</b><br>${cs.ownInfo.parts.map(p=>esc(p.name)+': '+brl(p.value)+'/mês → '+brl(p.amount)+' no período').join('<br>')}<br>IPVA/licenciamento: ${brl(+((cfg().own||{}).ipva)||0)}/ano → ${brl(cs.ownInfo.ipva)} no período.<br><b>Total rateado: ${brl(cs.ownInfo.total)} × participação do app/veículo (${num(cs.sh*100,1)}%) = ${brl(cs.own)}</b><br>Fórmula mensal: ${cs.ownInfo.months.map(m=>fmtD(m.month+'-01').slice(3)+' ('+m.days+'/'+m.dim+' dias)').join(' + ')}. Cada custo mensal é valor mensal × dias selecionados ÷ dias reais do mês; mês completo equivale exatamente ao valor cadastrado. Seguro vazio = R$ 0,00.</div>${crow('<b>= Resultado completo</b>',cs.full,Math.max(cs.inc,1),'tot')}
-   <p class="note">O lucro operacional usa só o que foi registrado: ${fuelTerm().toLowerCase()} ${brl(cs.energy)}. ${cs.estFuel>0?`Sem abastecimento registrado no período, o NESC estima ${brl(cs.estFuel)} (${num(cs.km,0)} km × ${brl(cs.k.total)}/km) e mostra à parte: lucro estimado ${brl(cs.opEst)}.`:'Quando há abastecimento registrado no período, nenhuma estimativa por km é calculada, para não contar o combustível duas vezes.'}</p></div>
+   <p class="note">O lucro operacional usa só o que foi registrado: ${fuelTerm().toLowerCase()} ${brl(cs.energy)}. ${cs.estFuel>0?`Sem abastecimento registrado no período, o NESC estima ${brl(cs.estFuel)} (${estBasis(cs)}) e mostra à parte: lucro estimado ${brl(cs.opEst)}.`:'Quando há abastecimento registrado no período, nenhuma estimativa por km é calculada, para não contar o combustível duas vezes.'}</p></div>
   <div class="c s6"><div class="mhead"><h3 style="margin:0">Contas a pagar</h3><button type="button" class="btn sm" data-addbill>Adicionar conta</button></div>
    ${db.bills.length?`<div class="stats" style="margin:12px 0"><div><small>Pendente (vencidas e próximos 30 dias)</small><b>${brl(pend)}</b></div><div><small>Contas cadastradas</small><b>${db.bills.length}</b></div></div>
    <div class="list">${due.slice(0,6).map(o=>`<div class="it"><div class="g">${esc(o.b.name)} <span class="tag ${o.st==='vencida'?'bad':o.st==='parcial'?'warn':''}">${o.st}</span><small>vence ${fmtD(o.o)} · ${brl(o.rem)}${o.paid?' (pago '+brl(o.paid)+')':''}${o.b.rec!=='unica'?' · '+REC[o.b.rec].toLowerCase():''}</small></div><button type="button" class="btn sm" data-paybtn="${o.b.id}|${o.o}">Registrar pagamento</button></div>`).join('')||empt('Nenhuma conta pendente nos próximos 30 dias.')}</div>
@@ -1924,7 +1952,7 @@ produtividade(){
   <p class="note">Lucro operacional = faturamento − despesas operacionais registradas (a mesma conta do Início e de Relatórios). Lucro por hora considera só os dias com horas informadas${P.noH?`; ${P.noH} dia(s) sem horas ficam fora dessa média`:''}. Uber e 99 no mesmo dia: quando você marca que trabalhou nos dois ao mesmo tempo, as horas não são somadas duas vezes.</p></div>
   <div class="c s6"><h3>Custos registrados × estimados</h3><div class="kv" style="grid-template-columns:minmax(0,1fr) auto">
    <span>Combustível/energia registrado</span><b>${brl(c.energy)}</b><span>Passes (rateados)</span><b>${brl(c.pass)}</b><span>Outros gastos</span><b>${brl(c.other)}</b><span><b>Total registrado</b></span><b>${brl(c.opCost)}</b></div>
-   ${c.estFuel>0?`<div class="estbox"><small>Estimativa, fora da conta</small><b>Combustível estimado por km: ${brl(c.estFuel)}</b><span>${num(c.km,0)} km × ${brl(c.k.total)}/km. Se esse gasto existiu e não foi lançado, o lucro seria cerca de ${brl(c.opEst)}${P.min>0?' ('+brl(r2(c.opEst-(c.op-P.hOp)) / (P.min/60))+'/h)':''}.</span></div>`:`<p class="note">${c.energy>0?'Há abastecimento registrado no período, então o NESC não soma estimativa por km (evita contar o combustível duas vezes).':'Sem km informados, não há estimativa de combustível.'}</p>`}</div>
+   ${c.estFuel>0?`<div class="estbox"><small>Estimativa, fora da conta</small><b>Combustível estimado por km: ${brl(c.estFuel)}</b><span>${estBasis(c)}. Se esse gasto existiu e não foi lançado, o lucro seria cerca de ${brl(c.opEst)}${P.min>0?' ('+brl(r2(c.opEst-(c.op-P.hOp)) / (P.min/60))+'/h)':''}.</span></div>`:`<p class="note">${c.energy>0?'Há abastecimento registrado no período, então o NESC não soma estimativa por km (evita contar o combustível duas vezes).':c.estMissing?'Há quilometragem informada, mas faltam o preço do litro ou o consumo (km/L) para estimar o custo. Configure em Manutenção → veículo ou informe o consumo do dia na jornada.':'Sem km informados, não é possível estimar o combustível.'}</p>`}</div>
   <div class="c s6"><h3>Uber × 99</h3><div class="kv" style="grid-template-columns:minmax(0,auto) minmax(0,1fr) minmax(0,1fr)"><span></span><span style="color:var(--uber)"><b>Uber</b></span><span style="color:var(--n99)"><b>99</b></span>
    <span>Dias</span><span>${U.n}</span><span>${N.n}</span><span>Faturamento</span><span>${brl(U.c.inc)}</span><span>${brl(N.c.inc)}</span><span>Lucro operacional</span><span>${brl(U.c.op)}</span><span>${brl(N.c.op)}</span><span>Horas</span><span>${dur(U.min)}</span><span>${dur(N.min)}</span><span>Lucro/h</span><span>${nph(U)}</span><span>${nph(N)}</span></div>
    <p class="note">Gastos gerais do veículo são divididos entre os apps pela participação no faturamento.</p></div>
@@ -1982,11 +2010,14 @@ historico(){const items=histItems(),[f,t]=hrange(),q=fold(hf.q.trim()),cat=hf.ca
   const val=x=>x.v==null?'<span class="mutd">—</span>':`<b class="${x.fin?(x.v>0?'pos':'neg'):'mutd'}">${x.v>0?'+':'−'}${brl(Math.abs(x.v))}</b>${x.fin?'':'<small class="mutd" style="display:block;font-size:.7rem">fora dos totais</small>'}`;
   const when=x=>fmtD(x.d)+(x.at>1e11?' · '+new Date(x.at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'');
   return`<div class="finbar">${seg('hper2',hf.per,{d:'Hoje',w:'7 dias',m:'Este mês',c:'Personalizado'})}${hf.per==='c'?`<div class="row" style="flex:1 1 280px"><input type="date" data-hfrom value="${f}" max="${TODAY()}" aria-label="Data inicial"><input type="date" data-hto value="${t}" max="${TODAY()}" aria-label="Data final"></div>`:''}<span class="sub">${fmtD(f)}${f!==t?' – '+fmtD(t):''}</span></div>
-  <div class="hfil"><div class="chips2" role="group" aria-label="Tipo">${Object.entries(TYPEF).map(([k,[n]])=>`<button type="button" class="${hf.type===k?'on':''}" data-htype="${k}" aria-pressed="${hf.type===k}">${n}</button>`).join('')}</div>
-   <div class="row wrap"><input type="search" id="hq" value="${esc(hf.q)}" placeholder="Pesquisar descrição" aria-label="Pesquisar no histórico" autocomplete="off"><select data-hcat aria-label="Categoria"><option value="">Todas as categorias</option>${Object.entries(HK).map(([k,n])=>`<option value="${k}" ${cat===k?'selected':''}>${n}</option>`).join('')}</select><select data-hsort aria-label="Ordenar"><option value="dd" ${hf.sort==='dd'?'selected':''}>Mais recentes</option><option value="da" ${hf.sort==='da'?'selected':''}>Mais antigos</option><option value="vd" ${hf.sort==='vd'?'selected':''}>Maior valor</option><option value="va" ${hf.sort==='va'?'selected':''}>Menor valor</option></select></div></div>
+  <div class="hfil"><div class="chips2 scrollx" role="group" aria-label="Tipo">${Object.entries(TYPEF).map(([k,[n]])=>`<button type="button" class="${hf.type===k?'on':''}" data-htype="${k}" aria-pressed="${hf.type===k}">${n}</button>`).join('')}</div>
+   <div class="row wrap"><input type="search" id="hq" value="${esc(hf.q)}" placeholder="Pesquisar" aria-label="Pesquisar no histórico" autocomplete="off"><select data-hcat aria-label="Categoria"><option value="">Categoria: todas</option>${Object.entries(HK).map(([k,n])=>`<option value="${k}" ${cat===k?'selected':''}>${n}</option>`).join('')}</select><select data-hsort aria-label="Ordenar"><option value="dd" ${hf.sort==='dd'?'selected':''}>Mais recentes</option><option value="da" ${hf.sort==='da'?'selected':''}>Mais antigos</option><option value="vd" ${hf.sort==='vd'?'selected':''}>Maior valor</option><option value="va" ${hf.sort==='va'?'selected':''}>Menor valor</option></select></div></div>
   <div class="grid"><div class="c s12"><div class="stats"><div><small>Receitas no filtro</small><b>${brl(rIn)}</b></div><div><small>Despesas no filtro</small><b>${brl(rOut)}</b></div><div><small>Receitas − despesas</small><b class="${rIn-rOut>0?'pos':rIn-rOut<0?'neg':''}">${brl(r2(rIn-rOut))}</b></div><div><small>Registros encontrados</small><b>${L_.length}</b></div></div>
-   <p class="note">Valores somados a partir dos lançamentos originais. Manutenções sem despesa, pagamentos de contas e reservas aparecem para consulta e ficam fora destes totais. O lucro operacional fica em Início e Relatórios, com o rateio de passes e combustível.</p></div>
-  ${pend.length?`<div class="c s12 remind"><div class="g"><b>${pend.length} dia(s) habitual(is) sem registro neste período</b><small>${pend.slice(0,6).map(d=>WD[pd(d).getDay()]+' '+fmtD(d).slice(0,5)).join(' · ')}${pend.length>6?' …':''}. Isso não conta como faturamento zero.</small></div><button type="button" class="btn sm" data-pendrec="${pend[0]}">Registrar ${fmtD(pend[0]).slice(0,5)}</button><button type="button" class="btn ghost sm" data-offday="${pend[0]}">Não trabalhei em ${fmtD(pend[0]).slice(0,5)}</button></div>`:''}
+   <details class="hexp"><summary>Como os valores são calculados</summary><p>Este resumo considera os lançamentos do período e dos filtros escolhidos. Manutenções sem despesa, pagamentos de contas e reservas não entram nesses totais. Para consultar o lucro operacional e os cálculos de combustível, acesse Início ou Relatórios.</p></details></div>
+  ${pend.length?`<div class="c s12 pendc" role="status"><div class="pendh"><div><h3>Dias sem registro</h3><p>Você tem dias habituais sem lançamento neste período.</p></div><b class="pendn">${pend.length} ${pend.length===1?'dia':'dias'}</b></div>
+   <div class="pendl">${pend.slice(0,2).map(pendRow).join('')}</div>
+   ${pend.length>2?`<details class="pendmore"><summary>Ver todos os dias (${pend.length})</summary><div class="pendl">${pend.slice(2).map(pendRow).join('')}</div></details>`:''}
+   <p class="note" style="margin:8px 0 0">Dia sem lançamento não conta como faturamento zero. Datas futuras e dias marcados como "não trabalhei" não aparecem aqui.</p></div>`:''}
   <div class="c s12 hlist">${shown.length?`<table class="htab"><thead><tr><th>Data</th><th>Categoria</th><th>Descrição</th><th>App</th><th>Km</th><th style="text-align:right">Valor</th><th><span class="sr-only">Ações</span></th></tr></thead><tbody>${shown.map(x=>`<tr data-hitem="${esc(x.key)}" tabindex="0"><td data-l="Data">${when(x)}</td><td data-l="Categoria"><span class="tag ${x.k==='in'?'ok':x.fin?'':'est'}">${x.cat}</span><span class="hm">${x.app==='uber'?'Uber':x.app==='n99'?'99':''}${x.km?' · '+num(x.km,0)+' km':''}</span></td><td data-l="Descrição" class="hd">${esc(x.desc)}${x.note?`<small>${esc(x.note)}</small>`:''}</td><td data-l="App">${appTxt(x.app)}</td><td data-l="Km">${x.km?num(x.km,0)+' km':'—'}</td><td data-l="Valor" class="hv">${val(x)}</td><td class="ha"><button type="button" class="btn ghost sm" data-hitem="${esc(x.key)}">Detalhes</button></td></tr>`).join('')}</tbody></table>
    ${L_.length>hf.n?`<button type="button" class="btn ghost" data-hmore style="margin-top:14px;width:100%">Mostrar mais ${Math.min(40,L_.length-hf.n)} de ${L_.length-hf.n} restantes</button>`:''}`
    :`<div class="cempty2">${items.length?'Nenhum registro com estes filtros. Ajuste o período ou o tipo.':'Seu histórico ainda está vazio. Registre o primeiro ganho ou despesa para começar.'}<button type="button" class="btn sm" data-addrec>+ Adicionar registro</button></div>`}</div></div>`},
@@ -2252,16 +2283,18 @@ const ICONS={historico:SVGI('<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M
   metas:SVGI('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>'),more:SVGI('<path d="M4 7h16M4 12h16M4 17h16"/>'),conta:SVGI('<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>'),
   sair:SVGI('<path d="M14 4h4.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H14"/><path d="M10 16l-4-4 4-4M6 12h10"/>'),plus:SVGI('<path d="M12 5v14M5 12h14"/>'),
   uber:'<span class="idn uber" aria-hidden="true"></span>',n99:'<span class="idn n99" aria-hidden="true"></span>'};
+ICONS.navmenu=SVGI('<path d="M4 7h16M4 12h16M4 17h16"/>');ICONS.navclose=SVGI('<path d="M6 6l12 12M18 6L6 18"/>');
 const ICON=k=>ICONS[k]||'';
 let tab='hoje';
 function navState(){try{return localStorage.getItem('nesc_nav')==='c'}catch(e){return false}}
-function renderNav(){const mob=innerWidth<=900,app=$('#app'),open=app.classList.contains('navx'),col=!mob&&app.classList.contains('navc');
-  const btn=t=>`<button class="nav ${t[0]===tab?'on':''}" data-go="${t[0]}" ${t[0]===tab?'aria-current="page"':''} title="${t[2]}"><span class="ni">${ICON(t[1])}</span><span class="nl">${t[2]}</span><span class="ns" aria-hidden="true">${t[4]}</span></button>`;
-  const tg=mob?(open?['navin','Recolher menu']:['navout','Expandir menu']):(col?['navout','Expandir menu']:['navin','Recolher menu']);
-  $('#nav').innerHTML=`<div class="navtop"><div class="logo"><img src="/icon-192.png" alt="" width="28" height="28"><b>NESC</b></div><button type="button" class="navtog" data-navtog aria-label="${tg[1]}" aria-expanded="${mob?open:!col}" title="${tg[1]}">${ICON(tg[0])}</button></div>`+
-   TABS.filter(t=>t[3]).map(btn).join('')+`<div class="navsep" role="presentation"><b>Mais ferramentas</b></div>`+TABS.filter(t=>!t[3]).map(btn).join('')+
-   `<div class="spacer"></div><div class="user"><b>${esc(user.name)}</b><button data-go="config">Conta e dados</button> · <button data-logout>Sair</button><span class="sync" id="sync">Dados: ${Store.sync}</span></div>`;
+function renderNav(){const mob=innerWidth<=900,app=$('#app'),open=app.classList.contains('navx'),col=!mob&&app.classList.contains('navc');let i=0;
+  const btn=t=>`<button class="nav ${t[0]===tab?'on':''}" data-go="${t[0]}" ${t[0]===tab?'aria-current="page"':''} title="${t[2]}" style="--i:${i++}"><span class="ni">${ICON(t[1])}</span><span class="nl">${t[2]}</span><span class="ns" aria-hidden="true">${t[4]}</span></button>`;
+  const tg=mob?(open?['navclose','Fechar menu']:['navmenu','Abrir menu']):(col?['navout','Expandir menu']:['navin','Recolher menu']),cur=TABS.find(t=>t[0]===tab);
+  $('#nav').innerHTML=`<div class="navtop"><div class="logo"><img src="/icon-192.png" alt="" width="28" height="28"><b>NESC</b></div><span class="navcur" aria-hidden="true">${cur?cur[2]:''}</span><button type="button" class="navtog" data-navtog aria-label="${tg[1]}" aria-expanded="${mob?open:!col}" aria-controls="nav" title="${tg[1]}">${ICON(tg[0])}</button></div>`+
+   `<div class="navlist"${mob&&!open?' inert':''}>`+TABS.filter(t=>t[3]).map(btn).join('')+`<div class="navsep" role="presentation" style="--i:${i++}"><b>Mais ferramentas</b></div>`+TABS.filter(t=>!t[3]).map(btn).join('')+
+   `<div class="spacer"></div><div class="user" style="--i:${i++}"><b>${esc(user.name)}</b><button data-go="config">Conta e dados</button> · <button data-logout>Sair</button><span class="sync" id="sync">Dados: ${Store.sync}</span></div></div>`;
 }
+addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#app.navx')){$('#app').classList.remove('navx');renderNav();const t=$('[data-navtog]');t&&t.focus()}});
 function render(){if(!user||!db)return;if(!V[tab]||!TABS.some(t=>t[0]===tab))tab='hoje';
   const T=TABS.find(t=>t[0]===tab),app=APPS[tab];
   const greet=tab==='hoje'?`Olá, ${esc(user.name.split(' ')[0])}`:(app?`<span class="idn lg ${tab}" aria-hidden="true"></span>`:'')+T[2],I=TABINFO[tab]||['','',''];
@@ -2319,11 +2352,16 @@ function openBatt(){modal(`<h2>Bateria de tração</h2><p class="sub" style="mar
 function openEdit(id){const x=db.tx.find(t=>t.id===id);if(!x||x.type==='pass')return;if(x.src==='uber_api'){toast('Registros oficiais da Uber não são editados; você pode removê-los.');return}const inc=x.type==='in';
   modal(`<h2>Editar ${inc?'ganho':'gasto'}</h2><form data-form="edtx" novalidate><input type="hidden" name="id" value="${id}">
   ${inc?`<div class="f"><label>Aplicativo</label>${rseg('app',appOf(x)==='n99'?'n99':'uber',{uber:'Uber',n99:'99'})}</div>`:`<div class="f"><label>Tipo de gasto</label>${rseg('type',x.type,{fuel:'Combustível/energia',maint:'Manutenção',other:'Outros gastos'})}</div>`}
-  <div class="row wrap"><div class="f"><label>Data</label><input name="d" type="date" value="${x.d}" max="${TODAY()}" required></div><div class="f"><label>Valor (R$)</label><input name="v" inputmode="decimal" autocomplete="off" value="${num(x.v,2)}" required></div></div>
+  <div class="row wrap"><div class="f"><label>Data</label><input name="d" type="date" value="${x.d}" max="${TODAY()}" required></div><div class="f"><label>${x.kind==='promo'?'Valor da promoção (R$)':'Valor (R$)'}</label><input name="v" inputmode="decimal" autocomplete="off" value="${num(x.v,2)}" required></div></div>
+  ${inc&&x.kind!=='promo'?`<div class="f"><label>Desse valor, quanto foi promoção (R$, opcional)</label><input name="promo" inputmode="decimal" autocomplete="off" value="${x.promo>0?num(x.promo,2):''}" placeholder="0,00"></div>`:''}
   ${inc?'':`<div class="row wrap"><div class="f"><label>Descrição</label><input name="desc" autocomplete="off" value="${esc(x.desc||'')}"></div><div class="f" ${x.type==='fuel'?'hidden':''}><label>Atribuir a</label><select name="app">${[['veic','Geral (Uber + 99)'],['uber','Uber'],['n99','99']].map(([k,n])=>`<option value="${k}" ${appOf(x)===k?'selected':''}>${n}</option>`).join('')}</select></div></div>`}
   <div class="err" data-err></div><div class="row wrap"><button class="btn">Salvar alterações</button>${mclose}</div></form>`)}
 let pendInc=null;
-function dupDialog(a,d,v,ex,editId){pendInc={a,d,v,editId};modal(`<h2>Já existe faturamento neste dia</h2><p class="sub" style="margin-bottom:14px">${APPS[a].n} em ${fmtD(d)}: ${brl(sum(ex))} em ${ex.length} lançamento${ex.length>1?'s':''}. Novo valor: <b>${brl(v)}</b>. Nada é somado automaticamente.</p>
+/* promoção "a mais": lançamento de faturamento próprio (kind:'promo'), somado uma única vez como qualquer ganho */
+const addPromo=(a,d,v)=>db.tx.push({id:uid(),d,type:'in',desc:'Promoção/incentivo '+APPS[a].n,v,app:a,kind:'promo',promo:v,at:Date.now()});
+/* quanto do faturamento foi promoção: detalhe de ganhos (promo) + lançamentos próprios de promoção */
+const promoOf=txs=>r2(txs.reduce((s,x)=>s+(x.type!=='in'?0:x.kind==='promo'?(+x.v||0):Math.min(+x.promo||0,+x.v||0)),0));
+function dupDialog(a,d,v,ex,editId,pro){pendInc={a,d,v,editId,pro};modal(`<h2>Já existe faturamento neste dia</h2><p class="sub" style="margin-bottom:14px">${APPS[a].n} em ${fmtD(d)}: ${brl(sum(ex))} em ${ex.length} lançamento${ex.length>1?'s':''}. Novo valor: <b>${brl(v)}</b>. Nada é somado automaticamente.</p>
   <div class="pick3"><button type="button" class="btn" data-dup="replace">Substituir pelo novo valor<small>${ex.length>1?'os '+ex.length+' lançamentos viram um só de '+brl(v):'o lançamento passa a ser '+brl(v)}</small></button><button type="button" class="btn ghost" data-dup="add">Acrescentar como registro adicional<small>total do dia: ${brl(sum(ex)+v)}</small></button><button type="button" class="btn ghost" data-dup="cancel">Cancelar<small>nada é alterado</small></button></div>`)}
 
 /* ============ ONBOARDING DO VEÍCULO ============ */
@@ -2428,12 +2466,13 @@ document.addEventListener('click',e=>{
   const ub=T.closest('[data-uber]');if(ub){const k=ub.dataset.uber;if(k==='connect')UberLink.connect();else if(k==='sync')UberLink.sync(30);else if(k==='disconnect')openUberDisconnect();else if(k==='review')openUberReview();else if(k==='restore')restoreUberManual();else if(k==='refresh'){UberLink.st=null;UberLink.refresh()}return}
   const ed=T.closest('[data-edit]');if(ed){openEdit(ed.dataset.edit);return}
   const ej=T.closest('[data-editjr]');if(ej){setPday(ej.dataset.editjr);lm='jr';render();const r=$('#reg');if(r)r.scrollIntoView({block:'start'});return}
-  const dp=T.closest('[data-dup]');if(dp&&pendInc){const{a,d,v,editId}=pendInc,k=dp.dataset.dup,mv=editId&&db.tx.find(t=>t.id===editId),ex=db.tx.filter(t=>t.type==='in'&&appOf(t)===a&&t.d===d&&t!==mv);pendInc=null;
+  const dp=T.closest('[data-dup]');if(dp&&pendInc){const{a,d,v,editId,pro}=pendInc,k=dp.dataset.dup,mv=editId&&db.tx.find(t=>t.id===editId),ex=db.tx.filter(t=>t.type==='in'&&appOf(t)===a&&t.d===d&&t!==mv&&t.kind!=='promo');pendInc=null;const pIn=pro&&pro.pm==='in'&&pro.pr>0?pro.pr:0,pAdd=pro&&pro.pm==='add'&&pro.pr>0?pro.pr:0;
     if(k==='cancel'){closeModal();return}
     if(mv){const oa=appOf(mv),od=mv.d;if(k==='replace'){ex.forEach(x=>{db._del[x.id]=1});db.tx=db.tx.filter(x=>!ex.includes(x))}else mv.desc='Faturamento adicional '+APPS[a].n;
       mv.v=v;mv.d=d;mv.app=a;mv.at=Date.now();ensurePass(a,d);reconcilePass(oa,wkStart(od));mark();Store.save();closeModal();render();toast(k==='replace'?'Registro movido e substituiu o faturamento do dia.':'Registro movido como faturamento adicional.');return}
-    if(k==='replace'){if(ex.length===1){ex[0].v=v;ex[0].at=Date.now()}else{ex.forEach(x=>{db._del[x.id]=1});db.tx=db.tx.filter(x=>!ex.includes(x));db.tx.push({id:uid(),d,type:'in',desc:'Faturamento '+APPS[a].n,v,app:a,at:Date.now()})}}
-    else db.tx.push({id:uid(),d,type:'in',desc:'Faturamento adicional '+APPS[a].n,v,app:a,at:Date.now()});
+    let tgt;if(k==='replace'){if(ex.length===1){tgt=ex[0];tgt.v=v;tgt.at=Date.now()}else{ex.forEach(x=>{db._del[x.id]=1});db.tx=db.tx.filter(x=>!ex.includes(x));tgt={id:uid(),d,type:'in',desc:'Faturamento '+APPS[a].n,v,app:a,at:Date.now()};db.tx.push(tgt)}}
+    else{tgt={id:uid(),d,type:'in',desc:'Faturamento adicional '+APPS[a].n,v,app:a,at:Date.now()};db.tx.push(tgt)}
+    if(pIn)tgt.promo=pIn;else if(k==='replace')delete tgt.promo;if(pAdd)addPromo(a,d,pAdd);
     ensurePass(a,d);mark();Store.save();closeModal();render();toast(k==='replace'?'Faturamento substituído: '+brl(v)+'.':'Registro adicional de '+brl(v)+' salvo.');return}
   const lmb=T.closest('[data-lm]');if(lmb){lm=lmb.dataset.lm;render();return}
   const pdb=T.closest('[data-pday]');if(pdb){const n=+pdb.dataset.pday,cur=pday||TODAY();setPday(n===0?TODAY():addD(cur,n));render();return}
@@ -2535,8 +2574,9 @@ function saveJr(form,f){const a=f.app,d=f.d||TODAY();if(!APPS[a])return false;if
   if(mode==='odo'&&(f.odoIni||f.odoFim)){odoIni=parseOdo(f.odoIni);odoFim=parseOdo(f.odoFim);if(!(odoIni>=0)||!(odoFim>=0))return ferr(form,'Informe as duas leituras do hodômetro.');
     if(!odoExc){if(odoFim<odoIni)return ferr(form,'A leitura final é menor que a inicial. Corrija as leituras ou marque que são de veículos diferentes/corrigidas.');km=Math.round((odoFim-odoIni)*10)/10}kmSrc='odo'}
   if(km!=null&&km>2000)return ferr(form,'Mais de 2.000 km em um dia: confira o valor.');
+  let kmlD=null;if(String(f.kmlDay||'').trim()!==''){kmlD=parseDec(f.kmlDay);if(!(kmlD>=1&&kmlD<=60))return ferr(form,'Consumo do dia inválido. Use km/L entre 1 e 60, ex.: 8,5 · 10 · 12,4.')}
   const notes=(f.notes||'').trim();if(!(min>0)&&trips==null&&km==null&&!notes)return ferr(form,'Informe ao menos horas, viagens, quilometragem ou uma observação.');
-  const ex=db.jr.filter(j=>j.app===a&&j.d===d),rec={d,app:a,v:2,min,periods,trips,km,kmSrc,odoIni,odoFim,odoExc,notes,overlap:!!f.overlap,hrsOk:true,src:undefined,tripsSrc:undefined,at:Date.now()}; // editado pelo usuário: deixa de ser 'oficial'
+  const ex=db.jr.filter(j=>j.app===a&&j.d===d),rec={d,app:a,v:2,min,periods,trips,km,kmSrc,odoIni,odoFim,odoExc,kml:kmlD,notes,overlap:!!f.overlap,hrsOk:true,src:undefined,tripsSrc:undefined,at:Date.now()}; // editado pelo usuário: deixa de ser 'oficial'
   if(ex.length===1&&ex[0].v===2)Object.assign(ex[0],rec);else{ex.forEach(j=>{db._del[j.id]=1});db.jr=db.jr.filter(j=>!ex.includes(j));db.jr.push(Object.assign({id:uid()},rec))}
   if(kmSrc==='odo'&&!odoExc&&odoFim>0)bumpOdo(Math.round(odoFim),d);if(min>0||trips||km)ensurePass(a,d);else reconcilePass(a,wkStart(d));
   return ex.length?'Jornada de '+fmtD(d)+' atualizada.':'Jornada de '+fmtD(d)+' salva.'}
@@ -2557,14 +2597,21 @@ document.addEventListener('submit',e=>{
   if(k==='uberrev'){const msg=applyUberReview(f);closeModal();render();toast(msg);return}
   const sig=k+JSON.stringify(f);if(!['jr','odo','cash','own','edtx','gnew','profile','rank'].includes(k)&&sig===lastSig&&Date.now()-lastT<1500)return;lastSig=sig;lastT=Date.now();
   if(k==='visit'){saveVisit(fm,f);return}
-  if(k==='inc'){const v=parseMoney(f.v),a=f.app,dd=f.d||d;if(!APPS[a])return ferr(fm,'Escolha Uber ou 99.');if(!(v>0))return ferr(fm,'Informe um valor válido, ex.: 250 · 250,50 · 250.50.');if(dd>d)return ferr(fm,'A data não pode ser futura.');
-    const ex=db.tx.filter(t=>t.type==='in'&&appOf(t)===a&&t.d===dd);if(ex.length){lastSig='';dupDialog(a,dd,v,ex);return}
-    db.tx.push({id,d:dd,type:'in',desc:'Faturamento '+APPS[a].n,v,app:a,at:Date.now()});ensurePass(a,dd);if(!inModal)setPday(dd);return ok('Ganho de '+brl(v)+' salvo em '+fmtD(dd)+'.')}
+  if(k==='inc'){const a=f.app,dd=f.d||d,pm=f.promoMode==='add'?'add':'in',hasV=String(f.v||'').trim()!=='',v=hasV?parseMoney(f.v):0,hasP=String(f.promo||'').trim()!=='',pr=hasP?parseMoney(f.promo):0;
+    if(!APPS[a])return ferr(fm,'Escolha Uber ou 99.');if(dd>d)return ferr(fm,'A data não pode ser futura.');
+    if(hasP&&!(pr>0))return ferr(fm,'Valor da promoção inválido, ex.: 35 ou 35,50.');
+    if(!hasV&&pm==='add'&&pr>0){addPromo(a,dd,pr);ensurePass(a,dd);if(!inModal)setPday(dd);return ok('Promoção de '+brl(pr)+' salva em '+fmtD(dd)+'.')}
+    if(!(v>0))return ferr(fm,'Informe um valor válido, ex.: 250 · 250,50 · 250.50.');
+    if(pm==='in'&&pr>v)return ferr(fm,'A promoção incluída não pode ser maior que o valor faturado. Se ela veio além desse valor, escolha "É um valor a mais".');
+    const ex=db.tx.filter(t=>t.type==='in'&&appOf(t)===a&&t.d===dd&&t.kind!=='promo');if(ex.length){lastSig='';dupDialog(a,dd,v,ex,null,{pr,pm});return}
+    db.tx.push(Object.assign({id,d:dd,type:'in',desc:'Faturamento '+APPS[a].n,v,app:a,at:Date.now()},pm==='in'&&pr>0?{promo:pr}:{}));if(pm==='add'&&pr>0)addPromo(a,dd,pr);
+    ensurePass(a,dd);if(!inModal)setPday(dd);return ok('Ganho de '+brl(v)+' salvo em '+fmtD(dd)+(pr>0?(pm==='in'?' (dos quais '+brl(pr)+' de promoção)':' + promoção de '+brl(pr)):'')+'.')}
   if(k==='jr'){const r=saveJr(fm,f);if(r){setPday(f.d)}return ok(r)}
   if(k==='exp'){const r=saveExp(fm,f);if(r&&!inModal)setPday(f.d);return ok(r)}
   if(k==='edtx'){const x=db.tx.find(t=>t.id===f.id);if(!x)return closeModal();const v=parseMoney(f.v);if(!(v>0))return ferr(fm,'Informe um valor válido.');if(!f.d||f.d>d)return ferr(fm,'Data inválida.');
-    if(x.type==='in'){const na=APPS[f.app]?f.app:appOf(x),oa=appOf(x),od=x.d;const ex=db.tx.filter(t=>t.type==='in'&&t!==x&&appOf(t)===na&&t.d===f.d);
-      if(ex.length&&(f.d!==od||na!==oa)){dupDialog(na,f.d,v,ex,x.id);return}x.v=v;x.d=f.d;x.app=na;x.at=Date.now();ensurePass(na,x.d);if(od!==x.d||oa!==na)reconcilePass(oa,wkStart(od));return ok('Registro atualizado.')}
+    if(x.type==='in'){const na=APPS[f.app]?f.app:appOf(x),oa=appOf(x),od=x.d;const ex=db.tx.filter(t=>t.type==='in'&&t!==x&&appOf(t)===na&&t.d===f.d&&t.kind!=='promo');
+      if(x.kind==='promo')x.promo=v;else{const hp=String(f.promo||'').trim()!=='',pp=hp?parseMoney(f.promo):0;if(hp&&!(pp>=0))return ferr(fm,'Valor da promoção inválido.');if(pp>v)return ferr(fm,'A promoção não pode ser maior que o valor do ganho.');if(pp>0)x.promo=pp;else delete x.promo}
+      if(x.kind!=='promo'&&ex.length&&(f.d!==od||na!==oa)){dupDialog(na,f.d,v,ex,x.id);return}x.v=v;x.d=f.d;x.app=na;x.at=Date.now();ensurePass(na,x.d);if(od!==x.d||oa!==na)reconcilePass(oa,wkStart(od));return ok('Registro atualizado.')}
     x.v=v;x.d=f.d;x.at=Date.now();{if(['fuel','maint','other'].includes(f.type))x.type=f.type;x.desc=(f.desc||'').trim()||L[x.type];x.app=x.type==='fuel'?'veic':['veic','uber','n99'].includes(f.app)?f.app:x.app}return ok('Registro atualizado.')}
   if(k==='goal'){if(!(f.text||'').trim())return;db.goals.push({id,kind:f.kind,text:f.text.trim(),pct:0,last:null});return ok('Meta adicionada.')}
   if(k==='gnew'){return ok(saveGoal(fm,f))}

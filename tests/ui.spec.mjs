@@ -173,19 +173,24 @@ await test("Movimento reduzido: app funciona e a frase do login não alterna", a
   assert(!errs.length, errs.join(" | "));
 });
 
-await test("Celular: as 9 áreas principais aparecem no trilho lateral sem tocar em \"Mais\"; menu expande e recolhe", async (keep) => {
+await test("Celular: sem faixa lateral; menu desce com as áreas principais, navega, fecha e o conteúdo usa a largura toda", async (keep) => {
   const ctx = await ctxFor(keep, { viewport: { width: 360, height: 780 }, hasTouch: true, isMobile: true });
   const { page } = await loggedPage(ctx);
-  const vis = await page.evaluate(() => [...document.querySelectorAll("aside .nav")].filter((b) => { const r = b.getBoundingClientRect(); return r.width > 0 && r.top >= 0 && r.bottom <= innerHeight; }).map((b) => b.dataset.go));
-  for (const k of ["hoje", "uber", "n99", "historico", "despesas", "manutencao", "metas", "financas", "config"]) assert(vis.includes(k), "não visível ao abrir: " + k + " (" + vis.join(",") + ")");
+  const closed = await page.evaluate(() => ({ bar: document.querySelector("aside").getBoundingClientRect().height, main: document.querySelector("main").getBoundingClientRect().width, vw: innerWidth }));
+  assert(closed.bar <= 64, "barra superior alta demais: " + closed.bar);
+  assert(closed.main === closed.vw, "o conteúdo não usa a largura toda: " + JSON.stringify(closed));
   assert(!(await page.locator("[data-more]").count()), "ainda existe o botão Mais");
-  const rail = await page.evaluate(() => document.querySelector("aside").getBoundingClientRect().width);
-  assert(rail <= 80, "trilho largo demais: " + rail);
   await page.click("[data-navtog]");
-  assert(await page.evaluate(() => document.getElementById("app").classList.contains("navx")), "não expandiu");
+  await page.waitForTimeout(500);
+  assert(await page.evaluate(() => document.getElementById("app").classList.contains("navx")), "não abriu");
+  assert((await page.getAttribute("[data-navtog]", "aria-expanded")) === "true", "aria-expanded não atualizou");
+  const vis = await page.evaluate(() => [...document.querySelectorAll("aside .nav")].filter((b) => { const r = b.getBoundingClientRect(); return r.width > 0 && r.top >= 0 && r.bottom <= innerHeight; }).map((b) => b.dataset.go));
+  for (const k of ["hoje", "uber", "n99", "historico", "despesas", "manutencao", "metas", "financas", "config"]) assert(vis.includes(k), "não visível com o menu aberto: " + k + " (" + vis.join(",") + ")");
   await page.click('aside [data-go="historico"]');
-  assert(await page.evaluate(() => tab === "historico" && !document.getElementById("app").classList.contains("navx")), "não navegou/recolheu");
-  return "trilho de " + rail + " px";
+  assert(await page.evaluate(() => tab === "historico" && !document.getElementById("app").classList.contains("navx")), "não navegou/fechou");
+  await page.click("[data-navtog]"); await page.keyboard.press("Escape");
+  assert(await page.evaluate(() => !document.getElementById("app").classList.contains("navx")), "Esc não fechou");
+  return "barra de " + closed.bar + " px, conteúdo com " + closed.main + " px";
 });
 await test("Desktop: menu lateral recolhe e lembra a escolha", async (keep) => {
   const ctx = await ctxFor(keep, { viewport: { width: 1280, height: 860 } });

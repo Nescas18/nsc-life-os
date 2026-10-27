@@ -84,6 +84,28 @@ podia **contar o combustível duas vezes**. Quando há qualquer abastecimento re
 estimativa é calculada. A mesma regra vale no app, nos relatórios, na produtividade e no ranking (servidor).
 Entre Uber e 99, o gasto registrado do período é dividido por km (ou por faturamento quando falta km).
 
+### Prioridade da estimativa de combustível (só informativa)
+
+1. Gasto real registrado no período → é a despesa efetiva; nenhuma estimativa é calculada.
+2. Sem gasto registrado, com km e **consumo do dia** (km/L informado na jornada) → `litros = km ÷ km/L`,
+   `custo = litros × preço do litro`. Ex.: 180 km a 12 km/L com R$ 6,00/L → 15 L e R$ 90,00.
+3. Sem consumo do dia → consumo padrão do veículo cadastrado.
+4. Sem km, ou sem preço/consumo → não há estimativa; a tela avisa que faltam dados. Nunca inventamos distância.
+
+O consumo do dia fica só naquela jornada e não altera o consumo padrão do veículo.
+
+## Promoções e incentivos
+
+No registro de ganho (Uber ou 99) há um campo opcional de promoção, com o significado escolhido pelo motorista:
+
+- **"Já está no valor acima"**: o NESC guarda quanto do faturamento foi promoção (`promo` no lançamento), sem somar
+  de novo. Não pode ser maior que o valor faturado.
+- **"É um valor a mais"**: vira um lançamento de faturamento próprio (`kind: 'promo'`), somado uma única vez.
+  Substituir o ganho do dia não apaga nem duplica esse lançamento.
+
+O total de promoções aparece no faturamento das abas Uber/99 e em Relatórios. O ranking do servidor soma todos os
+lançamentos de faturamento uma vez, então a promoção "a mais" entra lá do mesmo jeito que no app.
+
 ## Horas trabalhadas
 
 A duração da jornada é informada em dois campos inteiros, **Horas** e **Minutos** (teclado numérico). Minutos vão
