@@ -113,6 +113,50 @@ form.shake{animation:shake .38s}
 @media(prefers-reduced-motion:reduce){.tipbox{animation:none}}
 .cardh{display:flex;align-items:center;gap:4px;margin-bottom:12px}.cardh h3{margin:0}
 .lblrow{display:flex;align-items:center;gap:2px;margin-bottom:7px}.lblrow label{margin:0!important}
+/* ============ MASCOTE ============
+   A imagem oficial é estática: a profundidade vem de perspectiva 3D (inclinação que acompanha o cursor), brilho que
+   se desloca, sombra e flutuação. A piscada é uma "pálpebra" dourada sobre a posição exata dos olhos da imagem. */
+#bot{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + var(--sab));z-index:17;--sz:84px;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none;max-width:calc(100vw - 24px)}
+#bot[hidden],#modal.on~#bot,#app.navx~#bot,body.boot #bot{display:none}
+.bot-head{pointer-events:auto;position:relative;width:var(--sz);height:var(--sz);padding:0;border:none;background:none;cursor:pointer;border-radius:50%;perspective:420px;-webkit-tap-highlight-color:transparent;flex:0 0 auto;transition:width .3s var(--ease),height .3s var(--ease),opacity .3s}
+.bot-head:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.bot-float{display:block;width:100%;height:100%;animation:botfloat 5.5s ease-in-out infinite}
+.bot-tilt{display:block;position:relative;width:100%;height:100%;border-radius:50%;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .55s cubic-bezier(.2,.7,.2,1);box-shadow:0 14px 26px rgba(0,0,0,.55),0 0 0 1px rgba(226,178,80,.35),0 0 24px rgba(226,178,80,.16)}
+.bot-tilt img{width:100%;height:100%;border-radius:50%;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.bot-shine{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at var(--sx,34%) var(--sy,26%),rgba(255,238,190,.34),rgba(255,238,190,0) 46%);mix-blend-mode:screen;pointer-events:none;transition:background-position .5s}
+.bot-lid{position:absolute;top:45.6%;width:6.2%;height:7.8%;border-radius:50%;background:linear-gradient(180deg,#b48e44,#e6cd80);transform:scaleY(0);transform-origin:50% 0;pointer-events:none}
+.bot-lid.l{left:55.1%}.bot-lid.r{left:66.5%}
+#bot.blink .bot-lid{animation:botblink .2s ease-in-out}
+.bot-dot{position:absolute;top:3%;right:3%;width:22%;height:22%;max-width:14px;max-height:14px;border-radius:50%;background:var(--gold-hi);box-shadow:0 0 0 2px #0a0906;display:none}
+#bot.alert .bot-dot{display:block}
+#bot.alert .bot-head::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--gold);animation:botping 1.9s ease-out infinite;pointer-events:none}
+#bot.enter .bot-head{animation:botin .75s cubic-bezier(.2,.9,.25,1.25) both}
+#bot.talk .bot-tilt{animation:bottalk .45s ease-in-out 2}
+#bot.happy .bot-float{animation:bothop .75s cubic-bezier(.3,1.6,.5,1)}
+#bot.min .bot-head{--sz:44px;opacity:.85}#bot.min .bot-float{animation:none}
+@keyframes botfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes botblink{50%{transform:scaleY(1)}}
+@keyframes botping{0%{opacity:.9;transform:scale(.94)}100%{opacity:0;transform:scale(1.28)}}
+@keyframes botin{from{opacity:0;transform:translateY(26px) scale(.55) rotate(-14deg)}}
+@keyframes bottalk{50%{transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(1.06) translateY(-2px)}}
+@keyframes bothop{40%{transform:translateY(-14px) rotate(-6deg)}70%{transform:translateY(0) rotate(3deg)}}
+/* balão de fala */
+.bot-bub{pointer-events:auto;position:relative;width:max-content;max-width:min(330px,calc(100vw - 32px));padding:12px 14px 10px;border-radius:14px 14px 4px 14px;background:#16130c;border:1px solid var(--gold-line);box-shadow:0 16px 40px rgba(0,0,0,.55);color:var(--tx);font-size:.86rem;line-height:1.45;animation:bubin .22s var(--ease)}
+.bot-bub[hidden]{display:none}.bot-bub{max-height:min(62vh,520px);overflow-y:auto;overscroll-behavior:contain}
+.bot-bub .bot-msg{margin:0 26px 0 0}.bot-bub .bot-msg b{color:var(--gold-hi)}
+.bot-x{position:absolute;top:3px;right:3px;width:34px;height:34px;border:none;background:none;color:var(--mut);cursor:pointer;border-radius:8px;font-size:.9rem}.bot-x:hover{color:var(--tx)}
+.bot-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.bot-acts button{min-height:34px;padding:6px 12px;border-radius:18px;border:1px solid var(--gold-line);background:rgba(226,178,80,.1);color:var(--gold-hi);font-size:.78rem;font-weight:600;cursor:pointer}.bot-acts button.sec{background:none;color:var(--tx2);border-color:var(--line2)}
+.bot-foot{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;padding-top:7px;border-top:1px solid var(--line)}.bot-foot button{background:none;border:none;padding:4px 0;min-height:30px;color:var(--mut);font-size:.72rem;cursor:pointer;text-decoration:underline;text-underline-offset:2px}.bot-foot button:hover{color:var(--tx2)}
+.bot-ck{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}.bot-ck li{display:flex;align-items:flex-start;gap:8px;font-size:.8rem;line-height:1.35}
+.bot-ck .ic{flex:0 0 18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:.7rem;border:1px solid var(--line2);color:var(--mut)}.bot-ck .ok .ic{background:var(--ok);border-color:var(--ok);color:#06140c}.bot-ck .auto .ic{border-style:dashed}
+.bot-ck small{display:block;color:var(--mut);font-size:.72rem}.bot-ck .lv{font-size:.64rem;letter-spacing:.04em;text-transform:uppercase;color:var(--gold);margin-left:4px}
+.bot-ck li>div{flex:1;min-width:0}.bot-ck li button{flex:0 0 auto;min-height:30px;padding:4px 10px;border-radius:14px;border:1px solid var(--gold-line);background:none;color:var(--gold-hi);font-size:.72rem;cursor:pointer}
+@keyframes bubin{from{opacity:0;transform:translateY(6px) scale(.97)}to{opacity:1;transform:none}}
+#app main{padding-bottom:calc(110px + var(--sab))}
+@media(max-width:900px){#bot{--sz:58px;right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(12px + var(--sab))}#bot.min .bot-head{--sz:38px}.bot-bub{max-width:calc(100vw - 24px);font-size:.84rem}#app main{padding-bottom:calc(84px + var(--sab))}}
+/* teclado aberto no celular: só o balão, no topo da área visível, para não cobrir o campo nem o teclado */
+#bot.kb{bottom:auto;top:var(--bot-top,8px)}#bot.kb .bot-head{display:none}
+@media(prefers-reduced-motion:reduce){.bot-float,#bot.enter .bot-head,#bot.talk .bot-tilt,#bot.happy .bot-float,#bot.blink .bot-lid,.bot-bub{animation:none!important}.bot-tilt{transition:none}#bot.alert .bot-head::after{animation:none;opacity:.7}}
 .auth-done{text-align:center;animation:fadeIn .4s ease}
 .auth-done-ico{width:56px;height:56px;margin:4px auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;color:#120e05;background:linear-gradient(180deg,var(--gold-hi),var(--gold));box-shadow:0 8px 22px rgba(226,178,80,.25)}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -733,6 +777,8 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
   <main><div id="view"></div></main><div class="toast" id="toast" role="status"></div>
 </div>
 <div class="modal" id="modal" role="dialog" aria-modal="true"><div class="mbox" id="mbox"></div></div>
+<!-- Mascote do NESC (imagem oficial). Preenchido por Bot.mount(); fica escondido até a primeira tela aparecer. -->
+<div id="bot" hidden></div>
 
 <script>
 /* ============ CAMADA DE DADOS ============ */
@@ -815,9 +861,9 @@ const Store={sync:Cloud.on?'conectando…':'local',
     if(raw&&!db._v3&&!LS.get(this.key()+'_pre_v3'))LS.set(this.key()+'_pre_v3',raw); // cópia de segurança dos dados antes da atualização v3
     migrate();db._v3=1},
   save(){db._t=Date.now();if(typeof RK!=='undefined')RK.key=''; // ranking recalcula com os dados novos
-    LS.set(this.key(),JSON.stringify(db));if(LS.fail&&!LS.warned){LS.warned=1;toast('Armazenamento do navegador indisponível: os dados valem só nesta sessão. Use Backup para guardá-los.')}if(Cloud.on){LS.set(this.key()+'_pending','1');clearTimeout(this.tm);this.tm=setTimeout(()=>this.push(),1200)}},
+    LS.set(this.key(),JSON.stringify(db));if(LS.fail&&!LS.warned){LS.warned=1;toast('Armazenamento do navegador indisponível: os dados valem só nesta sessão. Use Backup para guardá-los.')}if(Cloud.on){LS.set(this.key()+'_pending','1');clearTimeout(this.tm);this.tm=setTimeout(()=>this.push(),1200)}if(typeof Bot!=='undefined')Bot.afterSave()},
   async pull(){if(!Cloud.on||!user.id)return;try{const r=await Cloud.pull(user.id);if(r&&!r._v3&&!LS.get(this.key()+'_pre_v3'))LS.set(this.key()+'_pre_v3',JSON.stringify(r));if(r){const pend=LS.get(this.key()+'_pending')==='1';db=pend?mergeDb(db,r):mergeDb(r,{});LS.set(this.key(),JSON.stringify(db));migrate();if(pend)await this.push()}else await this.push();this.setSync('sincronizado');render()}catch(e){this.setSync('offline · dados locais');}},
-  async push(){if(!Cloud.on||!user.id)return;try{await Cloud.push(user.id,db);LS.set(this.key()+'_pending','0');this.setSync('sincronizado')}catch(e){this.setSync('pendente · tentará novamente')}},
+  async push(){if(!Cloud.on||!user.id)return;try{await Cloud.push(user.id,db);LS.set(this.key()+'_pending','0');this.setSync('sincronizado');if(typeof Bot!=='undefined')Bot.synced(true)}catch(e){this.setSync('pendente · tentará novamente');if(typeof Bot!=='undefined')Bot.synced(false)}},
   setSync(s){this.sync=s;const el=$('#sync');if(el)el.textContent='Dados: '+s}
 };
 addEventListener('online',()=>{if(user&&Cloud.on&&LS.get(Store.key()+'_pending')==='1')Store.push()});
@@ -1059,6 +1105,7 @@ function switchTab(mode,msg,info){
   if(mode==='recover'){const a=document.getElementById('li-email').value.trim();const r=document.getElementById('rc-email');if(a&&!r.value)r.value=a}
   const er=document.getElementById('auth-err');er.textContent=msg||'';er.classList.toggle('info',!!info);
   const f=document.getElementById(F[mode]).querySelector('input');if(f&&mode!=='login'&&!msg)setTimeout(()=>f.focus(),30);
+  if(typeof Bot!=='undefined'&&!user)Bot.auth(mode);
 }
 async function handleAuth(e,mode){
   e.preventDefault();
@@ -1068,14 +1115,14 @@ async function handleAuth(e,mode){
   const bl=b.querySelector('.bl'),lab=b.dataset.label,fields=[...e.target.querySelectorAll('input')];
   err.textContent='';err.classList.remove('info');fields.forEach(i=>i.removeAttribute('aria-invalid'));
   let birth='';
-  if(mode==='register'){birth=String(f.get('birth')||'').trim();const bv=birthError(birth);if(bv){const bi=e.target.querySelector('[name=birth]');bi.setAttribute('aria-invalid','true');err.textContent=bv;bi.focus();return}}
+  if(mode==='register'){birth=String(f.get('birth')||'').trim();const bv=birthError(birth);if(bv){const bi=e.target.querySelector('[name=birth]');bi.setAttribute('aria-invalid','true');err.textContent=bv;bi.focus();Bot.authErr(mode,bv,false);return}}
   b.disabled=true;b.classList.add('loading');bl.textContent=mode==='login'?'Entrando…':'Criando conta…';
   let ok=false;
   try{
     const u=mode==='login'?await Auth.signIn(email,pass):await Auth.signUp(f.get('name').trim(),email,pass,birth);
-    ok=true;if(mode==='register')track('signup_done');b.classList.remove('loading');b.classList.add('done');bl.textContent=mode==='login'?'Acesso liberado':'Conta criada';
+    ok=true;if(mode==='register'){track('signup_done');Bot.signupOk()}b.classList.remove('loading');b.classList.add('done');bl.textContent=mode==='login'?'Acesso liberado':'Conta criada';
     Auth.start(u);enter(u,true,mode==='register');
-  }catch(x){err.textContent=x.message||'Não foi possível concluir. Tente novamente.';err.classList.toggle('info',!!x.info);
+  }catch(x){err.textContent=x.message||'Não foi possível concluir. Tente novamente.';err.classList.toggle('info',!!x.info);Bot.authErr(mode,err.textContent,!!x.info);
     if(!x.info){fields.filter(i=>i.type!=='text'||mode==='register').forEach(i=>{if(i.name!=='name')i.setAttribute('aria-invalid','true')});e.target.classList.remove('shake');void e.target.offsetWidth;e.target.classList.add('shake')}}
   finally{if(!ok){b.disabled=false;b.classList.remove('loading');bl.textContent=lab}}
 }
@@ -1691,6 +1738,155 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&Tip.btn){e.stopProp
 document.addEventListener('pointerover',e=>{const b=e.target.closest&&e.target.closest('.itip');if(!b||e.pointerType!=='mouse'||(Tip.btn&&!Tip.peek))return;clearTimeout(Tip.tm);Tip.tm=setTimeout(()=>Tip.open(b,true),180)});
 document.addEventListener('pointerout',e=>{const b=e.target.closest&&e.target.closest('.itip');if(!b||e.pointerType!=='mouse')return;clearTimeout(Tip.tm);if(Tip.peek)Tip.close(true)});
 addEventListener('scroll',()=>{if(Tip.btn)Tip.peek?Tip.close(true):Tip.place()},true);addEventListener('resize',()=>Tip.btn&&Tip.place());
+/* ============ MASCOTE: COPILOTO DO NESC ============
+   Personagem: a imagem oficial (medalhão estático). Vida e profundidade por CSS: flutuação, inclinação 3D que segue o
+   cursor (ou o toque), brilho que se desloca, piscada sobre os olhos e estados de fala, atenção e satisfação.
+   Falas: regras determinísticas, todas aqui (sem IA externa; nada sai do aparelho). Cada fala tem id, prioridade e
+   tempo de recarga; uma por vez; intervalo mínimo entre falas automáticas; nada interrompe digitação (vai para a fila).
+   Salvamentos só são confirmados depois da gravação real: no aparelho (modo local) ou na nuvem (Store.push ok).
+   Preferências (silenciar/minimizar) e histórico de falas ficam no aparelho, separados por conta. O campo de senha
+   nunca é lido. */
+const BOT_FEAT=['Registre os ganhos da Uber e da 99 em segundos, separados por aplicativo.','Combustível, passes e outros gastos entram na conta para mostrar o que realmente sobra.','Aqui, faturamento e lucro não são a mesma coisa. O NESC mostra os dois, lado a lado.','Crie metas de faturamento ou de lucro e acompanhe o progresso do dia.','Todo lançamento fica no histórico, com filtros por período e por aplicativo.','Cadastre o carro e acompanhe a manutenção pela quilometragem que você informar.'];
+const BOT_GREET=['Você dirige. Eu te ajudo a entender para onde seu dinheiro está indo.','Bora descobrir quanto realmente sobra depois dos gastos?','Já viu um app de gestão financeira assim, gratuito pra usar? Kkk. Vem conhecer o NESC.','Aqui, faturamento e lucro não são a mesma coisa. Vamos deixar isso claro?'];
+const BOT_SEC={'como-funciona':'Três passos: registra o ganho, lança os gastos e o NESC mostra o lucro real.','funcionalidades':'Tem Uber, 99, despesas, metas, histórico e manutenção no mesmo lugar.','ranking-lp':'O ranking é opcional e mostra só apelido, posição e valor. Seus lançamentos ficam privados.'};
+const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:null,autoN:0,tabSeen:'',area:'',lastForm:'',GAP:20000,
+  scope(){return'nesc_bot_'+(user&&user.email?user.email:'visitante')},
+  st(){try{return JSON.parse(localStorage.getItem(this.scope())||'{}')||{}}catch(e){return{}}},
+  put(p){const s=Object.assign(this.st(),p);try{localStorage.setItem(this.scope(),JSON.stringify(s))}catch(e){}return s},
+  seenAt(id){return(this.st().seen||{})[id]||0},
+  markSeen(id){const s=this.st(),m=s.seen||{};m[id]=Date.now();const ks=Object.keys(m);if(ks.length>150)ks.sort((a,b)=>m[a]-m[b]).slice(0,ks.length-150).forEach(k=>delete m[k]);this.put({seen:m})},
+  $(q){return this.el.querySelector(q)},
+  mount(){if(this.el)return;const el=this.el=$('#bot');if(!el)return;
+    el.innerHTML=`<div class="bot-bub" role="status" aria-live="polite" hidden><button type="button" class="bot-x" aria-label="Dispensar mensagem">✕</button><p class="bot-msg"></p><div class="bot-extra"></div><div class="bot-acts"></div><div class="bot-foot"><button type="button" data-bot="mute"></button><button type="button" data-bot="min">Minimizar</button></div></div>`+
+     `<button type="button" class="bot-head" aria-label="Assistente do NESC: pedir uma dica" aria-expanded="false"><span class="bot-float"><span class="bot-tilt"><picture><source type="image/webp" srcset="/mascote-160.webp 160w, /mascote-256.webp 256w, /mascote-512.webp 512w" sizes="(max-width:900px) 58px, 84px"><img src="/mascote-256.png" alt="" width="84" height="84" decoding="async" draggable="false"></picture><span class="bot-lid l"></span><span class="bot-lid r"></span><span class="bot-shine"></span></span></span><span class="bot-dot" aria-hidden="true"></span></button>`;
+    const bub=this.$('.bot-bub');
+    el.addEventListener('click',e=>{const T=e.target;
+      if(T.closest('.bot-head')){this.manual();return}
+      if(T.closest('.bot-x')){this.hide();return}
+      const b=T.closest('[data-bot]');if(b){const k=b.dataset.bot;if(k==='min'){this.put({min:true});el.classList.add('min');this.hide();return}
+        const m=!this.st().muted;this.put({muted:m});this.syncFoot();this.show({text:m?'Pronto, dicas automáticas pausadas. Toque em mim quando quiser uma.':'Boa, dicas reativadas. Eu falo só quando ajudar.',ms:5000});return}
+      const sk=T.closest('[data-botskip]');if(sk){const s=this.st().skip||{};s[sk.dataset.botskip]=1;this.put({skip:s});this.$('.bot-extra').innerHTML=this.ckHTML();this.alertState();return}
+      const a=T.closest('[data-bota]');if(a&&this.cur&&this.cur.acts){const f=this.cur.acts[+a.dataset.bota][1];this.hide();if(typeof f==='function')f();return}
+      if(T.closest('[data-go],[data-addrec],[data-onboard]'))setTimeout(()=>this.hide(),0)}); // ações do app seguem pelo tratamento normal
+    bub.addEventListener('mouseenter',()=>clearTimeout(this.hideT));bub.addEventListener('mouseleave',()=>{if(this.cur&&!this.cur.keep){clearTimeout(this.hideT);this.hideT=setTimeout(()=>this.hide(),4000)}});
+    bub.addEventListener('focusin',()=>clearTimeout(this.hideT));
+    document.addEventListener('pointerdown',e=>{if(this.cur&&!e.target.closest('#bot'))this.hide()},true); // tocar fora recolhe o balão: ele nunca fica preso sobre botões ou campos
+    /* inclinação: segue o cursor com limite e suavidade; um quadro por movimento, só variáveis CSS */
+    let raf=0,px=0,py=0;addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||RM.matches)return;px=e.clientX;py=e.clientY;if(!raf)raf=requestAnimationFrame(()=>{raf=0;this.look(px,py)})},{passive:true});
+    addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'||RM.matches||!this.el||this.el.hidden)return;this.look(e.clientX,e.clientY);clearTimeout(this.lookT);this.lookT=setTimeout(()=>this.look(null),1400)},{passive:true});
+    setInterval(()=>{if(document.hidden||RM.matches||!this.el||this.el.hidden||Math.random()>.22)return;this.el.classList.remove('blink');void this.el.offsetWidth;this.el.classList.add('blink')},1500);
+    document.addEventListener('focusin',e=>{const t=e.target;if(t.closest&&t.closest('#form-register')&&t.name)this.field(t.name)});
+    document.addEventListener('focusout',e=>{const t=e.target;if(t.id==='re-email'&&t.value.trim()&&!EMAIL_RE.test(t.value.trim().toLowerCase()))this.say({id:'a:emailbad',cd:30000,form:true,force:true,mood:'alert',text:'Confere se seu e-mail está certinho antes de continuar, tipo <b>nome@gmail.com</b>.'});clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),700)});
+    const vv=window.visualViewport;if(vv){const kb=()=>{const on=innerWidth<=900&&vv.height<innerHeight-140;el.classList.toggle('kb',on);if(on)el.style.setProperty('--bot-top',Math.round(vv.offsetTop+8)+'px')};vv.addEventListener('resize',kb);vv.addEventListener('scroll',kb)}
+    this.syncFoot()},
+  look(x,y){const h=this.$('.bot-head'),t=this.$('.bot-tilt'),sh=this.$('.bot-shine');if(!h||!t)return;let dx=0,dy=0;
+    if(x!=null){const r=h.getBoundingClientRect();if(!r.width)return;dx=Math.max(-1,Math.min(1,(x-(r.left+r.width/2))/600));dy=Math.max(-1,Math.min(1,(y-(r.top+r.height/2))/500))}
+    t.style.setProperty('--ry',(dx*16).toFixed(1)+'deg');t.style.setProperty('--rx',(dy*13).toFixed(1)+'deg');sh.style.setProperty('--sx',(34+dx*16).toFixed(0)+'%');sh.style.setProperty('--sy',(26+dy*14).toFixed(0)+'%')},
+  syncFoot(){const b=this.el&&this.$('[data-bot=mute]');if(b)b.textContent=this.st().muted?'Reativar dicas':'Silenciar dicas'},
+  enterArea(kind){this.mount();if(!this.el)return;const first=this.el.hidden;this.area=kind;this.el.hidden=false;this.el.classList.toggle('min',!!this.st().min);this.syncFoot();
+    if(first&&!RM.matches){this.el.classList.add('enter');setTimeout(()=>this.el.classList.remove('enter'),900)}},
+  mood(k){if(!this.el)return;this.el.classList.remove('talk','happy');void this.el.offsetWidth;this.el.classList.add(k)},
+  typing(){const a=document.activeElement;return!!(a&&a.matches&&a.matches('input:not([type=checkbox]):not([type=radio]):not([type=button]),textarea,select')&&!a.closest('#bot'))},
+  pick(a,b){return!a||(b.pri||0)>=(a.pri||0)?b:a},
+  /* decide se uma fala aparece agora, entra na fila ou é descartada */
+  say(m){if(!this.el||this.el.hidden)return false;const s=this.st();
+    if(!m.crit&&!m.manual&&(s.muted||s.min))return false;
+    if(m.id&&m.cd!==0){const t=this.seenAt(m.id);if(t&&Date.now()-t<(m.cd==null?Infinity:m.cd))return false}
+    if(!m.force&&this.typing()&&!m.form){this.queue=this.pick(this.queue,m);return false}
+    if(!m.force&&this.cur&&(this.cur.pri||0)>(m.pri||0)){this.queue=this.pick(this.queue,m);return false}
+    if(!m.force&&Date.now()-this.last<this.GAP){this.queue=this.pick(this.queue,m);clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),this.GAP-(Date.now()-this.last)+50);return false}
+    this.show(m);return true},
+  flush(){if(!this.queue||this.typing())return;const q=this.queue;this.queue=null;this.say(q)},
+  show(m){const el=this.el;if(!el)return;this.cur=m;this.$('.bot-msg').innerHTML=m.text;this.$('.bot-extra').innerHTML=m.extra||'';
+    const acts=this.$('.bot-acts');acts.innerHTML=(m.acts||[]).map((a,i)=>`<button type="button" data-bota="${i}" class="${a[2]||''}">${esc(a[0])}</button>`).join('');acts.hidden=!(m.acts||[]).length;
+    this.syncFoot();this.$('.bot-bub').hidden=false;this.$('.bot-head').setAttribute('aria-expanded','true');this.mood(m.mood||'talk');
+    clearTimeout(this.hideT);if(!m.keep||innerWidth<=900)this.hideT=setTimeout(()=>this.hide(),m.ms||(m.keep?22000:(m.acts||[]).length||m.extra?16000:9000));
+    if(m.id)this.markSeen(m.id);this.last=Date.now()},
+  hide(){if(!this.el)return;clearTimeout(this.hideT);this.cur=null;this.$('.bot-bub').hidden=true;this.$('.bot-head').setAttribute('aria-expanded','false');clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),1500)},
+  /* ---------- página pública ---------- */
+  landing(){this.enterArea('landing');const v=(this.st().visits||0)+1;this.put({visits:v});clearTimeout(this.lt);
+    this.lt=setTimeout(()=>{if(this.area!=='landing')return;
+      if(!this.seenAt('v:intro'))this.say({id:'v:intro',pri:1,keep:true,text:'Fala, motorista! Eu sou o assistente do NESC. Vou te mostrar como organizar seus ganhos, gastos e lucro sem complicar sua rotina.',acts:[['Mostrar o que dá pra fazer',()=>this.feature(0)],['Agora não',null,'sec']]});
+      else{const i=v%BOT_GREET.length;this.say({id:'v:greet:'+i,cd:3*864e5,text:BOT_GREET[i],acts:[['Ver o que dá pra fazer',()=>this.feature(0)]]})}},2600);
+    if(!this.io&&window.IntersectionObserver){this.io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting||this.area!=='landing'||this.autoN>=2)return;const t=BOT_SEC[e.target.id];if(t&&this.say({id:'v:sec:'+e.target.id,cd:7*864e5,text:t}))this.autoN++}),{threshold:.5});
+      Object.keys(BOT_SEC).forEach(id=>{const n=document.getElementById(id);if(n)this.io.observe(n)})}},
+  feature(i){const n=BOT_FEAT.length,cta=['Criar conta grátis',()=>{location.hash='#criar-conta'}];
+    this.show({text:BOT_FEAT[i],extra:`<small class="mutd">${i+1} de ${n}</small>`,keep:true,manual:true,acts:i+1<n?[['Próxima',()=>this.feature(i+1)],[cta[0],cta[1],'sec']]:[cta]})},
+  /* ---------- entrar / criar conta ---------- */
+  auth(mode){this.enterArea('auth:'+mode);
+    if(mode==='register'){if(this.say({id:'a:reg',cd:36e5,pri:1,form:true,force:true,text:'Bora criar sua conta? É rapidinho: nome, e-mail e uma senha. A data de nascimento é opcional.'}))this.markSeen('a:f:name')} // a apresentação já cobre o 1º campo, que recebe foco sozinho
+    else if(mode==='recover')this.say({id:'a:rec',cd:36e5,form:true,text:'Sem estresse: informe o e-mail da conta e siga as instruções que chegarem por lá.'})},
+  field(n){const T={name:'Seu nome aparece só pra você no app. No ranking, quem escolhe o apelido é você.',email:'Use um e-mail que você acessa: é por ele que dá pra recuperar a senha.',birth:'Opcional. Ajuda no suporte à recuperação de acesso e não aparece pra ninguém.',pass:'Boa! Agora crie uma senha forte: pelo menos 8 caracteres, com letras e números. Dica: guarde num gerenciador de senhas confiável. Não compartilhe sua senha comigo nem com ninguém.'};
+    if(T[n])this.say({id:'a:f:'+n,cd:36e5,form:true,force:true,ms:n==='pass'?11000:7000,text:T[n]})}, // nunca lê o valor da senha
+  authErr(mode,msg,info){msg=String(msg||'');let t;
+    if(info&&/Conta criada/.test(msg)){this.say({force:true,crit:true,mood:'happy',text:'Conta criada! Falta só confirmar o e-mail que a gente enviou. Depois é só entrar.'});return}
+    if(/já está cadastrado/.test(msg))t='Esse e-mail já tem conta. Tenta entrar ou use "Esqueceu a senha?".';
+    else if(/incorretos/.test(msg))t='E-mail ou senha não bateram. Confere com calma; se esqueceu, dá pra recuperar a senha.';
+    else if(/conexão|internet|servidor/i.test(msg))t='Parece que a conexão caiu. Nada foi criado ainda: tenta de novo quando a internet voltar.';
+    else if(/nascimento|data|futuro|1900|existe/i.test(msg))t='A data de nascimento não está valendo. '+esc(msg)+' Se preferir, deixe em branco.';
+    else if(/senha|caracteres/i.test(msg))t='A senha precisa ter pelo menos 8 caracteres. Use letras e números.';
+    else t='Não deu certo: '+esc(msg)+' Confere e tenta de novo.';
+    this.say({force:true,crit:true,mood:'alert',form:true,text:t})},
+  signupOk(){try{sessionStorage.setItem('nesc_bot_new','1')}catch(e){}},
+  /* ---------- checklist de configuração (dados reais da conta) ---------- */
+  ck(){const c=cfg(),wp=workPattern(),skip=this.st().skip||{},rec=db.tx.some(x=>x.type==='in')||db.jr.some(hasAct);
+    const items=[{id:'conta',lv:'essencial',label:'Conta criada',done:true},
+      {id:'registro',lv:'essencial',label:'Primeiro lançamento',done:rec,why:'É com ele que o NESC calcula faturamento, gastos e lucro.',act:['Lançar','data-addrec']},
+      {id:'veiculo',lv:'recomendada',label:'Veículo',done:!!db.vehicle,why:'Libera consumo, custo por km e lembretes de manutenção.',act:['Cadastrar','data-onboard']},
+      {id:'dias',lv:'opcional',label:'Dias de trabalho',done:Array.isArray(c.workDays),auto:!Array.isArray(c.workDays)&&wp.enough,why:'Para eu só lembrar de registrar nos dias em que você costuma rodar.',act:['Escolher','data-go="config"']},
+      {id:'meta',lv:'opcional',label:'Meta do dia',done:+c.goal>0||db.goals.length>0,why:'Para acompanhar o progresso do dia.',act:['Definir','data-go="metas"']}];
+    items.forEach(i=>{i.skip=!i.done&&!i.auto&&!!skip[i.id]});
+    return{items,pending:items.filter(i=>!i.done&&!i.auto&&!i.skip),ess:items.filter(i=>i.lv==='essencial'&&!i.done),basic:items.filter(i=>i.lv!=='opcional').every(i=>i.done||i.skip),doneIds:items.filter(i=>i.done).map(i=>i.id)}},
+  ckHTML(){return`<ul class="bot-ck">${this.ck().items.map(i=>`<li class="${i.done?'ok':i.auto?'auto':''}"><span class="ic" aria-hidden="true">${i.done?'✓':i.auto?'~':'•'}</span><div>${esc(i.label)}<span class="lv">${i.lv}</span><small>${i.done?'Feito.':i.auto?'Não precisa: já detectei pela sua rotina.':i.skip?'Pulado. Dá para fazer quando quiser.':esc(i.why)}</small></div>${!i.done&&!i.auto&&i.act?`<button type="button" ${i.act[1]}>${i.act[0]}</button>`:''}${!i.done&&!i.auto&&!i.skip&&i.lv!=='essencial'?`<button type="button" data-botskip="${i.id}">Pular</button>`:''}</li>`).join('')}</ul>`},
+  alertState(){if(!this.el||!user||!db)return;const k=this.ck();this.el.classList.toggle('alert',!!k.ess.length||!!this.syncFail)},
+  /* ---------- dentro do app ---------- */
+  app(){this.enterArea('app');this.tabSeen='';this.ckPrev=this.ck().doneIds;this.syncFail=false;this.alertState();let isNew=false;try{isNew=sessionStorage.getItem('nesc_bot_new')==='1';sessionStorage.removeItem('nesc_bot_new')}catch(e){}
+    if(isNew)this.say({force:true,id:'u:welcome',mood:'happy',keep:true,text:'Pronto! Sua conta foi criada. Agora vamos configurar seu espaço. Só o essencial é obrigatório; o resto dá para pular.',extra:this.ckHTML()});
+    else{const k=this.ck();if(k.pending.length&&!this.seenAt('u:setup'))setTimeout(()=>this.say({id:'u:setup',pri:1,keep:true,force:true,text:'Separei uma configuração rápida para você aproveitar melhor o NESC. Só o que for útil, e dá para pular.',extra:this.ckHTML()}),500)}},
+  tab(t){if(!this.el||this.area!=='app'||t===this.tabSeen)return;this.tabSeen=t;this.alertState();clearTimeout(this.tt);this.tt=setTimeout(()=>{if(tab!==t)return;const m=this.tabMsg(t);if(m)this.say(m)},900)},
+  /* resumo financeiro do dia: mesma regra de cor/equilíbrio do app (resTone) e mesmo cálculo de meta (goalPct) */
+  finMsg(){const T=TODAY(),c=CS(T,T),act=c.inc>0||c.jr.some(hasAct)||c.exp.length>0;
+    if(!act)return db.tx.length||db.jr.length?{id:'fin:none:'+T,cd:20*36e5,text:'Ainda não vejo lançamentos de hoje. Se você rodou, registre o ganho do dia e eu te mostro o resultado.',acts:[['Adicionar registro',()=>{const b=$('[data-addrec]');b&&b.click()}]]}:null;
+    const tone=resTone(c.op,c.inc),g=+cfg().goal||0,gp=goalPct(c.inc,g);let t,mood='talk';
+    const past=[...workedDays(addD(T,-30),addD(T,-1))],mean=past.length>=7?past.reduce((s,d)=>s+CS(d,d).op,0)/past.length:null;
+    if(tone==='pos'){mood='happy';t=mean!=null&&mean>0&&c.op>mean*1.15?`Mandou bem hoje! Seu lucro operacional (<b>${brl(c.op)}</b>) ficou acima da sua média recente de ${brl(mean)} por dia trabalhado (últimos ${past.length} dias).`:`Boa! Hoje você fechou no positivo: <b>${brl(c.op)}</b> de lucro operacional, já descontados os gastos registrados.`}
+    else if(tone==='neg')t=`Hoje os gastos passaram das receitas registradas (<b>${brl(c.op)}</b>). Vale conferir se ficou algum custo lançado a mais ou alguma receita faltando.`;
+    else t='Hoje ficou praticamente no zero a zero. Bora conferir os gastos para entender esse resultado?';
+    if(gp.has)t+=gp.hit?` Olha só: você passou da meta de faturamento de hoje (<b>${pctTxt(gp.pct)}</b>).`:` Faltam ${brl(r2(g-c.inc))} para a meta de faturamento de hoje. Sem pressa: o importante é registrar certinho e rodar com segurança.`;
+    return{id:'fin:'+T+':'+tone+':'+(gp.has?(gp.hit?'hit':'miss'):'-'),cd:20*36e5,mood,text:t}},
+  tabMsg(t,manual){const T=TODAY(),A=APPS[t];
+    if(t==='hoje')return db.tx.length||db.jr.length?this.finMsg():{id:'tab:hoje:empty',cd:3*864e5,text:'Bora começar? Toque em <b>Adicionar registro</b> e lance o ganho do dia. O resto eu te mostro no caminho.'};
+    if(A){const has=db.tx.some(x=>appOf(x)===t)||db.jr.some(j=>j.app===t);
+      return has?{id:'tab:'+t+':explain',text:`Aqui, faturamento é o que a ${A.n} te pagou; resultado é o que sobra depois dos gastos registrados. São números diferentes, e o segundo é o que importa no fim do mês.`}
+        :{id:'tab:'+t+':empty',cd:7*864e5,text:`Ainda não tem lançamentos da ${A.n} por aqui. Comece pelo ganho do dia; jornada e gastos são opcionais.`}}
+    if(t==='despesas')return{id:'tab:desp',text:'Lance combustível, manutenção e outros gastos aqui. Combustível e outros entram no lucro operacional; manutenção entra no resultado completo.'};
+    if(t==='historico'){const p=pendingDays(14);if(p.length)return{id:'tab:hist:pend:'+T,cd:20*36e5,mood:'talk',text:`Encontrei ${p.length} ${p.length>1?'dias habituais':'dia habitual'} sem lançamento. Não dá para saber se você trabalhou: se não rodou, é só marcar <b>Não trabalhei</b>.`};
+      if(!db.tx.length)return{id:'tab:hist:empty',cd:3*864e5,text:'O histórico ainda está vazio. Quando você registrar ganhos e gastos, eles aparecem aqui com filtros por período.'};return manual?{text:'Use os filtros para ver um período ou um aplicativo. O "i" do resumo explica o que entra nos totais.'}:null}
+    if(t==='metas')return+cfg().goal>0||db.goals.length?{id:'tab:metas:explain',text:'Meta de faturamento compara com o que entrou; meta de lucro compara com o que sobrou depois dos gastos. Cada uma no seu número.'}:{id:'tab:metas:nogoal',cd:7*864e5,text:'Metas são opcionais. Se quiser, defina uma de faturamento ou de lucro do dia para acompanhar o progresso.'};
+    if(t==='financas'){const[f,to]=frange(),n=workedDays(f,to).size;return n<7?{id:'tab:rel:few',cd:3*864e5,text:`Com ${n} dia${n===1?'':'s'} trabalhado${n===1?'':'s'} no período, ainda não dá para falar em tendência. Vou ficando mais útil conforme você lança.`}:{id:'tab:rel:explain',text:'Lucro operacional desconta combustível, passes e outros gastos. O resultado completo também tira manutenção e custos fixos.'}}
+    if(t==='manutencao'){if(!db.vehicle)return{id:'tab:man:noveh',cd:3*864e5,text:'Cadastre seu veículo para eu organizar consumo, custo por km e manutenção.',acts:[['Cadastrar veículo',()=>openOnboard()]]};
+      if(odoNow().km==null)return{id:'tab:man:odo',cd:7*864e5,text:'Se puder, informe a quilometragem atual. Os lembretes usam o km que você registrar, sem chute.'};return manual?{text:'Registre as trocas e revisões com a quilometragem do dia. Eu nunca invento prazo: os lembretes seguem o que você cadastrar.'}:null}
+    if(t==='produtividade'){const[f,to]=[addD(T,-29),T];return CS(f,to).min>0?null:{id:'tab:prod:nohours',cd:7*864e5,text:'Informe as horas na jornada (horas e minutos) para eu calcular quanto você lucra por hora.'}}
+    return manual?{text:'Estou por aqui. Toque em mim quando quiser uma dica sobre a tela em que você estiver.'}:null},
+  /* toque/clique na cabeça: dica sob demanda (funciona mesmo com as dicas silenciadas) */
+  manual(){this.mood('happy');if(this.cur){this.hide();return}const s=this.st();if(s.min){this.put({min:false});this.el.classList.remove('min')}
+    if(this.area==='landing')return this.feature(0);
+    if(this.area.startsWith('auth:'))return this.show({manual:true,text:this.area==='auth:register'?'Preencha nome, e-mail e uma senha de pelo menos 8 caracteres. Eu não leio sua senha: ela vai direto e protegida para o sistema de login.':'Use o e-mail e a senha da sua conta. Esqueceu a senha? Toque em "Esqueceu a senha?".'});
+    const k=this.ck();if(k.pending.length&&!this.st().ckHide)return this.show({manual:true,keep:true,text:k.ess.length?'Falta o essencial para eu calcular seus resultados:':'Sua configuração:',extra:this.ckHTML(),acts:[['Esconder esta lista',()=>this.put({ckHide:1}),'sec']]});
+    const m=this.tabMsg(tab,true)||{text:'Tudo certo por aqui. Quando quiser, toque em mim para uma dica.'};this.show(Object.assign({},m,{manual:true}))},
+  /* ---------- confirmações: só depois da gravação real ---------- */
+  afterSave(){if(!this.el||this.area!=='app')return;const k=this.lastForm;this.lastForm='';
+    if(!Cloud.on){clearTimeout(this.ct);if(LS.fail){this.say({force:true,crit:true,mood:'alert',text:'Não consegui gravar neste aparelho (o armazenamento do navegador está bloqueado). Faça um backup antes de fechar.'});return}this.ct=setTimeout(()=>this.confirm([k]),450);return}
+    this.pend.push(k)},
+  synced(ok){if(!this.el)return;if(!this.pend.length&&ok){if(this.syncFail){this.syncFail=false;this.alertState();this.say({force:true,mood:'happy',text:'Prontinho: o que estava pendente chegou à nuvem.'})}return}
+    const ks=this.pend.splice(0);if(ok){this.syncFail=false;this.confirm(ks)}
+    else{this.syncFail=true;this.alertState();this.say({force:true,crit:true,mood:'alert',id:'sync:fail',cd:6e4,text:'Seus dados ficaram salvos neste aparelho, mas ainda não chegaram à nuvem (sem conexão?). Vou tentar de novo sozinho.'})}},
+  confirm(ks){const k=this.ck(),prev=this.ckPrev||[],nw=k.items.filter(i=>i.done&&!prev.includes(i.id));this.ckPrev=k.doneIds;this.alertState();
+    const L={registro:'Primeiro lançamento salvo',veiculo:'Veículo cadastrado',dias:'Dias de trabalho definidos',meta:'Meta criada'};
+    if(nw.length){const fin=k.basic&&!k.ess.length&&!this.seenAt('u:basic');if(fin)this.markSeen('u:basic');
+      this.say({force:true,mood:'happy',text:'Boa! '+nw.map(i=>L[i.id]).join(' e ')+'. Já atualizei isso por aqui.'+(fin?' <b>Fechou!</b> Sua configuração básica está completa. Agora é só manter seus registros em dia.':'')});return}
+    if(ks.some(x=>x==='inc'||x==='exp'||x==='jr')){const m=this.finMsg();if(m&&m.id&&!/none/.test(m.id))this.say(m)}}};
+
 const pendRow=d=>`<div class="pendr"><span><b>${WD[pd(d).getDay()]}</b> ${fmtD(d)}</span><span class="pendb"><button type="button" class="btn sm" data-pendrec="${d}">Registrar dia</button><button type="button" class="btn ghost sm" data-offday="${d}">Não trabalhei nesse dia</button></span></div>`;
 /* de onde vem a estimativa: km do período e consumo usado (do dia, quando informado, ou o padrão do veículo) */
 const estBasis=s=>num(s.estKm||s.km,0)+' km '+(s.estManual?'com o consumo (km/L) informado na jornada':'× '+brl(s.k.total)+'/km (consumo padrão do veículo)');
@@ -2326,7 +2522,7 @@ function render(){if(!user||!db)return;Tip.close(true);if(!V[tab]||!TABS.some(t=
   const greet=tab==='hoje'?`Olá, ${esc(user.name.split(' ')[0])}`:(app?`<span class="idn lg ${tab}" aria-hidden="true"></span>`:'')+T[2],I=TABINFO[tab]||['','',''];
   const vw=$('#view');vw.style.setProperty('--app',tab==='uber'?'var(--uber)':tab==='n99'?'var(--n99)':'var(--gold)');
   vw.innerHTML=`<div class="head"><div><h1>${greet}</h1>${tab==='hoje'||app?`<p>${dateLabel()}</p>`:''}${I[0]?`<p class="intro">${I[0]}</p>`:''}</div>${I[1]?`<div class="hact"><button type="button" class="btn" ${I[2]}>${I[1]}</button></div>`:''}</div>${tab==='historico'?'':`<input class="srch" id="q" type="search" placeholder="Buscar no NESC…" aria-label="Buscar em lançamentos, metas, contas e manutenção" autocomplete="off"><div id="sr"></div>`}`+V[tab]();
-  renderNav();
+  renderNav();Bot.tab(tab);
   if(tab==='hoje'){mountGlobe();drawChart()}if(tab==='metas')mountGauge();
 }
 function modal(h){$('#mbox').innerHTML=h;const m=$('#modal');m.classList.add('on');const f=m.querySelector('input:not([type=hidden]):not([type=radio]),select,button');if(f)setTimeout(()=>f.focus(),30)}
@@ -2616,8 +2812,8 @@ function saveExp(form,f){const v=parseMoney(f.v),d=f.d||TODAY(),ty=f.type;if(!['
 document.addEventListener('submit',e=>{
   const fm=e.target,k=fm.dataset.form;if(!k)return;
   e.preventDefault();const f=Object.fromEntries(new FormData(fm)),id=uid(),d=TODAY(),inModal=!!fm.closest('#modal');
-  const ok=msg=>{if(msg===false)return;mark();Store.save();if(inModal)closeModal();render();toast(msg||'Salvo.')};
-  if(k==='ob'){f.custom=fm.custom.checked;if(obSave(f)){Store.save();closeModal();render();toast('Veículo salvo. O resumo e os cálculos foram atualizados.')}return}
+  const ok=msg=>{if(msg===false)return;mark();Bot.lastForm=k;Store.save();if(inModal)closeModal();render();toast(msg||'Salvo.')};
+  if(k==='ob'){f.custom=fm.custom.checked;if(obSave(f)){Bot.lastForm='ob';Store.save();closeModal();render();toast('Veículo salvo. O resumo e os cálculos foram atualizados.')}return}
   if(k==='ask'){const q=(f.q||'').trim();if(q)ask(q);fm.reset();return}
   if(k==='uberdc'){closeModal();UberLink.disconnect(!!f.purge,!!f.local);return}
   if(k==='uberrev'){const msg=applyUberReview(f);closeModal();render();toast(msg);return}
@@ -2673,7 +2869,7 @@ function track(ev,src){try{if(!TRACK_EV.includes(ev)||!C.supabaseUrl||!C.supabas
 const IN_APP=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())||matchMedia('(display-mode: standalone)').matches;
 const AUTH_ROUTES={'#entrar':'login','#criar-conta':'register','#recuperar-senha':'recover'};
 function showAuth(mode,msg,info){$('#auth-back').style.display=IN_APP?'none':'';$('#landing').hidden=true;LP.stop();$('#auth').style.display='';container.style.display='';document.body.classList.remove('boot');initLogin();switchTab(mode,msg,info)}
-function showLanding(){$('#auth').style.display='none';container.style.display='none';const l=$('#landing');const was=l.hidden;l.hidden=false;document.body.classList.remove('boot');LP.start();
+function showLanding(){$('#auth').style.display='none';container.style.display='none';const l=$('#landing');const was=l.hidden;l.hidden=false;document.body.classList.remove('boot');LP.start();Bot.landing();
   if(was){try{if(!sessionStorage.getItem('nesc_lv')){sessionStorage.setItem('nesc_lv','1');track('landing_view',document.referrer?new URL(document.referrer).hostname:'direto')}}catch(e){}}}
 function route(){if(user||RECOV)return;const m=AUTH_ROUTES[location.hash];if(m)showAuth(m);else if(IN_APP)showAuth('login');else showLanding()}
 addEventListener('hashchange',route);
@@ -2763,7 +2959,7 @@ const BG=Particles('#bgfx',()=>!!user&&!!$('#app.on'));
 /* ============ ENTRADA NO APP ============ */
 function enter(u,anim){
   user=u;Store.load();
-  const done=()=>{stopLogin();$('#landing').hidden=true;LP.stop();document.body.classList.remove('boot');if(AUTH_ROUTES[location.hash])try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}$('#auth').style.display='none';container.style.display='none';const a=$('#app');a.classList.add('on');a.classList.toggle('navc',navState());BG.init();BG.kick();if(anim&&!RM.matches)a.classList.add('reveal');render();if(anim)requestAnimationFrame(()=>requestAnimationFrame(()=>a.classList.remove('reveal')));
+  const done=()=>{stopLogin();$('#landing').hidden=true;LP.stop();document.body.classList.remove('boot');if(AUTH_ROUTES[location.hash])try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}$('#auth').style.display='none';container.style.display='none';const a=$('#app');a.classList.add('on');a.classList.toggle('navc',navState());BG.init();BG.kick();if(anim&&!RM.matches)a.classList.add('reveal');render();Bot.app();Bot.tab(tab);if(anim)requestAnimationFrame(()=>requestAnimationFrame(()=>a.classList.remove('reveal')));
     Store.pull();
     if(UBER_RET){tab='uber';render();const m={connected:'Conta Uber conectada. Use "Sincronizar" para importar os dados oficiais.',access_pending:'Conta Uber conectada, mas a Uber ainda não liberou o acesso aos dados.',denied:UBER_MSG.access_denied,error:UBER_MSG[UBER_RET.reason]||'Não foi possível conectar a Uber.'}[UBER_RET.r];if(m)toast(m);UBER_RET.r='';}
     /* O cadastro do veículo é opcional e fica disponível nas abas Uber e 99. */};

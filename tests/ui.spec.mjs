@@ -291,7 +291,7 @@ await test("Ícones de informação: abrem por toque e clique, ficam dentro da t
     const ctx = await ctxFor(keep, { viewport: { width: w, height: h }, isMobile: mob, hasTouch: mob });
     const { page } = await loggedPage(ctx);
     for (const t of ["historico", "uber", "financas", "produtividade", "despesas", "hoje"]) {
-      await page.evaluate((t) => { tab = t; render(); }, t);
+      await page.evaluate((t) => { Bot.put({ muted: true }); Bot.hide(); tab = t; render(); }, t); // mascote silenciado: este teste é dos ícones "i"
       const count = await page.locator("#view .itip:visible").count(); // ícones dentro de blocos recolhidos só contam quando abertos
       for (let k = 0; k < count; k++) {
         const b = page.locator("#view .itip:visible").nth(k); await b.scrollIntoViewIfNeeded();
