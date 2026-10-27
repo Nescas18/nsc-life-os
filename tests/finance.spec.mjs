@@ -184,13 +184,13 @@ await test("9. Decimais e arredondamento", async (keep) => {
 
 await test("10. Meta diária: não iniciada, parcial e concluída", async (keep) => {
   const o = await open(); keep(o.ctx);
-  const goalTxt = () => o.page.evaluate(() => document.querySelector("#view").textContent.replace(/\s+/g, " "));
+  const pct = () => o.page.evaluate(() => document.querySelector("#view .rs .gl b").firstChild.textContent.trim());
   await setDb(o.page, { cfg: { pass: OFF, goal: 300 } });
-  if (!/0% da meta/.test(await goalTxt())) throw new Error("meta não iniciada deveria mostrar 0%");
+  eq("não iniciada", await pct(), "0%");
   await setDb(o.page, { cfg: { pass: OFF, goal: 300 }, tx: [tx({ d: T, type: "in", app: "uber", v: 150 })] });
-  if (!/50% da meta/.test(await goalTxt())) throw new Error("meta parcial deveria mostrar 50%");
+  eq("parcial", await pct(), "50%");
   await setDb(o.page, { cfg: { pass: OFF, goal: 300 }, tx: [tx({ d: T, type: "in", app: "uber", v: 300 })] });
-  if (!/100% da meta/.test(await goalTxt())) throw new Error("meta concluída deveria mostrar 100%");
+  eq("concluída", await pct(), "100%");
 });
 
 await test("11. Editar e excluir lançamento (com passe automático)", async (keep) => {
@@ -207,6 +207,7 @@ await test("11. Editar e excluir lançamento (com passe automático)", async (ke
   await o.page.click('#mbox form[data-form=edtx] button.btn');
   s = await cs(o.page, T); eq("faturamento após editar", s.inc, 250); eq("lucro após editar", s.op, 221);
   await o.page.click(`[data-del="tx:${id}"]`);
+  await o.page.click("#mbox [data-delok]"); // exclusão pede confirmação
   s = await cs(o.page, T); eq("faturamento após excluir", s.inc, 0); eq("passe após excluir", s.pass, 0); eq("lucro após excluir", s.op, 0);
 });
 
@@ -238,6 +239,102 @@ await test("14. Conta sem histórico: todas as áreas abrem sem erro", async (ke
   const s = await cs(o.page, T); eq("lucro operacional", s.op, 0);
   if (o.errors.length) throw new Error("erros de JavaScript: " + o.errors.join(" | "));
   return tabs.length + " áreas renderizadas";
+});
+
+/* ===== Cenários da auditoria financeira (NESC 2.0) ===== */
+await test("A. Somente receita: Uber 100 + 99 50", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 100 }), tx({ d: T, type: "in", app: "n99", v: 50 })] });
+  const s = await cs(o.page, T); eq("faturamento", s.inc, 150); eq("despesas", s.expTot, 0); eq("lucro operacional", s.op, 150);
+});
+await test("B. Receita e despesas: 200 + 100 − 80", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 200 }), tx({ d: T, type: "in", app: "n99", v: 100 }), tx({ d: T, type: "fuel", app: "veic", v: 50, unit: "L" }), tx({ d: T, type: "other", app: "veic", v: 30, desc: "Alimentação" })] });
+  const s = await cs(o.page, T); eq("faturamento", s.inc, 300); eq("despesas", s.expTot, 80); eq("lucro operacional", s.op, 220);
+});
+await test("C. Somente despesas: −50", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "other", app: "veic", v: 50 })] });
+  const s = await cs(o.page, T); eq("faturamento", s.inc, 0); eq("resultado operacional", s.op, -50);
+});
+await test("D. Meta ultrapassada: 546 ÷ 220 = 248,18% (sem teto no número, barra em 100%)", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF, goal: 220 }, tx: [tx({ d: T, type: "in", app: "uber", v: 300 }), tx({ d: T, type: "in", app: "n99", v: 246 })] });
+  const g = await o.page.evaluate(() => goalPct(CS(TODAY(), TODAY()).inc, cfg().goal));
+  eq("percentual", g.pct, 248.18); eq("barra", g.bar, 100); eq("superada", g.over, true);
+  const t = await o.page.evaluate(() => document.querySelector("#view .rs .gl").textContent);
+  if (!t.includes("248,18%")) throw new Error("Início não mostrou 248,18%: " + t);
+  await o.page.evaluate(() => { tab = "metas"; render(); });
+  const m = await o.page.evaluate(() => document.querySelector(".gauge").textContent.replace(/\s+/g, " "));
+  if (!m.includes("248,18%") || !m.includes("R$ 546,00") || !m.includes("R$ 220,00")) throw new Error("Metas: " + m.slice(0, 160));
+});
+await test("D2. Meta zerada ou ausente não gera percentual", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  const r = await o.page.evaluate(() => [goalPct(100, 0), goalPct(100, undefined), goalPct(0, 220)]);
+  eq("meta 0", r[0].has, false); eq("sem meta", r[1].has, false); eq("0 de 220", r[2].pct, 0);
+});
+await test("D3. Meta de lucro compara com lucro operacional, não com faturamento", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 300 }), tx({ d: T, type: "fuel", app: "veic", v: 75, unit: "L" })], goals: [{ id: "g1", kind: "fin", metric: "lucro", per: "dia", target: 150 }, { id: "g2", kind: "fin", metric: "desp", per: "dia", target: 80 }] });
+  const r = await o.page.evaluate(() => [goalProgress(db.goals[0]), goalProgress(db.goals[1])]);
+  eq("lucro realizado", r[0].real, 225); eq("atingimento do lucro", r[0].pct, 150); eq("despesas dentro do limite", r[1].ok, true); eq("despesas usadas", r[1].pct, 93.75);
+});
+await test("E. Sem registros: nada inventado; dia sem registro ≠ dia confirmado sem trabalho", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF, workDays: [1, 2, 3, 4, 5] }, tx: [tx({ d: "2026-10-19", type: "in", app: "uber", v: 100 })], off: { "2026-10-22": { v: true, at: 1 } } });
+  const r = await o.page.evaluate(() => ({ pend: pendingDays(14), cs: CS("2026-10-20", "2026-10-25").inc, chart: chartData("2026-10-21", "2026-10-23").map((x) => [x.d, x.has, x.off]) }));
+  eq("faturamento sem registros", r.cs, 0);
+  if (r.pend.includes("2026-10-22")) throw new Error("dia confirmado sem trabalho apareceu como pendente");
+  if (!r.pend.includes("2026-10-23") || r.pend.includes("2026-10-25") || r.pend.includes("2026-10-26")) throw new Error("pendências erradas: " + r.pend.join(","));
+  eq("gráfico: 22/10 é folga, não R$ 0", JSON.stringify(r.chart), JSON.stringify([["2026-10-21", false, false], ["2026-10-22", false, true], ["2026-10-23", false, false]]));
+});
+await test("F. Manutenção: entra uma vez (resultado completo), sem desconto duplo", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 300 }), tx({ d: T, type: "fuel", app: "veic", v: 50, unit: "L" }), tx({ id: "tm", d: T, type: "maint", app: "veic", v: 30, desc: "Manutenção: Óleo do motor" })], maint: [{ id: "m1", comp: "oleo", d: T, odo: 73500, part: 20, labor: 10, txId: "tm", at: 1 }] });
+  const s = await cs(o.page, T); eq("lucro operacional (sem manutenção)", s.op, 250); eq("resultado com combustível e manutenção", s.full, 220); eq("despesas lançadas", s.expTot, 80);
+  const h = await o.page.evaluate(() => histItems().filter((x) => x.k === "maint" || x.k === "mrec").length);
+  eq("manutenção listada uma vez no histórico", h, 1);
+});
+await test("G. Criar, editar e excluir pelo histórico sem resíduo", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF } });
+  await o.page.evaluate(() => { tab = "uber"; render(); });
+  await o.page.fill('#reg form[data-form=inc] input[name=v]', "120,35");
+  await o.page.click('#reg form[data-form=inc] button.btn');
+  const id = await o.page.evaluate(() => db.tx[0].id);
+  await o.page.evaluate(() => { tab = "historico"; render(); });
+  await o.page.click(`tr[data-hitem="tx:${id}"]`);
+  await o.page.click("#mbox [data-edit]");
+  await o.page.fill('#mbox form[data-form=edtx] input[name=v]', "130,40");
+  await o.page.click('#mbox form[data-form=edtx] button.btn');
+  eq("após editar", (await cs(o.page, T)).inc, 130.4);
+  await o.page.click(`tr[data-hitem="tx:${id}"]`);
+  await o.page.click("#mbox [data-del]");
+  await o.page.click("#mbox [data-delok]");
+  const s = await cs(o.page, T); eq("após excluir", s.inc, 0); eq("lucro após excluir", s.op, 0);
+  eq("itens no histórico", await o.page.evaluate(() => histItems().length), 0);
+});
+await test("H. Histórico soma o mesmo que o motor e respeita filtros", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 10.1 }), tx({ d: T, type: "in", app: "n99", v: 20.2 }), tx({ d: "2026-10-20", type: "in", app: "uber", v: 0.3 }), tx({ d: "2026-09-30", type: "in", app: "uber", v: 999 }), tx({ d: T, type: "fuel", app: "veic", v: 40.05, unit: "L" })] });
+  await o.page.evaluate(() => { tab = "historico"; hf.per = "m"; hf.type = "all"; render(); });
+  const t = await o.page.evaluate(() => document.querySelector("#view .stats").textContent.replace(/\s+/g, " "));
+  const c = await cs(o.page, "2026-10-01", T);
+  eq("faturamento do mês (motor)", c.inc, 30.6);
+  if (!t.includes("R$ 30,60") || !t.includes("R$ 40,05")) throw new Error("totais do histórico: " + t);
+  await o.page.click('[data-htype="n99"]');
+  const n = await o.page.evaluate(() => document.querySelectorAll(".htab tbody tr").length);
+  eq("filtro 99", n, 1);
+});
+await test("I. Sincronização não duplica o mesmo registro (nuvem + aparelho)", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  const r = await o.page.evaluate(() => { const a = Object.assign(empty(), { tx: [{ id: "x1", d: "2026-10-27", type: "in", app: "uber", v: 100, at: 1 }] }), b = Object.assign(empty(), { tx: [{ id: "x1", d: "2026-10-27", type: "in", app: "uber", v: 120, at: 2 }] }); const m = mergeDb(a, b); return { n: m.tx.length, v: m.tx[0].v }; });
+  eq("registros após mesclar", r.n, 1); eq("versão mais recente", r.v, 120);
+});
+await test("J. Centavos: 0,1 + 0,2 e arredondamento de 1,005", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  const r = await o.page.evaluate(() => [sum([{ v: 0.1 }, { v: 0.2 }]), r2(1.005), r2(-1.005), sum([{ v: 19.99 }, { v: 0.01 }, { v: 33.33 }])]);
+  eq("0,1 + 0,2", r[0], 0.3, 0); eq("1,005", r[1], 1.01, 0); eq("−1,005", r[2], -1.01, 0); eq("soma", r[3], 53.33, 0);
 });
 
 await browser.close();
