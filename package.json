@@ -11,7 +11,8 @@
     "test:recovery": "node tests/recovery.spec.mjs",
     "test:landing": "node tests/landing.spec.mjs",
     "test:ranking": "node tests/ranking.spec.mjs",
-    "test:ranking-ui": "node tests/ranking-ui.spec.mjs"
+    "test:ranking-ui": "node tests/ranking-ui.spec.mjs",
+    "test:profile": "node tests/profile.spec.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",

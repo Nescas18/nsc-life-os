@@ -56,7 +56,7 @@ body,html{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .gl-fallback{position:absolute;inset:0;overflow:hidden}.gl-fallback i{position:absolute;left:62%;top:46%;width:min(34vw,300px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 35% 30%,#1a1710,#060606 70%);box-shadow:0 0 80px rgba(226,178,80,.18),0 0 0 1px rgba(226,178,80,.12)}.gl-fallback i::after{content:'';position:absolute;inset:-60%;border-radius:50%;border:1px solid rgba(226,178,80,.18);transform:rotateX(75deg)}
 @media(max-width:900px){.gl-fallback i{left:50%;top:15%;width:150px}}
 .layout-container{position:relative;z-index:2;display:flex;width:100vw;height:100%;pointer-events:none}
-.left-panel{pointer-events:auto;width:46%;min-width:400px;max-width:560px;height:100%;display:flex;flex-direction:column;justify-content:center;padding:calc(28px + var(--sat)) 56px calc(28px + var(--sab));overflow-y:auto;background:linear-gradient(90deg,rgba(4,4,5,.96) 0%,rgba(4,4,5,.82) 62%,rgba(4,4,5,0) 100%)}
+.left-panel{pointer-events:auto;width:46%;min-width:400px;max-width:560px;height:100%;display:flex;flex-direction:column;justify-content:safe center;padding:calc(28px + var(--sat)) 56px calc(28px + var(--sab));overflow-y:auto;background:linear-gradient(90deg,rgba(4,4,5,.96) 0%,rgba(4,4,5,.82) 62%,rgba(4,4,5,0) 100%)}
 .right-panel{flex:1;height:100%}
 .auth-wrap{width:100%;max-width:420px}
 .brand-row{display:flex;align-items:center;gap:12px;margin-bottom:26px}
@@ -96,6 +96,10 @@ select option{background:#0c0c10}
 @keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
 form.shake{animation:shake .38s}
 .form-footer{margin-top:14px;display:flex;justify-content:center}.forgot-link{font-size:.85rem;color:var(--mut);text-decoration:none;background:none;border:none;cursor:pointer;padding:8px 4px;min-height:40px}.forgot-link:hover{color:var(--gold)}
+.fhint{display:block;margin-top:6px;font-size:.72rem;line-height:1.4;color:#8c8c94}
+.auth-done{text-align:center;animation:fadeIn .4s ease}
+.auth-done-ico{width:56px;height:56px;margin:4px auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;color:#120e05;background:linear-gradient(180deg,var(--gold-hi),var(--gold));box-shadow:0 8px 22px rgba(226,178,80,.25)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .err{color:var(--bad);font-size:.85rem;min-height:20px;margin-top:10px;line-height:1.4}.err.info{color:var(--tx2)}
 .auth-areas{margin-top:22px;display:flex;flex-wrap:wrap;gap:6px 8px;color:var(--faint);font-size:.74rem;letter-spacing:.02em}
 .auth-areas span{padding:4px 9px;border:1px solid var(--line);border-radius:20px;transition:color .3s,border-color .3s}
@@ -227,6 +231,14 @@ textarea{height:90px;font-size:.8rem}
 .chkl{display:flex;gap:10px;align-items:center;font-size:.85rem;margin:6px 0 14px;cursor:pointer;line-height:1.4}
 .lnk{background:none;border:none;color:var(--tx);text-decoration:underline;cursor:pointer;font-size:inherit;padding:4px 0}
 details.sec{margin:6px 0 12px}details.sec>summary{cursor:pointer;color:var(--mut);font-size:.85rem;padding:8px 0;min-height:36px}
+.durrow{display:flex;align-items:center;gap:8px}.durrow input{width:5.2em;flex:0 0 auto;text-align:center;font-size:1.05rem;font-variant-numeric:tabular-nums}.durrow span{color:var(--mut);font-size:.9rem}
+.ptiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.pt{min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--card2,rgba(255,255,255,.02))}
+.pt small{display:block;color:var(--mut);font-size:.74rem;line-height:1.3;margin-bottom:5px}
+.pt b{display:block;font-size:1.2rem;font-weight:640;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.pt span{display:block;color:var(--mut);font-size:.72rem;margin-top:4px;line-height:1.3}
+.pt.pos b{color:var(--ok)}.pt.neg b{color:var(--bad)}.pt.hl{border-color:var(--gold-line);background:linear-gradient(145deg,rgba(226,178,80,.1),rgba(226,178,80,.02))}
+.estbox{margin-top:12px;padding:11px 13px;border:1px dashed var(--gold-line);border-radius:var(--r-lg)}.estbox small{display:block;text-transform:uppercase;letter-spacing:.05em;font-size:.66rem;color:var(--gold)}.estbox b{display:block;margin:3px 0;font-size:.95rem}.estbox span{color:var(--mut);font-size:.78rem;line-height:1.4}
 .prow{display:flex;gap:8px;align-items:center;margin-bottom:8px}.prow input{flex:1;min-width:0}.prow span{color:var(--mut);font-size:.8rem}
 form[data-kmmode="none"] [data-km],form[data-kmmode="total"] [data-km="odo"],form[data-kmmode="odo"] [data-km="total"]{display:none}
 form[data-gm] [data-gs]{display:none}form[data-gm=fat] [data-gs~=fat],form[data-gm=lucro] [data-gs~=lucro],form[data-gm=desp] [data-gs~=desp],form[data-gm=res] [data-gs~=res],form[data-gm=obr] [data-gs~=obr],form[data-gm=pers] [data-gs~=pers]{display:block}form[data-gm] span[data-gs]{display:none}form[data-gm=fat] span[data-gs~=fat],form[data-gm=lucro] span[data-gs~=lucro],form[data-gm=desp] span[data-gs~=desp],form[data-gm=res] span[data-gs~=res],form[data-gm=obr] span[data-gs~=obr]{display:inline}
@@ -642,24 +654,31 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
     <form id="form-register" style="display:none" onsubmit="handleAuth(event,'register')">
       <div class="form-group"><label for="re-name">Nome completo</label><input id="re-name" name="name" type="text" autocomplete="name" placeholder="Seu nome" required /></div>
       <div class="form-group"><label for="re-email">E-mail</label><input id="re-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" placeholder="seu@email.com" required /></div>
+      <div class="form-group"><label for="re-birth">Data de nascimento</label><input id="re-birth" name="birth" type="date" autocomplete="bday" min="1900-01-01" /><small class="fhint">Utilizamos essa informação para ajudar na identificação da conta e oferecer suporte à recuperação de acesso. Ela é opcional e fica privada.</small></div>
       <div class="form-group"><label for="re-pass">Senha</label><div class="pw"><input id="re-pass" name="pass" type="password" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" minlength="8" required /><button type="button" class="eye" onclick="togglePw(this)" aria-label="Mostrar senha" aria-pressed="false"></button></div></div>
       <button type="submit" class="btn-submit" data-label="Criar minha conta"><span class="spin" aria-hidden="true"></span><span class="bl">Criar minha conta</span></button>
       <div class="form-footer"><button type="button" class="forgot-link" onclick="switchTab('recover')">Já tem conta e esqueceu a senha?</button></div>
     </form>
     <form id="form-recover" style="display:none" onsubmit="handleRecover(event)" novalidate>
-      <h2 class="auth-h">Recuperar acesso</h2>
-      <p class="sub" style="margin-bottom:16px">Informe o e-mail da sua conta. Se ele estiver cadastrado, enviaremos um link para você criar uma nova senha.</p>
+      <h2 class="auth-h">Recupere o acesso à sua conta</h2>
+      <p class="sub" style="margin-bottom:16px">Informe o e-mail cadastrado para receber as instruções de recuperação da sua senha.</p>
       <div class="form-group"><label for="rc-email">E-mail cadastrado</label><input id="rc-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" placeholder="seu@email.com" required /></div>
-      <button type="submit" class="btn-submit" data-label="Enviar link de recuperação"><span class="spin" aria-hidden="true"></span><span class="bl">Enviar link de recuperação</span></button>
-      <div class="form-footer"><button type="button" class="forgot-link" onclick="switchTab('login')">Voltar para entrar</button></div>
+      <button type="submit" class="btn-submit" data-label="Enviar instruções"><span class="spin" aria-hidden="true"></span><span class="bl">Enviar instruções</span></button>
+      <div class="form-footer"><button type="button" class="forgot-link" onclick="switchTab('login')">Voltar ao login</button></div>
     </form>
     <form id="form-newpass" style="display:none" onsubmit="handleNewPass(event)" novalidate>
-      <h2 class="auth-h">Criar nova senha</h2>
+      <h2 class="auth-h">Crie uma nova senha</h2>
       <p class="sub" style="margin-bottom:16px" id="np-who">Escolha uma nova senha para sua conta.</p>
       <div class="form-group"><label for="np-pass">Nova senha</label><div class="pw"><input id="np-pass" name="pass" type="password" autocomplete="new-password" minlength="8" placeholder="Mínimo de 8 caracteres" required /><button type="button" class="eye" onclick="togglePw(this)" aria-label="Mostrar senha" aria-pressed="false"></button></div></div>
-      <div class="form-group"><label for="np-pass2">Confirme a nova senha</label><div class="pw"><input id="np-pass2" name="pass2" type="password" autocomplete="new-password" minlength="8" placeholder="Repita a senha" required /><button type="button" class="eye" onclick="togglePw(this)" aria-label="Mostrar senha" aria-pressed="false"></button></div></div>
+      <div class="form-group"><label for="np-pass2">Confirmar nova senha</label><div class="pw"><input id="np-pass2" name="pass2" type="password" autocomplete="new-password" minlength="8" placeholder="Repita a senha" required /><button type="button" class="eye" onclick="togglePw(this)" aria-label="Mostrar senha" aria-pressed="false"></button></div></div>
       <button type="submit" class="btn-submit" data-label="Salvar nova senha"><span class="spin" aria-hidden="true"></span><span class="bl">Salvar nova senha</span></button>
     </form>
+    <div id="form-done" style="display:none" class="auth-done">
+      <div class="auth-done-ico" aria-hidden="true">✓</div>
+      <h2 class="auth-h" id="done-h">Senha alterada com sucesso</h2>
+      <p class="sub" id="done-sub" style="margin-bottom:18px">Sua nova senha já está ativa. Use-a da próxima vez que entrar.</p>
+      <button type="button" class="btn-submit" onclick="switchTab('login')"><span class="bl">Voltar ao login</span></button>
+    </div>
     <div class="err" id="auth-err" role="alert"></div>
     </div>
     <div class="auth-areas" id="auth-areas" aria-label="Áreas do NESC"></div>
@@ -678,12 +697,22 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
 <script>
 /* ============ CAMADA DE DADOS ============ */
 const C=window.NSC_CONFIG;
+/* Destino público dos links de recuperação/confirmação. Nunca confiamos cegamente na URL do navegador:
+   só usamos a origem atual quando ela está na lista de destinos autorizados (produção, previews do projeto
+   na Vercel e ambiente de desenvolvimento local). Qualquer outra origem cai para o endereço oficial do app,
+   de modo que o link do e-mail nunca aponta para localhost:3000 nem para um domínio externo não autorizado. */
+function publicUrl(){
+  const site=String(C.siteUrl||'').replace(/\/+$/,''),o=location.origin,p=location.pathname;
+  const allow=[site,/^https:\/\/indexnscai(-[a-z0-9-]+)?-nsc-ai1\.vercel\.app$/,/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
+  const ok=o&&allow.some(a=>a instanceof RegExp?a.test(o):a&&o===a);
+  return ok?o+p:(site||o+p);
+}
 const mem={};
 const LS={get(k){try{return localStorage.getItem(k)}catch(e){return mem[k]??null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){mem[k]=v;LS.fail=true}}};
 const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error('Não foi possível carregar '+src));document.head.appendChild(s)});
 /* Supabase opcional: ativado só quando supabaseUrl + supabaseAnonKey estão configurados (ver LEIA-ME). */
 const Cloud={on:!!(C.supabaseUrl&&C.supabaseAnonKey),sb:null,
-  async init(){if(!this.on)return false;if(this.sb)return true;if(!window.supabase)await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js');this.sb=window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return true},
+  async init(){if(!this.on)return false;if(this.sb)return true;if(!window.supabase)await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js');this.sb=window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit'}});return true},
   async pull(id){const{data,error}=await this.sb.from('lifeos_user_data').select('data,updated_at').eq('user_id',id).maybeSingle();if(error)throw error;return data&&data.data},
   async push(id,doc){const{error}=await this.sb.from('lifeos_user_data').upsert({user_id:id,data:doc,updated_at:new Date().toISOString()});if(error)throw error},
   /* ranking: calculado no servidor a partir dos registros salvos (função nesc_ranking); o navegador só consulta */
@@ -696,8 +725,8 @@ const Auth={
   async kdf(pass,salt){if(!(window.crypto&&crypto.subtle))return null;const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveBits']);return hex(await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:120000,hash:'SHA-256'},k,256))},
   async mk(pass){const salt=hex(crypto.getRandomValues(new Uint8Array(16))),h=await this.kdf(pass,salt);return h?'p2$'+salt+'$'+h:this.hash(pass)},
   async check(stored,pass){if(stored&&stored.startsWith('p2$')){const[,salt,h]=stored.split('$');return await this.kdf(pass,salt)===h}return stored===this.hash(pass)},
-  async signUp(name,email,pass){
-    if(Cloud.on){await Cloud.init();const{data,error}=await Cloud.sb.auth.signUp({email,password:pass,options:{data:{name}}});if(error)throw new Error(cloudErr(error));if(!data.session){const e=new Error('Conta criada. Confirme o e-mail que enviamos e depois entre.');e.info=true;throw e}return{email,name,id:data.user.id}}
+  async signUp(name,email,pass,birth){
+    if(Cloud.on){await Cloud.init();const data_={name};if(birth)data_.birth_date=birth;const{data,error}=await Cloud.sb.auth.signUp({email,password:pass,options:{data:data_,emailRedirectTo:publicUrl()}});if(error)throw new Error(cloudErr(error));if(!data.session){const e=new Error('Conta criada. Confirme o e-mail que enviamos e depois entre.');e.info=true;throw e}return{email,name,id:data.user.id}}
     const u=this.users();if(u[email])throw new Error('Este e-mail já está cadastrado.');u[email]={name,pass:await this.mk(pass)};LS.set('nsc_users',JSON.stringify(u));return{email,name}},
   async signIn(email,pass){
     email=String(email||'').trim().toLowerCase();pass=String(pass??'').trim();
@@ -713,10 +742,22 @@ const Auth={
       try{Object.keys(localStorage).filter(k=>/^sb-.*-auth-token/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}} // sem rede: remove ao menos a sessão deste aparelho
     LS.set('nsc_session','null')},
   async rename(name){if(Cloud.on&&Cloud.sb){try{await Cloud.sb.auth.updateUser({data:{name}})}catch(e){}}else{const u=this.users();if(u[user.email]){u[user.email].name=name;LS.set('nsc_users',JSON.stringify(u))}}user.name=name;this.start(user)},
-  async reset(email){if(Cloud.on){await Cloud.init();const{error}=await Cloud.sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
+  async reset(email){if(Cloud.on){await Cloud.init();const{error}=await Cloud.sb.auth.resetPasswordForEmail(email,{redirectTo:publicUrl()});
       if(error){const m=String(error.message||'').toLowerCase();if(error.status===429||m.includes('rate')||m.includes('seconds'))throw new Error('Muitos pedidos em pouco tempo. Aguarde alguns minutos e tente de novo.');if(m.includes('fetch')||m.includes('network'))throw new Error(cloudErr(error));} // outros erros não revelam se a conta existe
       return'Se houver uma conta com '+email+', o link para criar uma nova senha chega em alguns minutos. Confira também o spam. O link vale por tempo limitado e só pode ser usado uma vez.'}
     return'No modo local a senha fica só neste navegador e não há servidor para enviar e-mail de recuperação. Se você fez Backup, crie uma nova conta e importe o backup.'}
+};
+/* Data de nascimento do perfil: fica em public.profiles (RLS: só o dono lê/edita) na nuvem, ou no armazenamento
+   local da conta no modo offline. É apenas complementar — nunca autentica, nunca redefine senha. */
+const Profile={birth:null,loaded:false,
+  async load(){if(this.loaded)return;this.loaded=true;
+    try{if(Cloud.on){await Cloud.init();const{data}=await Cloud.sb.from('profiles').select('birth_date').eq('id',user.id).maybeSingle();this.birth=data&&data.birth_date||null}
+      else{const u=Auth.users()[user.email];this.birth=u&&u.birth||null}}catch(e){}},
+  async save(v){v=v||null;
+    if(Cloud.on){await Cloud.init();const{error}=await Cloud.sb.from('profiles').update({birth_date:v}).eq('id',user.id);if(error)throw error}
+    else{const all=Auth.users();if(all[user.email]){all[user.email].birth=v;LS.set('nsc_users',JSON.stringify(all))}}
+    this.birth=v;this.loaded=true},
+  reset(){this.birth=null;this.loaded=false}
 };
 function cloudErr(e){const m=(e&&e.message||'').toLowerCase();if(m.includes('invalid login'))return'E-mail ou senha incorretos.';if(m.includes('already registered'))return'Este e-mail já está cadastrado.';if(m.includes('not confirmed'))return'Confirme seu e-mail antes de entrar.';if(m.includes('fetch')||m.includes('network'))return'Sem conexão com o servidor. Verifique sua internet.';return e.message||'Erro inesperado.'}
 let user=null,db=null;
@@ -971,7 +1012,7 @@ const AREAS=[['seus ganhos na Uber','Uber'],['seus ganhos na 99','99'],['suas fi
 (function(){const el=document.getElementById('rot'),box=document.getElementById('auth-areas');if(!el||!box)return;box.innerHTML=AREAS.map(a=>'<span>'+a[1]+'</span>').join('');let i=0;const chips=[...box.children],mark=()=>chips.forEach((c,k)=>c.classList.toggle('on',k===i));mark();
   setInterval(()=>{if(document.hidden||matchMedia('(prefers-reduced-motion:reduce)').matches||!document.getElementById('auth')||document.getElementById('auth').style.display==='none')return;el.classList.add('out');setTimeout(()=>{i=(i+1)%AREAS.length;el.textContent=AREAS[i][0];mark();el.classList.remove('out')},360)},2800)})();
 function switchTab(mode,msg,info){
-  const F={login:'form-login',register:'form-register',recover:'form-recover',newpass:'form-newpass'};
+  const F={login:'form-login',register:'form-register',recover:'form-recover',newpass:'form-newpass',done:'form-done'};
   Object.entries(F).forEach(([k,id])=>{document.getElementById(id).style.display=k===mode?'block':'none'});
   document.querySelector('#auth .auth-tabs').style.display=mode==='login'||mode==='register'?'':'none';
   [['btn-tab-login',mode==='login'],['btn-tab-register',mode==='register']].forEach(([id,on])=>{const t=document.getElementById(id);t.classList.toggle('active',on);t.setAttribute('aria-selected',on)});
@@ -985,10 +1026,13 @@ async function handleAuth(e,mode){
   const email=String(f.get('email')||'').trim().toLowerCase();
   const pass=String(f.get('pass')??'').trim();
   const bl=b.querySelector('.bl'),lab=b.dataset.label,fields=[...e.target.querySelectorAll('input')];
-  err.textContent='';err.classList.remove('info');fields.forEach(i=>i.removeAttribute('aria-invalid'));b.disabled=true;b.classList.add('loading');bl.textContent=mode==='login'?'Entrando…':'Criando conta…';
+  err.textContent='';err.classList.remove('info');fields.forEach(i=>i.removeAttribute('aria-invalid'));
+  let birth='';
+  if(mode==='register'){birth=String(f.get('birth')||'').trim();const bv=birthError(birth);if(bv){const bi=e.target.querySelector('[name=birth]');bi.setAttribute('aria-invalid','true');err.textContent=bv;bi.focus();return}}
+  b.disabled=true;b.classList.add('loading');bl.textContent=mode==='login'?'Entrando…':'Criando conta…';
   let ok=false;
   try{
-    const u=mode==='login'?await Auth.signIn(email,pass):await Auth.signUp(f.get('name').trim(),email,pass);
+    const u=mode==='login'?await Auth.signIn(email,pass):await Auth.signUp(f.get('name').trim(),email,pass,birth);
     ok=true;if(mode==='register')track('signup_done');b.classList.remove('loading');b.classList.add('done');bl.textContent=mode==='login'?'Acesso liberado':'Conta criada';
     Auth.start(u);enter(u,true,mode==='register');
   }catch(x){err.textContent=x.message||'Não foi possível concluir. Tente novamente.';err.classList.toggle('info',!!x.info);
@@ -1003,6 +1047,13 @@ async function handleAuth(e,mode){
 const RECOV=(()=>{const h=location.hash||'',q=location.search||'';if(/type=recovery/.test(h))return'link';if(/error_code=otp_expired|error_code=.*expired|error=access_denied/.test(h+q))return'expired';return''})();
 const cleanUrl=()=>{try{history.replaceState(null,'',location.pathname+location.search.replace(/([?&])(error|error_code|error_description)=[^&]*/g,'$1').replace(/[?&]+$/,''))}catch(e){}};
 const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+/* valida a data de nascimento: opcional, mas quando informada precisa ser uma data real, não futura e não
+   anterior a 1900. A data sozinha NUNCA dá acesso à conta nem redefine senha; serve só para apoio de suporte. */
+function birthError(v){if(!v)return'';if(!/^\d{4}-\d{2}-\d{2}$/.test(v))return'Informe a data de nascimento no formato dia/mês/ano, ou deixe em branco.';
+  const d=new Date(v+'T00:00:00'),[y,m,dd]=v.split('-').map(Number);
+  if(isNaN(d)||d.getFullYear()!==y||d.getMonth()+1!==m||d.getDate()!==dd)return'Essa data não existe. Confira o dia e o mês.';
+  const t=new Date();t.setHours(0,0,0,0);if(d>t)return'A data de nascimento não pode estar no futuro.';
+  if(y<1900)return'Informe um ano a partir de 1900.';return''}
 async function handleRecover(e){e.preventDefault();const fm=e.target,b=fm.querySelector('[type=submit]'),bl=b.querySelector('.bl'),inp=fm.email,email=String(inp.value||'').trim().toLowerCase(),err=document.getElementById('auth-err');
   err.classList.remove('info');inp.removeAttribute('aria-invalid');
   if(!EMAIL_RE.test(email)){inp.setAttribute('aria-invalid','true');err.textContent='Digite um e-mail válido, por exemplo nome@gmail.com.';inp.focus();return}
@@ -1021,7 +1072,7 @@ async function handleNewPass(e){e.preventDefault();const fm=e.target,b=fm.queryS
   b.disabled=true;b.classList.add('loading');bl.textContent='Salvando…';
   try{await Cloud.init();const{error}=await Cloud.sb.auth.updateUser({password:p1});if(error)throw error;
     try{await Cloud.sb.auth.signOut()}catch(x){}LS.set('nsc_session','null');cleanUrl();fm.reset();
-    b.classList.remove('loading');bl.textContent=b.dataset.label;b.disabled=false;switchTab('login','Senha redefinida. Entre com a nova senha.',true)}
+    b.classList.remove('loading');bl.textContent=b.dataset.label;b.disabled=false;document.getElementById('auth-err').textContent='';switchTab('done')}
   catch(x){const m=String(x&&(x.code||x.message)||'').toLowerCase();err.textContent=m.includes('same')?'A nova senha precisa ser diferente da anterior.':m.includes('weak')?'Senha fraca. Use pelo menos 8 caracteres com letras e números.':m.includes('session')||m.includes('jwt')||m.includes('expired')?'O link expirou. Peça um novo link de recuperação.':cloudErr(x);
     b.disabled=false;b.classList.remove('loading');bl.textContent=b.dataset.label}}
 async function startRecovery(){showAuth('recover');if(!Cloud.on)return;
@@ -1030,15 +1081,20 @@ async function startRecovery(){showAuth('recover');if(!Cloud.on)return;
   try{await Cloud.init();let done=false;const show=s=>{if(done)return;done=true;const em=s&&s.user&&s.user.email;document.getElementById('np-who').textContent=em?'Escolha uma nova senha para '+em+'.':'Escolha uma nova senha para sua conta.';switchTab('newpass')};
     Cloud.sb.auth.onAuthStateChange((ev,s)=>{if(ev==='PASSWORD_RECOVERY')show(s)});
     const{data}=await Cloud.sb.auth.getSession();if(data&&data.session)show(data.session);
-    setTimeout(()=>{if(!done){switchTab('recover','Não foi possível validar o link. Ele pode ter expirado: peça um novo.')}},6000)}
+    setTimeout(()=>{if(!done){switchTab('recover','Este link de recuperação é inválido ou já expirou. Peça um novo abaixo.')}},4000)}
   catch(x){switchTab('recover','Não foi possível validar o link agora. Tente novamente.')}}
 /* ============ MUNDO 1 · PLANETA DO LOGIN ============
    Planeta escuro com anel de partículas douradas/brancas, poeira distante e luz de contorno que circula.
    Mouse: paralaxe e inclinação do anel. Toque: onda nas partículas e giro ao arrastar (sem bloquear a rolagem). */
 const container=document.getElementById('canvas-container');
+// LOWPOWER mede o ORÇAMENTO de geometria/partículas (quantidade), nunca a resolução de desenho.
 const LOWPOWER=(navigator.hardwareConcurrency||8)<=4||(navigator.deviceMemory||8)<=2;
+// Nitidez: a resolução do canvas segue a densidade real da tela (retina/alta DPI), com teto para não estourar
+// a memória de GPU. Antes, celulares (que costumam reportar poucos núcleos) caíam para pixelRatio 1 e o planeta
+// ficava borrado e com a borda serrilhada. Agora o serrilhado some com antialias + densidade correta.
+const GLDPR=Math.max(1,Math.min(devicePixelRatio||1,2.5));
 const RM=matchMedia('(prefers-reduced-motion:reduce)');
-let loginOn=false,loginRaf=0,scene,camera,renderer,planet,particleSystem,particleCount,orbitAngles,orbitSpeed,orbitRadius,baseY,dust,glow,rimLight;
+let loginOn=false,loginRaf=0,scene,camera,renderer,planet,particleSystem,particleCount,orbitAngles,orbitSpeed,orbitRadius,baseY,dust,glow,rimLight,signals;
 /* estado da interação: paralaxe do mouse (x,y → alvo tx,ty), onda e giro do toque; tudo volta ao repouso sozinho */
 const ptr={x:0,y:0,tx:0,ty:0,wave:0,spin:0,lx:null};
 let camBase,camLook,nDraw=0,perf={n:0,sum:0,done:false},waving=false,loginT=0,needRender=true;
@@ -1081,6 +1137,23 @@ function updateCameraPosition(){
 /* three.js só é baixado quando o login ou o app aparecem: a landing abre sem esperar o 3D */
 const THREE_URL='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';let threeP=null;
 const ensureThree=()=>threeP||(threeP=window.THREE?Promise.resolve():new Promise(ok=>{const s=document.createElement('script');s.src=THREE_URL;s.onload=ok;s.onerror=()=>{console.warn('three.js indisponível');ok()};document.head.appendChild(s)}));
+/* arcos de "sinal" saindo da superfície do planeta (inspirados no globo verde de referência, mas em tom dourado):
+   cada arco é um tubo fino com um pulso de luz que percorre seu comprimento; o grupo é filho do planeta e gira com ele. */
+function makeSignals(r){const grp=new THREE.Group(),N=LOWPOWER?4:6,mats=[];
+  for(let i=0;i<N;i++){
+    const th=(i/N)*Math.PI*2+Math.random()*.4,ph=(.28+Math.random()*.42)*Math.PI; // latitudes médias e altas
+    const base=new THREE.Vector3(Math.sin(ph)*Math.cos(th),Math.cos(ph),Math.sin(ph)*Math.sin(th)).normalize();
+    const tang=new THREE.Vector3(-Math.sin(th),.3,Math.cos(th)).normalize(),hop=.55+Math.random()*.4;
+    const p0=base.clone().multiplyScalar(r*1.002),p2=base.clone().addScaledVector(tang,hop).normalize().multiplyScalar(r*1.002);
+    const apex=base.clone().addScaledVector(tang,hop/2).normalize().multiplyScalar(r*(1.4+Math.random()*.28));
+    const geo=new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(p0,apex,p2),48,.022*r,7,false);
+    const mat=new THREE.ShaderMaterial({uniforms:{uT:{value:Math.random()},uC:{value:new THREE.Color(0xffd98a)}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+      vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+      fragmentShader:'uniform float uT;uniform vec3 uC;varying vec2 vUv;void main(){float d=abs(vUv.x-uT);float pulse=smoothstep(.16,0.,d);float rim=smoothstep(.5,1.,abs(vUv.y-.5)*2.);float base=.18*smoothstep(0.,.1,vUv.x)*smoothstep(1.,.88,vUv.x);float a=(base+pulse*1.1)*(1.-rim*.5);if(a<.004)discard;gl_FragColor=vec4(uC*(a*1.9),a);}'});
+    grp.add(new THREE.Mesh(geo,mat));mats.push({mat,spd:.22+Math.random()*.3});
+  }
+  grp.userData.mats=mats;return grp;
+}
 function initLogin(){if(initLogin.done)return;initLogin.done=true;ensureThree().then(initLoginScene)}
 function initLoginScene(){
 try{
@@ -1089,13 +1162,13 @@ try{
   scene.fog=new THREE.FogExp2(0x040405,0.0012);
   camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,1000);
   updateCameraPosition();
-  renderer=new THREE.WebGLRenderer({antialias:!LOWPOWER,alpha:false,powerPreference:'high-performance'});
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
   renderer.setSize(innerWidth,innerHeight);
-  renderer.setPixelRatio(Math.min(devicePixelRatio,LOWPOWER?1:1.75));
+  renderer.setPixelRatio(GLDPR);
   renderer.setClearColor(0x040405,1);
   container.appendChild(renderer.domElement);
   renderer.domElement.setAttribute('aria-hidden','true');
-  planet=new THREE.Mesh(new THREE.SphereGeometry(3.2,LOWPOWER?48:96,LOWPOWER?48:96),new THREE.MeshStandardMaterial({color:0x17120b,roughness:.86,metalness:.12}));planet.rotation.z=THREE.MathUtils.degToRad(-14);
+  planet=new THREE.Mesh(new THREE.SphereGeometry(3.2,LOWPOWER?72:120,LOWPOWER?72:120),new THREE.MeshStandardMaterial({color:0x17120b,roughness:.86,metalness:.12}));planet.rotation.z=THREE.MathUtils.degToRad(-14);
   planet.position.set(3,0,0);scene.add(planet);
   scene.add(new THREE.AmbientLight(0x2a2218,.55)); // lado noturno quase escuro, sem virar um buraco preto
   const KEY=new THREE.Vector3(16,7,4),dirLight=new THREE.DirectionalLight(0xffdcaa,1.9);dirLight.position.copy(KEY);scene.add(dirLight); // luz lateral dourada: dia/noite com terminador
@@ -1105,8 +1178,10 @@ try{
     vertexShader:'varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
     fragmentShader:'uniform float ri;uniform float ro;varying vec2 vP;void main(){float t=(length(vP)-ri)/(ro-ri);float b=.55+.45*sin(t*44.)*sin(t*11.+1.3);float a=smoothstep(0.,.1,t)*smoothstep(1.,.78,t)*b*.2;gl_FragColor=vec4(vec3(.9,.7,.36)*a*1.4,a);}'}));
   ring.rotation.x=-Math.PI/2;rg.add(ring);rg.position.set(3,0,0);rg.rotation.set(THREE.MathUtils.degToRad(12),0,THREE.MathUtils.degToRad(8));scene.add(rg);
-  const applyTex=()=>{try{const m=planet.material,T=planetTexture(LOWPOWER?256:512,LOWPOWER?128:256);m.map=T;m.bumpMap=T;m.bumpScale=.035;m.color.set(0xffffff);m.needsUpdate=true;needRender=true}catch(e){}};
+  const applyTex=()=>{try{const m=planet.material,T=planetTexture(LOWPOWER?768:1024,LOWPOWER?384:512);T.anisotropy=renderer.capabilities.getMaxAnisotropy?Math.min(8,renderer.capabilities.getMaxAnisotropy()):4;m.map=T;m.bumpMap=T;m.bumpScale=.035;m.color.set(0xffffff);m.needsUpdate=true;needRender=true}catch(e){}};
   (window.requestIdleCallback||((f)=>setTimeout(f,60)))(applyTex,{timeout:900});
+  /* sinais emitidos da superfície: arcos dourados com um pulso que viaja, girando junto com o planeta */
+  signals=makeSignals(3.2);planet.add(signals);
   rimLight=new THREE.PointLight(0xe2b250,2.2,40);rimLight.position.set(-4,3,-6);scene.add(rimLight); // contorno dourado que circula devagar
   glow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture(),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.55}));glow.scale.set(15,15,1);glow.position.copy(planet.position);scene.add(glow);
   particleCount=LOWPOWER?14000:30000;nDraw=particleCount;const geometry=new THREE.BufferGeometry();
@@ -1147,7 +1222,7 @@ function animate(now){
   if(!mot&&!zoomT&&!needRender)return; // movimento reduzido: só redesenha quando algo muda
   needRender=false;
   /* aparelho lento: mede os primeiros quadros e, se passar de ~30 ms por quadro, desenha metade das partículas */
-  if(mot&&!perf.done){perf.n++;perf.sum+=dt;if(perf.n>=90){perf.done=true;if(perf.sum/perf.n>.03){nDraw=Math.floor(particleCount/2);particleSystem.geometry.setDrawRange(0,nDraw);dust.visible=false}}}
+  if(mot&&!perf.done){perf.n++;perf.sum+=dt;if(perf.n>=90){perf.done=true;if(perf.sum/perf.n>.03){nDraw=Math.floor(particleCount/2);particleSystem.geometry.setDrawRange(0,nDraw);dust.visible=false;if(GLDPR>1.3)try{renderer.setPixelRatio(Math.max(1,GLDPR*.72))}catch(e){}}}} // aparelho lento: menos partículas e, se preciso, menos resolução — a nitidez do planeta vem do antialias
   const f=dt*60,t=now/1000,p=particleSystem.geometry.attributes.position.array;
   if(mot){
     ptr.x+=(ptr.tx-ptr.x)*Math.min(1,.05*f);ptr.y+=(ptr.ty-ptr.y)*Math.min(1,.05*f);
@@ -1161,6 +1236,7 @@ function animate(now){
     if(!wv&&waving){for(let i=0;i<nDraw;i++)p[i*3+1]=baseY[i]}waving=wv;
     particleSystem.geometry.attributes.position.needsUpdate=true;
     planet.rotation.y+=.002*f;dust.rotation.y+=.0003*f;
+    if(signals)signals.userData.mats.forEach(s=>{s.mat.uniforms.uT.value=(s.mat.uniforms.uT.value+s.spd*dt)%1});
     particleSystem.rotation.x=THREE.MathUtils.degToRad(12)+ptr.y*.06;particleSystem.rotation.z=THREE.MathUtils.degToRad(8)+ptr.x*.05;
     const la=t*.18;rimLight.position.set(planet.position.x+Math.cos(la)*8,3+Math.sin(la*.7)*2,Math.sin(la)*8-2);rimLight.intensity=2+Math.sin(t*.6)*.5+ptr.x*.4;
     glow.material.opacity=.48+Math.sin(t*.8)*.08;
@@ -1181,8 +1257,8 @@ addEventListener('resize',()=>{if(!loginOn)return;camera.aspect=innerWidth/inner
 const G3={r:null,fail:false,views:[],angle:.6,last:0,frame:0,
   init(){if(this.r)return true;if(this.fail)return false;
     if(!window.THREE){ensureThree().then(()=>{if(window.THREE&&tab==='hoje'&&$('#globe'))mountGlobe()});return false} // carrega e monta depois
-    try{const r=new THREE.WebGLRenderer({antialias:!LOWPOWER,alpha:true,powerPreference:'low-power'});
-      r.setPixelRatio(Math.min(devicePixelRatio,LOWPOWER?1:2));r.setSize(innerWidth,innerHeight);r.setScissorTest(true);r.setClearColor(0x000000,0);r.domElement.id='gl';r.domElement.setAttribute('aria-hidden','true');
+    try{const r=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'});
+      r.setPixelRatio(GLDPR);r.setSize(innerWidth,innerHeight);r.setScissorTest(true);r.setClearColor(0x000000,0);r.domElement.id='gl';r.domElement.setAttribute('aria-hidden','true');
       if(r.outputEncoding!==undefined)r.outputEncoding=THREE.sRGBEncoding;
       $('#app').appendChild(r.domElement);this.r=r;
       r.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();this.fail=true;this.r=null;this.views.forEach(v=>v.el.isConnected&&G3.fallback(v.el));this.views=[]});
@@ -1287,7 +1363,15 @@ function parseMoney(s){if(typeof s==='number')return isFinite(s)?Math.round(s*10
   const v=+s;return isFinite(v)?Math.round(v*100)/100:NaN}
 /* números decimais comuns (preço por litro, km, litros): vírgula ou ponto é sempre decimal */
 function parseDec(s){if(typeof s==='number')return s;s=String(s??'').trim().replace(/\s/g,'');if(!s)return NaN;if((s.match(/[.,]/g)||[]).length>1)return NaN;const v=+s.replace(',','.');return isFinite(v)?v:NaN}
-/* horas: 6 · 6,5 · 6.5 · 6:30 · 6h30 · 6h */
+/* DURAÇÃO (fonte única): horas e minutos em campos separados → minutos inteiros. "6" e "30" = 390 min = 6h30min.
+   Nada de horas decimais: "6,30" nunca vira 6,3 h. Ambos vazios = horas não informadas (null), não zero inventado. */
+function durMin(h,m){h=String(h??'').trim();m=String(m??'').trim();if(!h&&!m)return{ok:true,min:null};
+  if(h&&!/^\d{1,3}$/.test(h))return{ok:false,err:'Horas: use só números inteiros, por exemplo 6.'};
+  if(m&&!/^\d{1,2}$/.test(m))return{ok:false,err:'Minutos: use só números inteiros de 0 a 59.'};
+  const H=h?+h:0,M=m?+m:0;if(M>59)return{ok:false,err:'Minutos devem ficar entre 0 e 59. Para 75 minutos, use 1 hora e 15 minutos.'};
+  return{ok:true,min:H*60+M}}
+const fmtDur=m=>{m=Math.round(+m||0);return Math.floor(m/60)+'h'+String(m%60).padStart(2,'0')+'min'};
+/* horas no formato antigo (6:30 · 6h30); mantido só para compatibilidade, o formulário usa durMin */
 function parseHours(s){s=String(s??'').trim().toLowerCase().replace(/\s/g,'');if(!s)return NaN;let m=s.match(/^(\d{1,2})(?:[:h](\d{1,2})?)?m?(?:in)?$/);if(m&&(s.includes(':')||s.includes('h'))){const h=+m[1],mi=+(m[2]||0);return mi<60?h*60+mi:NaN}const v=parseDec(s);return isFinite(v)?Math.round(v*60):NaN}
 /* leituras de hodômetro/km inteiros: 52.340 · 52,340 · 52340 → 52340 (ponto/vírgula seguido de 3 dígitos é milhar) */
 function parseOdo(s){s=String(s??'').trim().replace(/\s|km/gi,'');if(!s)return NaN;if(/^\d{1,3}([.,]\d{3})+$/.test(s))return+s.replace(/[.,]/g,'');const v=parseDec(s);return isFinite(v)?Math.round(v):NaN}
@@ -1304,6 +1388,13 @@ const jrKm=j=>j.km==null||j.km===''||!isFinite(+j.km)?null:+j.km;
 const jrTrips=j=>j.trips==null||j.trips===''||!isFinite(+j.trips)?null:+j.trips;
 const hasAct=j=>jrMin(j)>0||(jrTrips(j)||0)>0||(jrKm(j)||0)>0;
 function jrIntervals(j){if(j.v===2)return unionPeriods(j.periods).map(([s,e])=>[s,e,1]);if(j.start&&j.end){const s=hhmm(j.start);let e=hhmm(j.end);if(e<=s)e+=1440;const tot=e-s;return tot?[[s,e,onl(j)/tot]]:[]}return[]}
+/* horas do MOTORISTA num conjunto de jornadas: por dia, Uber e 99 só somam se forem horas diferentes.
+   Com períodos nos dois apps, vale a união dos horários; se a jornada foi marcada como "mesmas horas", vale a maior. */
+function driverMin(jrs){const by={};jrs.forEach(j=>{(by[j.d]=by[j.d]||[]).push(j)});let t=0;
+  Object.values(by).forEach(js=>{if(js.length===1){t+=jrMin(js[0]);return}
+    const apps={};js.forEach(j=>{apps[j.app]=(apps[j.app]||0)+jrMin(j)});const vals=Object.values(apps);
+    if(js.every(j=>j.v===2&&(j.periods||[]).length))t+=unionMin(js.flatMap(j=>j.periods));
+    else if(vals.length>1&&js.some(j=>j.overlap))t+=Math.max(...vals);else t+=vals.reduce((a,b)=>a+b,0)});return t}
 const jrPeriods=j=>j.v===2?(j.periods||[]):j.start&&j.end?[{s:j.start,e:j.end}]:[];
 
 /* ============ VEÍCULO ============ */
@@ -1366,15 +1457,19 @@ function energyRange(apps,f,t,perApp){const k=ckm(),c=cfg(),fu={},km={};
   new Set([...Object.keys(fu),...Object.keys(km)]).forEach(d=>{const fx=fu[d]||[],w=perApp?shareOf(apps[0],d,d):1,r=sum(fx)*w;
     if(r>0){real+=r;fx.forEach(x=>{const q=(+x.qty||0)*w;if((x.unit||'L')==='kWh')kReg+=q;else lReg+=q})}
     else if(km[d]>0){est+=km[d]*k.total;estKm+=km[d]}});
-  return{real,est,v:real+est,mode:real>0&&est>0?'mixed':real>0?'real':est>0?'est':'none',estKm,lReg,kReg,litersEst:k.share<1&&c.kml>0?estKm*(1-k.share)/c.kml:0,kwhEst:k.share>0&&c.kmkwh>0?estKm*k.share/c.kmkwh:0}}
+  /* registrado × estimado: se o período tem QUALQUER abastecimento/recarga registrado, ele cobre o combustível e
+     nenhuma estimativa por km é calculada (evita contar o mesmo combustível duas vezes). Sem registro no período,
+     a estimativa existe só como informação à parte: nunca entra no lucro operacional. */
+  if(Object.keys(fu).length){est=0;estKm=0}
+  return{real,est,v:real,mode:real>0?'real':est>0?'est':'none',estKm,lReg,kReg,litersEst:k.share<1&&c.kml>0?estKm*(1-k.share)/c.kml:0,kwhEst:k.share>0&&c.kmkwh>0?estKm*k.share/c.kmkwh:0}}
 function stats(apps,f,t,sh,perApp){const k=ckm(),tx=db.tx.filter(x=>inR(x.d,f,t)),jr=db.jr.filter(j=>apps.includes(j.app)&&inR(j.d,f,t)),w=x=>apps.includes(appOf(x))?1:appOf(x)==='veic'?sh:0;
-  const ins=tx.filter(x=>x.type==='in'&&apps.includes(appOf(x))),inc=sum(ins),min=jr.reduce((s,j)=>s+jrMin(j),0);
+  const ins=tx.filter(x=>x.type==='in'&&apps.includes(appOf(x))),inc=sum(ins),min=driverMin(jr);
   const kmL=jr.map(jrKm).filter(x=>x!=null),km=kmL.reduce((s,x)=>s+x,0),kmKnown=kmL.length>0,trL=jr.map(jrTrips).filter(x=>x!=null),n=trL.length?trL.reduce((s,x)=>s+x,0):null;
   const en=energyRange(apps,f,t,perApp),part=ty=>tx.filter(x=>x.type===ty).reduce((s,x)=>s+w(x)*(+x.v||0),0);
   const pass=apps.reduce((s,a)=>s+passShare(a,f,t),0),other=part('other'),maint=part('maint'),days=dDiff(f,t)+1,ownInfo=ownBreakdown(f,t),own=ownInfo.total*sh,passInfo=passBreakdown(apps,f,t);
   /* cada componente é arredondado para centavos antes de compor o resultado: o que aparece na tela sempre fecha a conta */
-  const E=r2(en.v),P=r2(pass),O=r2(other),M=r2(maint),W=r2(own),opCost=r2(E+P+O),op=r2(inc-opCost),full=r2(op-M-W),hr=min/60;
-  return{tx,jr,ins,inc,min,hr,km,kmKnown,n,energy:E,eReal:r2(en.real),eEst:r2(en.est),pass:P,other:O,maint:M,own:W,emode:en.mode,passInfo,ownInfo,opCost,op,full,days,sh,lReg:en.lReg,kReg:en.kReg,litersEst:en.litersEst,kwhEst:en.kwhEst,k}}
+  const E=r2(en.real),P=r2(pass),O=r2(other),M=r2(maint),W=r2(own),opCost=r2(E+P+O),op=r2(inc-opCost),full=r2(op-M-W),hr=min/60,estFuel=r2(en.est),opEst=r2(op-estFuel);
+  return{tx,jr,ins,inc,min,hr,km,kmKnown,n,energy:E,eReal:E,eEst:estFuel,estFuel,opEst,pass:P,other:O,maint:M,own:W,emode:en.mode,passInfo,ownInfo,opCost,op,full,days,sh,lReg:en.lReg,kReg:en.kReg,litersEst:en.litersEst,kwhEst:en.kwhEst,k}}
 /* estatísticas de um app (Uber ou 99) no período [f,t] */
 function AS(a,f,t){return stats([a],f,t,shareOf(a,f,t),true)}
 /* consolidado Uber + 99 + gastos gerais do veículo, sem duplicar lançamentos */
@@ -1509,23 +1604,28 @@ function forecast(){const t=TODAY(),me=monthEnd(t),rem=dDiff(t,me),cash=cashNow(
   const base=free==null?null:free-bills-passes,z=1.28*sd*Math.sqrt(rem);
   return{t,me,rem,cash,reserved,free,N,mean,sd,conf,est,bills,covered,passes,occs,prob:base==null?null:base+est,cons:N>=14&&base!=null?base+est-z:null,opt:N>=14&&base!=null?base+est+z:null,ws}}
 
-/* ============ PRODUTIVIDADE POR HORÁRIO ============
-   Horas e km vêm dos períodos informados. Ganhos antigos com horário entram na hora registrada;
-   ganhos diários sem horário são distribuídos pelos períodos do mesmo dia (estimativa) ou ficam "sem horário". */
-const BANDS=[['Madrugada',0,5],['Manhã',6,11],['Tarde',12,17],['Noite',18,23]],DOW=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-function jrSplit(j){const out=[],km=jrKm(j),iv=jrIntervals(j),tot=iv.reduce((s,[a,b])=>s+b-a,0);
-  iv.forEach(([s,e,fac])=>{let x=s;while(x<e){const nx=Math.min(e,(Math.floor(x/60)+1)*60),mins=nx-x;out.push({d:addD(j.d,Math.floor(x/1440)),h:Math.floor(x/60)%24,min:mins*fac,km:km!=null&&tot?km*mins/tot:0});x=nx}});return out}
-function prod(apps,f,t){const k=ckm().total,mk=()=>({inc:0,min:0,km:0,days:new Set()}),H=[...Array(24)].map(mk),D=[...Array(7)].map(mk),U=mk();let incEst=0;
-  const jrs=db.jr.filter(j=>apps.includes(j.app)&&inR(j.d,f,t));
-  jrs.forEach(j=>{const w=pd(j.d).getDay(),m=jrMin(j),km=jrKm(j)||0;if(hasAct(j)){D[w].min+=m;D[w].km+=km;D[w].days.add(j.d)}
-    const sp=jrSplit(j);if(sp.length)sp.forEach(p=>{H[p.h].min+=p.min;H[p.h].km+=p.km;H[p.h].days.add(p.d)});else if(m>0){U.min+=m;U.km+=km;U.days.add(j.d)}});
-  db.tx.filter(x=>x.type==='in'&&apps.includes(appOf(x))&&inR(x.d,f,t)).forEach(x=>{const w=pd(x.d).getDay();D[w].inc+=x.v;D[w].days.add(x.d);
-    if(x.h!=null){H[(x.h||0)%24].inc+=x.v;H[(x.h||0)%24].days.add(x.d);return}
-    const sp=jrs.filter(j=>j.app===appOf(x)&&j.d===x.d).flatMap(jrSplit),tm=sp.reduce((s,p)=>s+p.min,0);
-    if(tm>0){sp.forEach(p=>{H[p.h].inc+=x.v*p.min/tm});incEst+=x.v}else{U.inc+=x.v;U.days.add(x.d)}});
-  const fin=o=>{o.cost=o.km*k;o.net=o.inc-o.cost;o.hr=o.min/60;o.nph=o.hr>0?o.net/o.hr:null;o.obs=o.days.size;return o};
-  H.forEach(fin);D.forEach(fin);fin(U);const B=BANDS.map(([n,a,b])=>{const o={n,...mk()};for(let h=a;h<=b;h++){o.inc+=H[h].inc;o.min+=H[h].min;o.km+=H[h].km;H[h].days.forEach(d=>o.days.add(d))}return fin(o)});
-  return{H,D,B,U,k,incEst}}
+/* ============ PRODUTIVIDADE (resumo consolidado do período) ============
+   Faturamento, despesas e lucro operacional vêm de CS(f,t): a mesma conta do Início e de Relatórios.
+   Lucro/h = lucro operacional dos dias COM horas informadas ÷ horas desses dias (dias sem horas não inflam a média).
+   Horas de Uber e 99 no mesmo dia seguem driverMin (sem contar duas vezes quando você marca que trabalhou nos dois ao mesmo tempo). */
+const DOW=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+function prodSum(f,t,apps){apps=apps||['uber','n99'];const both=apps.length>1,S=(a,b)=>both?CS(a,b):AS(apps[0],a,b),c=S(f,t),ds=new Set();
+  db.tx.forEach(x=>{if(x.type==='in'&&apps.includes(appOf(x))&&inR(x.d,f,t))ds.add(x.d)});
+  db.jr.forEach(j=>{if(apps.includes(j.app)&&inR(j.d,f,t)&&(hasAct(j)||jrMin(j)>0))ds.add(j.d)});
+  const days=[...ds].sort().map(d=>{const x=S(d,d);return{d,inc:x.inc,op:x.op,min:x.min}}),wh=days.filter(x=>x.min>0);
+  const hMin=wh.reduce((s,x)=>s+x.min,0),hOp=r2(wh.reduce((s,x)=>s+x.op,0)),D=DOW.map(()=>({n:0,inc:0,op:0,min:0,hOp:0}));
+  days.forEach(x=>{const o=D[pd(x.d).getDay()];o.n++;o.inc+=x.inc;o.op+=x.op;o.min+=x.min;if(x.min>0)o.hOp+=x.op});
+  D.forEach(o=>{o.nph=o.min>0?o.hOp/(o.min/60):null});
+  const off=Object.keys(db.off||{}).filter(d=>inR(d,f,t)&&isOff(d)&&!ds.has(d)).length;
+  return{f,t,c,days,n:days.length,hd:wh.length,noH:days.length-wh.length,min:hMin,hOp,nph:hMin>0?hOp/(hMin/60):null,avg:wh.length?hMin/wh.length:null,D,off}}
+
+/* Revisão de horas antigas: o campo único de horas aceitava "6,30", que era lido como 6,3 h = 6h18min.
+   Só sugerimos correção quando o resto em minutos é exatamente o que essa leitura produziria (18 → 30, 9 → 15, 27 → 45…);
+   nada muda sem a confirmação do usuário, e o valor original fica guardado em minOrig. */
+function hrsSuspect(j){if(j.v!==2||j.hrsOk||j.src||(j.periods||[]).length)return null;const m=Math.round(+j.min||0),r=m%60;if(!(m>0)||!r)return null;
+  const T=Math.round(r/0.6);if(T>59||T===r||T===50||T%5||Math.round(T*0.6)!==r)return null;return{was:m,to:Math.floor(m/60)*60+T}}
+const hrsReview=()=>db.jr.map(j=>({j,s:hrsSuspect(j)})).filter(x=>x.s).sort((a,b)=>b.j.d.localeCompare(a.j.d));
+function hrsFix(id,ok){const j=db.jr.find(x=>x.id===id),s=j&&hrsSuspect(j);if(!s)return;if(ok){j.minOrig=s.was;j.min=s.to}j.hrsOk=true;j.at=Date.now();Store.save()}
 </script>
 <script>
 /* ============ COMPONENTES COMPARTILHADOS ============ */
@@ -1534,7 +1634,7 @@ const mark=()=>{db.days[TODAY()]=true}; // mantém o histórico de dias ativos (
 const dateLabel=()=>{const s=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});return s.charAt(0).toUpperCase()+s.slice(1)};const net=d=>sum(db.tx.filter(t=>t.d===d&&t.type==='in'))-sum(db.tx.filter(t=>t.d===d&&t.type!=='in'));
 const dailyGoals=()=>db.goals.filter(g=>g.kind==='dia');
 const goalsDone=()=>dailyGoals().filter(g=>g.last===TODAY()).length;
-const hm=m=>Math.floor(m/60)+'h '+String(Math.round(m%60)).padStart(2,'0')+'min';
+const hm=fmtDur;
 const empt=t=>`<p class="empty">${t}</p>`;
 const del=(col,id)=>`<button type="button" class="x" data-del="${col}:${id}" aria-label="Remover">✕</button>`;
 const edt=id=>`<button type="button" class="x" data-edit="${id}" aria-label="Editar">✎</button>`;
@@ -1542,7 +1642,8 @@ const seg=(attr,cur,opts)=>`<div class="seg" role="group">${Object.entries(opts)
 const rseg=(name,cur,opts)=>`<div class="seg" role="radiogroup">${Object.entries(opts).map(([k,n])=>`<label><input type="radio" name="${name}" value="${k}" ${k===cur?'checked':''}>${n}</label>`).join('')}</div>`;
 const kpi=(h,v,sub,cls)=>`<div class="kpi ${cls||''}"><h5>${h}</h5><div class="v">${v}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>`;
 const EST='<span class="tag est">estimado</span>',REG='<span class="tag ok">registrado</span>';
-const emTag=m=>m==='real'?REG:m==='est'?EST:m==='mixed'?REG+' '+EST:'<span class="tag">sem dados</span>';
+const emTag=m=>m==='real'?REG:m==='est'?'<span class="tag est">só estimado, fora da conta</span>':'<span class="tag">sem registro</span>';
+const estLine=s=>s.estFuel>0?`<small style="display:block;margin-top:6px;color:var(--tx2)">Sem abastecimento registrado no período. Com ${fuelTerm().toLowerCase()} estimado por km (${brl(s.estFuel)}): <b>${brl(s.opEst)}</b> (estimativa)</small>`:'';
 /* linha de composição: rótulo | barra proporcional | valor (grid; o valor desce de linha em telas estreitas) */
 const crow=(label,v,total,cls)=>{const p=total>0?clamp(v/total*100,0,100):0;return`<div class="crow ${cls||''}"><span class="cl">${label}</span><span class="cbar" aria-hidden="true"><i style="width:${p.toFixed(1)}%"></i></span><span class="cv">${brl(v)}</span></div>`};
 const CAR_ICON='<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13l2-5.5A2 2 0 0 1 6.9 6h10.2a2 2 0 0 1 1.9 1.5L21 13v4a1 1 0 0 1-1 1h-1.5M3 13v4a1 1 0 0 0 1 1h1.5M3 13h18M8.5 18h7"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>';
@@ -1595,8 +1696,9 @@ function jrForm(a,d){const ex=db.jr.filter(j=>j.app===a&&j.d===d),one=ex.length=
   const trL=ex.map(jrTrips).filter(x=>x!=null),kmL=ex.map(jrKm).filter(x=>x!=null),mode=one&&one.kmSrc==='odo'?'odo':kmL.length?'total':'none',notes=ex.map(j=>j.notes).filter(Boolean).join(' · ');
   return`<form data-form="jr" novalidate data-kmmode="${mode}"><input type="hidden" name="app" value="${a}">
    <div class="row wrap"><div class="f"><label>Data</label><input name="d" type="date" value="${d}" max="${TODAY()}" data-pdate required></div>
-   <div class="f"><label>Horas trabalhadas no dia</label><input name="hours" inputmode="decimal" autocomplete="off" placeholder="Ex.: 6 ou 6:30" value="${min?fmtH(min):''}" ${per.length?'readonly':''}></div>
+   <div class="f"><label id="jr-h-l">Horas trabalhadas no dia</label><div class="durrow" role="group" aria-labelledby="jr-h-l"><input name="hh" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" placeholder="0" aria-label="Horas" value="${min?Math.floor(min/60):''}" ${per.length?'readonly':''} data-dur><span>h</span><input name="mm" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" placeholder="00" aria-label="Minutos" value="${min?String(min%60).padStart(2,'0'):''}" ${per.length?'readonly':''} data-dur><span>min</span></div><small class="sub" data-durout>${min?'Total: '+fmtDur(min):'Ex.: 6 h e 30 min'}</small></div>
    <div class="f"><label>Viagens (opcional)</label><input name="trips" inputmode="numeric" autocomplete="off" value="${trL.length?trL.reduce((s,x)=>s+x,0):''}"></div></div>
+   ${(()=>{const o=a==='uber'?'n99':'uber',om=db.jr.filter(j=>j.app===o&&j.d===d).reduce((s,j)=>s+jrMin(j),0);return om>0?`<label class="chkl"><input type="checkbox" name="overlap" value="1" ${one&&one.overlap?'checked':''}> São as mesmas horas da jornada na ${APPS[o].n} (${fmtDur(om)}): os dois apps ficaram ligados ao mesmo tempo</label>`:''})()}
    <details class="sec" ${per.length?'open':''}><summary>Adicionar período (opcional)</summary><p class="note" style="margin-top:0">Use se trabalhou em intervalos separados, por exemplo 15h–17h e 19h–23h. O total é calculado sem contar sobreposições.</p>
     <div class="periods">${per.map(p=>periodRow(p)).join('')}</div><button type="button" class="btn ghost sm" data-addper>+ Adicionar período</button> <span class="sub" data-pertotal>${per.length?'Total: '+hm(unionMin(per)):''}</span></details>
    <div class="f" style="margin-top:12px"><label>Quilometragem (opcional)</label>${rseg('kmMode',mode,{none:'Não informar',total:'Total do dia',odo:'Hodômetro'})}</div>
@@ -1673,7 +1775,7 @@ hoje(){
    <div class="rs">
     <div class="rs-main"><small>Faturamento ${hper==='d'?'de hoje':'no período'} · Uber + 99</small><b>${brl(cs.inc)}</b><div class="rs-split"><span><span class="idn uber" aria-hidden="true"></span>Uber ${brl(u.inc)}</span><span><span class="idn n99" aria-hidden="true"></span>99 ${brl(n.inc)}</span></div></div>
     <div><small>Despesas lançadas</small><b>${brl(cs.expTot)}</b><small style="margin:6px 0 0">combustível, manutenção, outros e passes</small></div>
-    <div><small>Lucro operacional</small><b class="${cs.op>0?'pos':cs.op<0?'neg':''}">${brl(cs.op)}</b><small style="margin:6px 0 0">faturamento − combustível, passes e outros · ${fuelTerm().toLowerCase()} ${emTag(cs.emode)}</small></div>
+    <div><small>Lucro operacional</small><b class="${cs.op>0?'pos':cs.op<0?'neg':''}">${brl(cs.op)}</b><small style="margin:6px 0 0">faturamento − despesas registradas (${fuelTerm().toLowerCase()}, passes e outros) · ${fuelTerm().toLowerCase()} ${emTag(cs.emode)}</small>${estLine(cs)}</div>
     <div class="gl"><small>Meta de faturamento de hoje</small>${gp.has?`<b>${pctTxt(gp.pct)}${gp.over?' <span class="pill">superada</span>':''}</b><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(gp.bar)}" aria-label="Atingimento da meta de faturamento"><i style="width:${gp.bar}%;background:${gColor(gp.pct/100)}"></i></div><small style="margin:6px 0 0">Realizado ${brl(ct.inc)} de ${brl(g)} · ${gp.hit?(gp.over?'superou em '+brl(r2(ct.inc-g)):'meta alcançada'):'faltam '+brl(r2(g-ct.inc))}</small>`:`<b>—</b><small style="margin:6px 0 0"><button type="button" class="lnk" data-go="metas">Definir meta de faturamento</button></small>`}
      ${lp&&lp.has?`<small style="margin:10px 0 0;color:var(--tx2)">Meta de lucro: ${pctTxt(lp.pct)} · ${brl(ct.op)} de ${brl(+lg.target)}</small>`:''}</div>
    </div>
@@ -1702,6 +1804,7 @@ return `<div class="daynav"><button type="button" class="nb" data-pday="-1" aria
  ${kpi('Faturamento bruto',brl(s.inc),cx(s.inc,p.inc,{good:1}),'hl')}
  ${kpi('Custos operacionais',brl(s.opCost),fuelTerm().toLowerCase()+' '+emTag(s.emode)+'<br>'+cx(s.opCost,p.opCost,{good:-1}))}
  ${kpi('Lucro operacional',`<span class="${s.op>=0?'pos':'neg'}">${brl(s.op)}</span>`,cx(s.op,p.op,{good:1}),'hl')}
+ ${s.estFuel>0?kpi(fuelTerm()+' estimado',brl(s.estFuel),num(s.km,1)+' km × '+brl(s.k.total)+'/km · fora do lucro; registre o abastecimento'):''}
  ${kpi('Resultado completo',`<span class="${s.full>=0?'pos':'neg'}">${brl(s.full)}</span>`,'com manutenção e custos fixos')}
  ${kpi('Tempo online',s.min>0?hm(s.min):'—',s.min>0?cx(s.min,p.min>0?p.min:0,{fmt:hm}):'informe as horas na jornada')}
  ${kpi('Viagens',s.n!=null?s.n:'—',s.n!=null?cx(s.n,p.n,{fmt:x=>String(x)}):'opcional')}
@@ -1714,9 +1817,9 @@ return `<div class="daynav"><button type="button" class="nb" data-pday="-1" aria
 <div class="c s6" id="reg"><h3>Registrar · ${fmtD(d)}</h3>${seg('lm',lm,{in:'Ganho',jr:'Jornada',out:'Gasto'})}<div style="margin-top:14px">${lm==='jr'?jrForm(a,d):lm==='out'?expForm(a,d,false):incForm(a,d,false)}</div></div>
 <div class="c s6"><h3>Registros de ${fmtD(d)}</h3><div class="list">${dayJr.map(j=>`<div class="it tx"><div class="g">Jornada${jrMin(j)?' · '+hm(jrMin(j)):''}${jrTrips(j)!=null?' · '+jrTrips(j)+' viagens':''}${jrKm(j)!=null?' · '+num(jrKm(j),1)+' km':''} ${j.src==='uber_api'||j.tripsSrc==='uber_api'?SRC_UBER:''}<small>${jrPeriods(j).map(x=>x.s+'–'+x.e).join(', ')||'sem períodos'}${j.kmTrips?' · '+num(j.kmTrips,1)+' km em viagens (Uber)':''}${j.notes?' · '+esc(j.notes):''}</small></div><button type="button" class="x" data-editjr="${j.d}" aria-label="Editar jornada">✎</button>${del('jr',j.id)}</div>`).join('')}${dayTx.map(txRow).join('')}${!dayJr.length&&!dayTx.length?empt('Nenhum registro neste dia.'):''}</div></div>
 <div class="c s8"><h3>Composição dos custos do dia</h3>
- <div class="stats" style="margin-bottom:14px"><div><small>${fuelTerm()}</small><b>${brl(s.energy)}</b><small>${s.emode==='real'?'Valor real registrado':s.emode==='est'?'Estimativa por km':'Sem custo calculado'}</small></div><div><small>Passes rateados</small><b>${brl(s.pass)}</b><small>Divididos entre os dias trabalhados na validade</small></div><div><small>Outros gastos</small><b>${brl(s.other)}</b></div></div>
+ <div class="stats" style="margin-bottom:14px"><div><small>${fuelTerm()}</small><b>${brl(s.energy)}</b><small>${s.emode==='real'?'Valor registrado':s.emode==='est'?'Nada registrado (estimativa à parte: '+brl(s.estFuel)+')':'Nada registrado'}</small></div><div><small>Passes rateados</small><b>${brl(s.pass)}</b><small>Divididos entre os dias trabalhados na validade</small></div><div><small>Outros gastos</small><b>${brl(s.other)}</b></div></div>
  ${crow('<b>Custos operacionais</b>',s.opCost,tc,'tot')}${crow('Manutenção',s.maint,tc)}${crow('Custos fixos <small>(parcela, seguro, IPVA…)</small>',s.own,tc)}
- <p class="note">${s.emode==='real'?`${fuelTerm()} = abastecimentos/recargas registrados neste dia (a estimativa por km não é somada).`:s.emode==='est'?`${fuelTerm()} estimado(a): ${num(s.km,1)} km × ${brl(k.total)}/km (consumo e preço configurados). Registre o abastecimento para usar o valor real.`:`Sem km nem abastecimento/recarga registrados: o custo de ${fuelTerm().toLowerCase()} não foi calculado.`}${s.sh<1&&s.sh>0?` Gastos gerais: ${num(s.sh*100,0)}% atribuídos ao ${A.n}.`:''}</p></div>
+ <p class="note">${s.emode==='real'?`${fuelTerm()} = abastecimentos/recargas registrados no dia.`:s.emode==='est'?`Nenhum abastecimento registrado no dia. Estimativa à parte: ${num(s.km,1)} km × ${brl(k.total)}/km = ${brl(s.estFuel)}, que não entra nos custos acima.`:`Nenhum abastecimento/recarga registrado no dia.`}${s.sh<1&&s.sh>0?` Gastos gerais: ${num(s.sh*100,0)}% atribuídos ao ${A.n}.`:''}</p></div>
 <div class="c s4"><h3>Pacote de passe · ${A.n}</h3><div class="row wrap"><div class="f"><label>Situação</label><select data-cfgk="pass.${a}.on"><option value="1" ${cfg().pass[a]&&cfg().pass[a].on?'selected':''}>Ativo</option><option value="0" ${cfg().pass[a]&&cfg().pass[a].on?'':'selected'}>Não uso</option></select></div></div>
 <div class="f"><label>Pacote contratado</label><select data-passpkg="${a}">${PASS_CATALOG[a].map(o=>`<option value="${o.id}" ${selectedPass(a).id===o.id?'selected':''}>${o.label} · ${brl(o.price)}</option>`).join('')}</select></div>
 <div class="scope" style="margin-top:8px"><b>Como é rateado:</b> ${brl(selectedPass(a).price)} com ${selectedPass(a).days} dia(s) de validade. O custo operacional divide o pacote entre os dias <b>com atividade</b> no ${A.n} dentro da validade: trabalhando todos os dias, ${brl(selectedPass(a).price/selectedPass(a).days)}/dia; dia sem registro não recebe custo.</div>
@@ -1776,7 +1879,7 @@ financas(){
   <div class="grid">${cmpCard}
   <div class="c s3 k2"><h3>Faturamento registrado</h3><div class="big">${brl(cs.inc)}</div><div class="sub">Uber + 99 no período</div></div>
   <div class="c s3 k2"><h3>Gastos registrados</h3><div class="big">${brl(cs.expTot)}</div><div class="sub">combustível, manutenção, outros e passes</div></div>
-  <div class="c s3 k2"><h3>Lucro operacional</h3><div class="big ${cs.op>=0?'pos':'neg'}">${brl(cs.op)}</div><div class="sub">energia ${emTag(cs.emode)}</div></div>
+  <div class="c s3 k2"><h3>Lucro operacional</h3><div class="big ${cs.op>=0?'pos':'neg'}">${brl(cs.op)}</div><div class="sub">só despesas registradas ${emTag(cs.emode)}</div>${estLine(cs)}</div>
   <div class="c s3 k2"><h3>Resultado completo</h3><div class="big ${cs.full>=0?'pos':'neg'}">${brl(cs.full)}</div><div class="sub">com manutenção e custos fixos · <button type="button" class="lnk" data-own>configurar custos fixos</button></div></div>
   <div class="c s12"><div class="stats">
    <div><small>Dias trabalhados</small><b>${N}</b></div><div><small>Faturamento nos dias trabalhados</small><b>${brl(cs.wdInc)}</b></div>
@@ -1785,9 +1888,9 @@ financas(){
    <p class="note">Dia trabalhado = dia com faturamento ou jornada registrada. Uber e 99 no mesmo dia contam como um dia; dias só com despesas não contam.</p></div>
   <div class="c s6"><h3>Para onde vai o dinheiro</h3>${ct>0?cat.map(x=>crow(x[0],x[1],ct)).join('')+crow('<b>Total de gastos</b>',ct,ct,'tot'):empt('Nenhum gasto registrado no período.')}<p class="note">Pagamentos de contas a pagar não entram aqui; eles aparecem em Contas.</p></div>
   <div class="c s6"><h3>Como o resultado é calculado</h3>
-   ${crow('Faturamento',cs.inc,Math.max(cs.inc,1))}${crow(`− Combustível/energia ${emTag(cs.emode)}`,cs.energy,Math.max(cs.inc,1))}${crow('− Passes (rateados)',cs.pass,Math.max(cs.inc,1))}<div class="note" style="margin-top:8px"><b>Detalhamento do rateio dos passes</b><br>${cs.passInfo.length?cs.passInfo.map(p=>esc(p.label)+' ('+fmtD(p.start)+' a '+fmtD(p.end)+'): '+brl(p.price)+(p.idle?' sem dia trabalhado na validade, lançado na data de início':' ÷ '+p.work+' dia(s) trabalhado(s) na validade = '+brl(p.daily)+'/dia')+' × '+p.used+' dia(s) no período = '+brl(p.amount)).join('<br>'):'Nenhum passe com custo atribuído ao período selecionado.'}<br>Total de passes rateados: ${brl(cs.pass)}. Cada passe é dividido entre os dias com atividade no app dentro da validade; dias sem registro não recebem custo de passe.</div>${crow('− Outros gastos',cs.other,Math.max(cs.inc,1))}
+   ${crow('Faturamento',cs.inc,Math.max(cs.inc,1))}${crow(`− Combustível/energia registrado`,cs.energy,Math.max(cs.inc,1))}${crow('− Passes (rateados)',cs.pass,Math.max(cs.inc,1))}<div class="note" style="margin-top:8px"><b>Detalhamento do rateio dos passes</b><br>${cs.passInfo.length?cs.passInfo.map(p=>esc(p.label)+' ('+fmtD(p.start)+' a '+fmtD(p.end)+'): '+brl(p.price)+(p.idle?' sem dia trabalhado na validade, lançado na data de início':' ÷ '+p.work+' dia(s) trabalhado(s) na validade = '+brl(p.daily)+'/dia')+' × '+p.used+' dia(s) no período = '+brl(p.amount)).join('<br>'):'Nenhum passe com custo atribuído ao período selecionado.'}<br>Total de passes rateados: ${brl(cs.pass)}. Cada passe é dividido entre os dias com atividade no app dentro da validade; dias sem registro não recebem custo de passe.</div>${crow('− Outros gastos',cs.other,Math.max(cs.inc,1))}
    ${crow('<b>= Lucro operacional</b>',cs.op,Math.max(cs.inc,1),'tot')}${crow('− Manutenção',cs.maint,Math.max(cs.inc,1))}${crow('− Custos fixos do veículo',cs.own,Math.max(cs.inc,1))}<div class="note" style="margin-top:8px"><b>Detalhamento dos custos fixos</b><br>${cs.ownInfo.parts.map(p=>esc(p.name)+': '+brl(p.value)+'/mês → '+brl(p.amount)+' no período').join('<br>')}<br>IPVA/licenciamento: ${brl(+((cfg().own||{}).ipva)||0)}/ano → ${brl(cs.ownInfo.ipva)} no período.<br><b>Total rateado: ${brl(cs.ownInfo.total)} × participação do app/veículo (${num(cs.sh*100,1)}%) = ${brl(cs.own)}</b><br>Fórmula mensal: ${cs.ownInfo.months.map(m=>fmtD(m.month+'-01').slice(3)+' ('+m.days+'/'+m.dim+' dias)').join(' + ')}. Cada custo mensal é valor mensal × dias selecionados ÷ dias reais do mês; mês completo equivale exatamente ao valor cadastrado. Seguro vazio = R$ 0,00.</div>${crow('<b>= Resultado completo</b>',cs.full,Math.max(cs.inc,1),'tot')}
-   <p class="note">Energia calculada dia a dia: nos dias com abastecimento/recarga registrado vale o valor real (${brl(cs.eReal)}); nos demais dias com km, estimativa por km × consumo e preço configurados (${brl(cs.eEst)}). Real e estimativa nunca são somados no mesmo dia.</p></div>
+   <p class="note">O lucro operacional usa só o que foi registrado: ${fuelTerm().toLowerCase()} ${brl(cs.energy)}. ${cs.estFuel>0?`Sem abastecimento registrado no período, o NESC estima ${brl(cs.estFuel)} (${num(cs.km,0)} km × ${brl(cs.k.total)}/km) e mostra à parte: lucro estimado ${brl(cs.opEst)}.`:'Quando há abastecimento registrado no período, nenhuma estimativa por km é calculada, para não contar o combustível duas vezes.'}</p></div>
   <div class="c s6"><div class="mhead"><h3 style="margin:0">Contas a pagar</h3><button type="button" class="btn sm" data-addbill>Adicionar conta</button></div>
    ${db.bills.length?`<div class="stats" style="margin:12px 0"><div><small>Pendente (vencidas e próximos 30 dias)</small><b>${brl(pend)}</b></div><div><small>Contas cadastradas</small><b>${db.bills.length}</b></div></div>
    <div class="list">${due.slice(0,6).map(o=>`<div class="it"><div class="g">${esc(o.b.name)} <span class="tag ${o.st==='vencida'?'bad':o.st==='parcial'?'warn':''}">${o.st}</span><small>vence ${fmtD(o.o)} · ${brl(o.rem)}${o.paid?' (pago '+brl(o.paid)+')':''}${o.b.rec!=='unica'?' · '+REC[o.b.rec].toLowerCase():''}</small></div><button type="button" class="btn sm" data-paybtn="${o.b.id}|${o.o}">Registrar pagamento</button></div>`).join('')||empt('Nenhuma conta pendente nos próximos 30 dias.')}</div>
@@ -1802,20 +1905,33 @@ financas(){
     <p class="note">Saldo livre − contas pendentes (${brl(fc.bills)}) − passes previstos (${brl(fc.passes)})${fc.N>=7?' + média diária dos lançamentos ('+brl(fc.mean)+' × '+fc.rem+' dias, estimativa)':''}. Base: ${fc.N} dia(s), confiança ${fc.conf}. Previsão não é garantia.</p>`}</div>
   </div>`},
 produtividade(){
-  const t=TODAY(),f=pper==='all'?(db.tx.map(x=>x.d).concat(db.jr.map(x=>x.d)).sort()[0]||t):addD(t,-(+pper-1)),P=prod(['uber','n99'],f,t),U=prod(['uber'],f,t),N=prod(['n99'],f,t);
-  const nph=o=>o.nph!=null?brl(o.nph)+'/h':'—',few=o=>o.obs<3?' <span class="tag warn">amostra pequena</span>':'';
-  const best=P.B.filter(o=>o.obs>=3&&o.nph!=null&&o.hr>0).sort((a,b)=>b.nph-a.nph).slice(0,3),mxB=Math.max(1,...P.H.map(o=>Math.abs(o.nph||0)));
-  return`<div class="finbar">${seg('pper',pper,{'30':'30 dias','90':'90 dias','all':'Tudo'})}<span class="sub">Período analisado: ${fmtD(f)} – ${fmtD(t)}</span></div><div class="grid">
-  <div class="c s12"><h3>Faixas do dia · Uber + 99</h3><div class="scrollx"><div class="kv" style="grid-template-columns:repeat(6,auto);min-width:560px"><span><b>Faixa</b></span><span><b>Faturamento</b></span><span><b>Custos (energia)</b></span><span><b>Horas</b></span><span><b>Lucro/h</b></span><span><b>Observações</b></span>
-   ${P.B.map(b=>`<span>${b.n}</span><span>${brl(b.inc)}</span><span>${brl(b.cost)}</span><span>${hm(b.min)}</span><span>${nph(b)}</span><span>${b.obs} dia(s)${few(b)}</span>`).join('')}
-   <span>Sem horário</span><span>${brl(P.U.inc)}</span><span>${brl(P.U.cost)}</span><span>${hm(P.U.min)}</span><span>${nph(P.U)}</span><span>${P.U.obs} dia(s)</span></div></div>
-   <p class="note">Horas por faixa vêm dos períodos informados na jornada. Ganhos diários sem horário são distribuídos pelos períodos do mesmo dia ${P.incEst?'('+brl(P.incEst)+' distribuídos, estimativa)':''}; sem períodos, ficam em "Sem horário". Custos = km × ${brl(P.k)}/km ${EST}.</p></div>
-  <div class="c s6"><h3>Uber × 99 · lucro por hora</h3><div class="kv" style="grid-template-columns:minmax(0,auto) minmax(0,1fr) minmax(0,1fr)"><span></span><span style="color:var(--uber)"><b>Uber</b></span><span style="color:var(--n99)"><b>99</b></span>${BANDS.map((b,i)=>`<span>${b[0]}</span><span>${nph(U.B[i])}${few(U.B[i])}</span><span>${nph(N.B[i])}${few(N.B[i])}</span>`).join('')}</div></div>
-  <div class="c s6"><h3>Por dia da semana</h3>${P.D.map((d,i)=>`<div class="hb"><span>${DOW[i]}</span><div style="flex:1;font-size:.78rem;color:var(--mut)">${brl(d.inc)} · ${hm(d.min)} · ${d.obs} dia(s)</div><span>${nph(d)}</span></div>`).join('')}</div>
-  <div class="c s8"><h3>Lucro por hora, hora a hora</h3>${P.H.some(o=>o.nph!=null)?P.H.map((o,h)=>o.nph==null?'':`<div class="hb"><span>${String(h).padStart(2,'0')}h</span><div class="bar"><i style="width:${Math.abs(o.nph)/mxB*100}%;background:${o.nph<0?'var(--bad)':'#fff'}"></i></div><span>${nph(o)}</span></div>`).join(''):empt('Informe períodos de trabalho na jornada para ver o lucro por hora ao longo do dia.')}<p class="note">Ganhos antigos lançados com horário entram na hora registrada; se o total de várias horas foi lançado de uma vez, aquela hora parece mais rentável. Por isso o ranking ao lado usa faixas do dia.</p></div>
-  <div class="c s4"><h3>Faixas historicamente mais rentáveis</h3>${best.length?best.map((o,i)=>`<div class="alert"><span class="tag ok">${i+1}º</span><div class="g">${o.n}<small style="display:block;color:var(--mut)">${nph(o)} · ${o.obs} dias observados</small></div></div>`).join(''):empt('Ainda não há faixas com pelo menos 3 dias de observação.')}<p class="note">Baseado só nos seus registros. Não representa a demanda das plataformas.</p></div>
+  const t=TODAY(),f=pper==='all'?(db.tx.map(x=>x.d).concat(db.jr.map(x=>x.d)).sort()[0]||t):pper==='m'?t.slice(0,8)+'01':addD(t,-(+pper-1)),P=prodSum(f,t),c=P.c,U=prodSum(f,t,['uber']),N=prodSum(f,t,['n99']),rv=hrsReview();
+  const nph=o=>o.nph!=null?brl(o.nph)+'/h':'<span class="mutd">Sem dados de horas</span>',dur=m=>m>0?fmtDur(m):'<span class="mutd">não informado</span>';
+  const tile=(l,v,sm,cl)=>`<div class="pt${cl?' '+cl:''}"><small>${l}</small><b>${v}</b>${sm?`<span>${sm}</span>`:''}</div>`;
+  const review=rv.length?`<div class="c s12 remind" id="hrs-review"><div class="g"><b>Revise ${rv.length===1?'1 jornada com horas':rv.length+' jornadas com horas'} possivelmente lidas errado</b><small>Antes, "6,30" no campo de horas era lido como 6,3 h (6h18min). Confirme cada caso: nada é alterado sem a sua escolha.</small>
+    <div class="list" style="margin-top:10px">${rv.slice(0,8).map(({j,s})=>`<div class="it" style="flex-wrap:wrap"><div class="g">${fmtD(j.d)} · ${j.app==='n99'?'99':'Uber'}<small>Registrado: ${fmtDur(s.was)}. Se você digitou ${Math.floor(s.was/60)},${String(s.to%60).padStart(2,'0')} querendo dizer ${fmtDur(s.to)}, corrija.</small></div><div class="row" style="flex:0 0 auto;gap:6px"><button type="button" class="btn sm" data-hrsfix="${j.id}:1">Corrigir para ${fmtDur(s.to)}</button><button type="button" class="btn ghost sm" data-hrsfix="${j.id}:0">Manter ${fmtDur(s.was)}</button></div></div>`).join('')}</div>${rv.length>8?`<small>Mais ${rv.length-8} depois destas.</small>`:''}</div></div>`:'';
+  if(!P.n)return`<div class="finbar">${seg('pper',pper,{'7':'7 dias','30':'30 dias','m':'Mês atual','90':'90 dias','all':'Tudo'})}<span class="sub">${fmtD(f)} – ${fmtD(t)}</span></div><div class="grid">${review}<div class="c s12"><h3>Resumo do período</h3>${empt('Nenhum registro de ganhos ou jornada neste período.'+(P.off?' '+P.off+' dia(s) confirmado(s) como folga.':''))}</div></div>`;
+  return`<div class="finbar">${seg('pper',pper,{'7':'7 dias','30':'30 dias','m':'Mês atual','90':'90 dias','all':'Tudo'})}<span class="sub">${fmtD(f)} – ${fmtD(t)}</span></div><div class="grid">${review}
+  <div class="c s12"><h3>Resumo do período · Uber + 99</h3><div class="ptiles">
+   ${tile('Dias registrados',P.n,P.off?P.off+' folga(s) confirmada(s)':'')}
+   ${tile('Faturamento',brl(c.inc))}
+   ${tile('Despesas operacionais',brl(c.opCost),'combustível registrado, passes e outros')}
+   ${tile('Lucro operacional',brl(c.op),'',c.op>=0?'pos':'neg')}
+   ${tile('Horas totais',dur(P.min),P.hd?P.hd+' dia(s) com horas'+(P.noH?' · '+P.noH+' sem':''):'')}
+   ${tile('Média por dia',P.avg!=null?fmtDur(P.avg):'<span class="mutd">Sem dados de horas</span>','nos dias com horas')}
+   ${tile('Lucro operacional por hora',nph(P),P.hd?brl(P.hOp)+' ÷ '+fmtDur(P.min):'','hl')}
+  </div>
+  <p class="note">Lucro operacional = faturamento − despesas operacionais registradas (a mesma conta do Início e de Relatórios). Lucro por hora considera só os dias com horas informadas${P.noH?`; ${P.noH} dia(s) sem horas ficam fora dessa média`:''}. Uber e 99 no mesmo dia: quando você marca que trabalhou nos dois ao mesmo tempo, as horas não são somadas duas vezes.</p></div>
+  <div class="c s6"><h3>Custos registrados × estimados</h3><div class="kv" style="grid-template-columns:minmax(0,1fr) auto">
+   <span>Combustível/energia registrado</span><b>${brl(c.energy)}</b><span>Passes (rateados)</span><b>${brl(c.pass)}</b><span>Outros gastos</span><b>${brl(c.other)}</b><span><b>Total registrado</b></span><b>${brl(c.opCost)}</b></div>
+   ${c.estFuel>0?`<div class="estbox"><small>Estimativa, fora da conta</small><b>Combustível estimado por km: ${brl(c.estFuel)}</b><span>${num(c.km,0)} km × ${brl(c.k.total)}/km. Se esse gasto existiu e não foi lançado, o lucro seria cerca de ${brl(c.opEst)}${P.min>0?' ('+brl(r2(c.opEst-(c.op-P.hOp)) / (P.min/60))+'/h)':''}.</span></div>`:`<p class="note">${c.energy>0?'Há abastecimento registrado no período, então o NESC não soma estimativa por km (evita contar o combustível duas vezes).':'Sem km informados, não há estimativa de combustível.'}</p>`}</div>
+  <div class="c s6"><h3>Uber × 99</h3><div class="kv" style="grid-template-columns:minmax(0,auto) minmax(0,1fr) minmax(0,1fr)"><span></span><span style="color:var(--uber)"><b>Uber</b></span><span style="color:var(--n99)"><b>99</b></span>
+   <span>Dias</span><span>${U.n}</span><span>${N.n}</span><span>Faturamento</span><span>${brl(U.c.inc)}</span><span>${brl(N.c.inc)}</span><span>Lucro operacional</span><span>${brl(U.c.op)}</span><span>${brl(N.c.op)}</span><span>Horas</span><span>${dur(U.min)}</span><span>${dur(N.min)}</span><span>Lucro/h</span><span>${nph(U)}</span><span>${nph(N)}</span></div>
+   <p class="note">Gastos gerais do veículo são divididos entre os apps pela participação no faturamento.</p></div>
+  <div class="c s12"><h3>Por dia da semana</h3><div class="scrollx"><div class="kv" style="grid-template-columns:repeat(5,auto);min-width:420px"><span><b>Dia</b></span><span><b>Dias</b></span><span><b>Faturamento</b></span><span><b>Horas</b></span><span><b>Lucro/h</b></span>
+   ${P.D.map((o,i)=>o.n?`<span>${DOW[i]}</span><span>${o.n}</span><span>${brl(o.inc)}</span><span>${dur(o.min)}</span><span>${nph(o)}</span>`:'').join('')}</div></div>${P.D.some(o=>o.n&&o.n<3)?'<p class="note">Dias da semana com menos de 3 registros ainda são uma amostra pequena.</p>':''}</div>
   </div>`},
-ia(){const sug=['Quanto lucrei nos últimos 7 dias?','Qual aplicativo me deu maior lucro por hora?','Quanto preciso guardar para a parcela do carro?','Estou gastando demais com combustível?','Quanto gastei com manutenção este mês?','Qual foi meu custo médio por quilômetro?','Qual é minha previsão de saldo para o final do mês?','Quais são meus horários mais rentáveis?'];
+ia(){const sug=['Quanto lucrei nos últimos 7 dias?','Qual aplicativo me deu maior lucro por hora?','Quanto preciso guardar para a parcela do carro?','Estou gastando demais com combustível?','Quanto gastei com manutenção este mês?','Qual foi meu custo médio por quilômetro?','Qual é minha previsão de saldo para o final do mês?','Quais dias da semana rendem mais por hora?'];
   return`<div class="grid"><div class="c s8"><h3>Assistente financeiro</h3><div class="chat" id="chat">${chat.length?chat.map(m=>`<div class="msg ${m.me?'me':'ai'}">${m.h}</div>`).join(''):`<div class="msg ai">Pergunte sobre seus ganhos, custos, contas e manutenção. Respondo com os números calculados pelo próprio NESC a partir dos seus registros, indicando o período usado e o que é estimativa.</div>`}</div>
    <form data-form="ask" class="row"><input name="q" placeholder="Digite sua pergunta…" aria-label="Pergunta" autocomplete="off" required><button class="btn" style="flex:0 0 auto">Perguntar</button></form>
    <div class="chips" style="margin-top:12px">${sug.map(s=>`<button type="button" data-ask="${esc(s)}" style="flex:1 1 220px;padding:9px 10px;text-align:left">${s}</button>`).join('')}</div></div>
@@ -1885,7 +2001,10 @@ manutencao(){const v=db.vehicle;
   const od=odoNow();
   return`<div class="grid">${vehCard()}${od.km==null?`<div class="c s12 remind"><div class="g"><b>Informe a quilometragem atual do veículo</b><small>Sem ela não dá para calcular quanto falta para cada revisão. Você não precisa recadastrar o veículo.</small></div><button type="button" class="btn sm" data-focusodo>Informar km</button></div>`:''}${maintSection()}</div>`},
 config(){const c=cfg(),wp=workPattern(),share=c.rankShare===true;
-  return`<div class="grid"><form class="c s6" data-form="profile" novalidate><h3>Perfil</h3><div class="f"><label for="pf-name">Nome exibido</label><input id="pf-name" name="name" value="${esc(user.name)}" autocomplete="name" required></div><p class="sub" style="margin-bottom:12px">E-mail da conta: ${esc(user.email)} · Dados: <span>${esc(Store.sync)}</span></p><div class="err" data-err></div><button class="btn">Salvar nome</button></form>
+  if(!Profile.loaded)Profile.load().then(()=>{if(tab==='config')render()});
+  return`<div class="grid"><form class="c s6" data-form="profile" novalidate><h3>Perfil</h3><div class="f"><label for="pf-name">Nome exibido</label><input id="pf-name" name="name" value="${esc(user.name)}" autocomplete="name" required></div>
+   <div class="f"><label for="pf-birth">Data de nascimento</label><input id="pf-birth" name="birth" type="date" max="${TODAY()}" min="1900-01-01" value="${esc(Profile.birth||'')}" autocomplete="bday"><small class="fhint">Opcional e privada. Ajuda a identificar a conta no suporte à recuperação de acesso. Não aparece em ranking nem para outros usuários e, sozinha, não dá acesso à conta.</small></div>
+   <p class="sub" style="margin-bottom:12px">E-mail da conta: ${esc(user.email)} · Dados: <span>${esc(Store.sync)}</span></p><div class="err" data-err></div><button class="btn">Salvar perfil</button></form>
   <div class="c s6"><h3>Dias habituais de trabalho</h3><p class="sub" style="margin:-6px 0 12px">Usados só para lembrar de registrar ganhos. Um dia sem registro nunca vira faturamento zero.</p>
    <div class="chips2" role="group" aria-label="Dias habituais">${WD.map((n,i)=>`<button type="button" data-wday="${i}" class="${wp.days.has(i)?'on':''}" aria-pressed="${wp.days.has(i)}">${n}</button>`).join('')}</div>
    <p class="note">${wp.set?'Configurado por você.':wp.enough?'Detectado automaticamente pelos seus registros das últimas 6 semanas. Toque para ajustar.':'Ainda não há registros suficientes para detectar sua rotina. Toque nos dias em que costuma trabalhar.'} ${wp.set?'<button type="button" class="lnk" data-wdauto>Voltar à detecção automática</button>':''}</p></div>
@@ -1971,7 +2090,7 @@ function askLocal(q){const s=fold(q),t=TODAY();let f,to=t,pl;
   const m=s.match(/(\d+)\s*dias?/);if(m){f=addD(t,-(+m[1]-1));pl='últimos '+m[1]+' dias'}else if(/ontem/.test(s)){f=to=addD(t,-1);pl='ontem'}else if(/hoje/.test(s)){f=t;pl='hoje'}else if(/mes passado|mes anterior/.test(s)){to=addD(t.slice(0,8)+'01',-1);f=to.slice(0,8)+'01';pl='mês anterior'}else if(/\bmes\b/.test(s)){f=t.slice(0,8)+'01';pl='mês atual'}else if(/semana/.test(s)){f=addD(t,-6);pl='últimos 7 dias'}
   const def=(d,l)=>{if(!f){f=d;pl=l}};const per=()=>`<small>Período: ${pl} (${fmtD(f)}${f!==to?' a '+fmtD(to):''}).</small>`;const perT=()=>per().replace(/<\/?small>/g,'');
   const both=()=>{const c=CS(f,to),u=AS('uber',f,to),n=AS('n99',f,to);return{u,n,c,inc:c.inc,op:c.op,km:c.km,min:c.min,cost:c.opCost,jr:c.jr.length,tx:c.tx.length,energy:c.energy,emode:c.emode,full:c.full}};
-  const emT=x=>x==='real'?'registrada':x==='est'?'estimada':x==='mixed'?'registrada + estimada':'não calculada';
+  const emT=x=>x==='real'?'registrada':x==='est'?'não registrada (só estimativa à parte)':'não registrada';
   if(/previs|final do mes|fim do mes|saldo/.test(s)){const fc=forecast();if(fc.cash==null)return'Ainda não sei seu saldo atual. Informe-o em Finanças → "Informar saldo" e eu calculo a previsão.';
     return`Previsão para ${fmtD(fc.me)}: <b>${brl(fc.prob)}</b> ${fc.N>=7?'(provável)':'(só compromissos confirmados: histórico insuficiente)'}${fc.cons!=null?`, entre ${brl(fc.cons)} e ${brl(fc.opt)}`:''}.<br>Cálculo: saldo livre ${brl(fc.free)} (saldo ${brl(fc.cash)} − reservas ${brl(fc.reserved)}) − contas ${brl(fc.bills)} − passes ${brl(fc.passes)} ${fc.N>=7?'+ média diária '+brl(fc.mean)+' × '+fc.rem+' dias':''}.<small>Base: ${fc.N} dia(s) de histórico, confiança ${fc.conf}. Previsão não é garantia; a média diária é estimativa.</small>`}
   if(/parcela|guardar|prestac/.test(s)){const r=db.reserves.find(r=>r.kind==='parcela'),b=db.bills.find(b=>b.cat==='parcela');if(!r&&!b)return'Não encontrei uma reserva do tipo "Prestação do veículo" nem uma conta do tipo "Parcela do veículo". Cadastre em Finanças para eu calcular.';
@@ -1982,11 +2101,11 @@ function askLocal(q){const s=fold(q),t=TODAY();let f,to=t,pl;
   if(/combust|gasolin|etanol|energia|recarga|gastando demais/.test(s)){def(addD(t,-29),'últimos 30 dias');const x=both(),n=dDiff(f,to)+1,pc=CS(addD(f,-n),addD(to,-n)),v=db.vehicle,c=cfg(),ml=measured('L');
     if(!x.energy)return'Não há abastecimentos registrados nem km informados nesse período, então não consigo avaliar o gasto com energia.'+per();
     const sh=x.inc?x.energy/x.inc*100:null,psh=pc.inc?pc.energy/pc.inc*100:null;
-    return`Energia (${emT(x.emode)}): <b>${brl(x.energy)}</b>${x.km>0?' para '+num(x.km,0)+' km ('+brl(x.energy/x.km)+'/km)':''}${sh!=null?', <b>'+num(sh,0)+'% do faturamento</b>':''}${psh!=null?' (período anterior: '+num(psh,0)+'%)':''}.${v&&v.refCons&&v.refUnit==='km/L'?' Seu consumo configurado é '+num(c.kml,1)+' km/L; a referência aproximada do modelo é '+num(v.refCons,1)+' km/L'+(c.kml<v.refCons*.85?', ou seja, abaixo da referência: vale checar pneus, filtro de ar e estilo de condução.':'.'):''}${ml?' Consumo medido entre tanques cheios: '+num(ml.v,2)+' km/L.':''}<small>Dias com abastecimento registrado usam o valor real (${brl(x.c.eReal)}); os demais dias com km usam estimativa (${brl(x.c.eEst)}). ${perT()}</small>`}
+    return`Energia (${emT(x.emode)}): <b>${brl(x.energy)}</b>${x.km>0?' para '+num(x.km,0)+' km ('+brl(x.energy/x.km)+'/km)':''}${sh!=null?', <b>'+num(sh,0)+'% do faturamento</b>':''}${psh!=null?' (período anterior: '+num(psh,0)+'%)':''}.${v&&v.refCons&&v.refUnit==='km/L'?' Seu consumo configurado é '+num(c.kml,1)+' km/L; a referência aproximada do modelo é '+num(v.refCons,1)+' km/L'+(c.kml<v.refCons*.85?', ou seja, abaixo da referência: vale checar pneus, filtro de ar e estilo de condução.':'.'):''}${ml?' Consumo medido entre tanques cheios: '+num(ml.v,2)+' km/L.':''}<small>Valor registrado nos abastecimentos/recargas do período (${brl(x.c.eReal)}).${x.c.estFuel>0?' Sem registro, a estimativa por km seria '+brl(x.c.estFuel)+' (não somada).':''} ${perT()}</small>`}
   if(/custo.*(km|quilom)|por (km|quilom)/.test(s)){def(addD(t,-29),'últimos 30 dias');const x=both();if(!(x.km>0))return'Sem km informados nesse período. Informe a quilometragem na jornada para calcular o custo por km.'+per();
     return`Custo operacional médio: <b>${brl(x.cost/x.km)}/km</b> (energia ${emT(x.emode)} + passe + outros: ${brl(x.cost)} ÷ ${num(x.km,0)} km). Incluindo manutenção e custos fixos: <b>${brl((x.inc-x.full)/x.km)}/km</b>.<small>${pl}: ${x.jr} jornada(s).</small>`}
-  if(/horari|melhor hora|que horas/.test(s)){def(addD(t,-89),'últimos 90 dias');const P=prod(['uber','n99'],f,to),b=P.B.filter(o=>o.obs>=3&&o.nph!=null&&o.hr>0).sort((a,c)=>c.nph-a.nph);
-    return b.length?'Faixas do dia por lucro operacional/hora: '+b.map(o=>`<b>${o.n}</b> (${brl(o.nph)}/h, ${o.obs} dias)`).join(', ')+'.'+per():'Ainda não há faixas com 3+ dias de observação. Informe os períodos de trabalho na jornada.'+per()}
+  if(/horari|melhor hora|que horas|dia da semana/.test(s)){def(addD(t,-89),'últimos 90 dias');const P=prodSum(f,to),b=P.D.map((o,i)=>({...o,n_:DOW[i]})).filter(o=>o.n>=3&&o.nph!=null).sort((a,c)=>c.nph-a.nph);
+    return b.length?'Dias da semana por lucro operacional/hora: '+b.map(o=>`<b>${o.n_}</b> (${brl(o.nph)}/h, ${o.n} dias)`).join(', ')+'. O NESC não compara faixas de horário porque a maioria das jornadas é registrada sem horário de início e fim.'+per():'Ainda não há dias da semana com 3+ registros com horas informadas.'+per()}
   if(/(qual|que) (app|aplicativo)|uber.*99|99.*uber|por hora/.test(s)){def(addD(t,-29),'últimos 30 dias');const u=AS('uber',f,to),n=AS('n99',f,to),uh=u.hr?u.op/u.hr:null,nh=n.hr?n.op/n.hr:null;
     if(uh==null&&nh==null)return'Não há horas trabalhadas registradas para comparar.'+per();
     return`Lucro operacional por hora: Uber <b>${uh!=null?brl(uh):'—'}</b> (${hm(u.min)}), 99 <b>${nh!=null?brl(nh):'—'}</b> (${hm(n.min)}). ${uh!=null&&nh!=null?'Maior: <b>'+(uh>=nh?'Uber':'99')+'</b>.':''}${Math.min(u.jr.length,n.jr.length)<5?' Atenção: poucas jornadas em pelo menos um dos apps.':''}<small>Cálculo: (faturamento − energia − passe − outros) ÷ horas trabalhadas. ${perT()}</small>`}
@@ -2324,8 +2443,9 @@ document.addEventListener('click',e=>{
   const rmt=T.closest('[data-rmet]');if(rmt){rmet=rmt.dataset.rmet;render();return}
   if(T.closest('[data-rkretry]')){const[f,t]=range(rper);RK.key='';loadRanking(f,t,true);render();return}
   const pp=T.closest('[data-pper]');if(pp){pper=pp.dataset.pper;render();return}
+  const hfx=T.closest('[data-hrsfix]');if(hfx){const[id,ok]=hfx.dataset.hrsfix.split(':');hrsFix(id,ok==='1');render();toast(ok==='1'?'Horas corrigidas. O valor anterior ficou guardado.':'Horas mantidas como estavam.');return}
   const ak=T.closest('[data-ask]');if(ak){ask(ak.dataset.ask);return}
-  if(T.closest('[data-addper]')){const f=T.closest('form'),box=f.querySelector('.periods');if(!box.children.length&&f.dataset.typed==null)f.dataset.typed=f.hours.value;box.insertAdjacentHTML('beforeend',periodRow(null));f.hours.readOnly=true;box.lastElementChild.querySelector('input').focus();perTotal(f);return}
+  if(T.closest('[data-addper]')){const f=T.closest('form'),box=f.querySelector('.periods');if(!box.children.length&&f.dataset.typed==null)f.dataset.typed=f.hh.value+'|'+f.mm.value;box.insertAdjacentHTML('beforeend',periodRow(null));f.hh.readOnly=f.mm.readOnly=true;box.lastElementChild.querySelector('input').focus();perTotal(f);return}
   const rp2=T.closest('[data-rmper]');if(rp2){const f=T.closest('form');rp2.closest('.prow').remove();perTotal(f);return}
   if(T.closest('[data-impgo]')){try{const m=JSON.parse($('#bi').value);if(!m||typeof m!=='object')throw 0;let n=0;Object.assign(db._del,m._del&&typeof m._del==='object'?m._del:{});COLS.forEach(c=>{db[c]=db[c].filter(y=>!db._del[y.id]);(Array.isArray(m[c])?m[c]:[]).forEach(x=>{if(x&&typeof x.id==='string'&&!db._del[x.id]&&!db[c].some(y=>y.id===x.id)){db[c].push(x);n++}})});Object.keys(m.days||{}).forEach(k=>{if(m.days[k])db.days[k]=true});if(!db.vehicle&&m.vehicle&&typeof m.vehicle==='object'){db.vehicle=m.vehicle;n++}Store.save();closeModal();render();toast(n+' registro(s) importado(s).')}catch(x){toast('Backup inválido: cole o texto completo do arquivo de backup.')}return}
   const ex=T.closest('[data-export]');if(ex){const d=TODAY();if(ex.dataset.export==='pre'){dl_('nesc-backup-antes-v3.json',LS.get(Store.key()+'_pre_v3')||'{}','application/json');return}if(ex.dataset.export==='json')dl_('nesc-backup-'+d+'.json',JSON.stringify(db,null,1),'application/json');
@@ -2339,8 +2459,9 @@ document.addEventListener('click',e=>{
 });
 function delItem(p){const[c,id]=p.split(':'),snap=snapshot(),it=(db[c]||[]).find(x=>x.id===id);if(!it)return;db[c]=db[c].filter(x=>x.id!==id);db._del[id]=1;{
     if(it&&c==='tx'&&it.type==='pass')db._del['pass-'+appOf(it)+'-'+(it.wk||wkStart(it.d))]=1;if(it&&((c==='tx'&&it.type==='in')||c==='jr'))reconcilePass(c==='jr'?it.app:appOf(it),wkStart(it.d));if(c==='tx')db.maint.forEach(m=>{if(m.txId===id)m.txId=null});if(c==='bills')db.reserves.forEach(r=>{if(r.bill===id)r.bill=''});Store.save();if($('#modal.on'))closeModal();render();toast('Item removido.',()=>{db=JSON.parse(snap);Store.save();render()})}}
+function durOut(f){const o=f.querySelector('[data-durout]');if(!o)return;const r=durMin(f.hh.value,f.mm.value);o.textContent=!r.ok?r.err:r.min==null?'Ex.: 6 h e 30 min':'Total: '+fmtDur(r.min);o.classList.toggle('neg',!r.ok)}
 function perTotal(f){const ps=[...f.querySelectorAll('.prow')].map(r=>({s:r.querySelector('[name=ps]').value,e:r.querySelector('[name=pe]').value})),out=f.querySelector('[data-pertotal]'),valid=ps.filter(p=>p.s&&p.e&&p.s!==p.e);
-  if(!ps.length){f.hours.readOnly=false;if(f.dataset.typed!=null){f.hours.value=f.dataset.typed;delete f.dataset.typed}if(out)out.textContent='';return}f.hours.readOnly=true;const m=unionMin(valid);if(valid.length)f.hours.value=fmtH(m);if(out)out.textContent=valid.length?'Total: '+hm(m)+(valid.length>1&&m<valid.reduce((s,p)=>s+unionMin([p]),0)?' (sobreposição descontada)':''):''}
+  if(!ps.length){f.hh.readOnly=f.mm.readOnly=false;if(f.dataset.typed!=null){const[h,mi]=f.dataset.typed.split('|');f.hh.value=h;f.mm.value=mi;delete f.dataset.typed}if(out)out.textContent='';durOut(f);return}f.hh.readOnly=f.mm.readOnly=true;const m=unionMin(valid);if(valid.length){f.hh.value=Math.floor(m/60);f.mm.value=String(m%60).padStart(2,'0');durOut(f)}if(out)out.textContent=valid.length?'Total: '+hm(m)+(valid.length>1&&m<valid.reduce((s,p)=>s+unionMin([p]),0)?' (sobreposição descontada)':''):''}
 function visitHints(f){if(!f)return;const o=parseOdo(f.odo.value),d=f.d.value;f.querySelectorAll('input[name=comp]').forEach(cb=>{const k=cb.value,iv=interval(k),nk=f['nk_'+k],nd=f['nd_'+k];if(nk)nk.placeholder=o>0&&iv.km?num(o+iv.km,0):'automático';if(nd&&d&&iv.m)nd.title='automático: '+fmtD(addM(d,iv.m))})}
 document.addEventListener('change',e=>{
   const el=e.target;
@@ -2381,6 +2502,8 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('input',e=>{
   if(e.target.id==='vq'){obSel=null;acRender(e.target.value);obSync();return}
   if(e.target.name==='ps'||e.target.name==='pe'){perTotal(e.target.form);return}
+  if(e.target.hasAttribute('data-dur')){const f=e.target.form,mt=e.target.name==='hh'&&e.target.value.trim().match(/^(\d{1,2})\s*[,.:h]\s*(\d{2})$/); // "6,30" digitado nas horas = 6 h e 30 min (nunca 6,3 h)
+    if(mt&&!f.mm.value){f.hh.value=mt[1];f.mm.value=mt[2]}durOut(f);return}
   if(e.target.id==='hq'){hf.q=e.target.value;hf.n=40;clearTimeout(hqT);hqT=setTimeout(()=>{render();const i=$('#hq');if(i){i.focus();const n=i.value.length;try{i.setSelectionRange(n,n)}catch(x){}}},250);return}
   if(e.target.id!=='q')return;const q=e.target.value.trim().toLowerCase(),sr=$('#sr');if(q.length<2){sr.innerHTML='';return}
   const m=(a)=>String(a).toLowerCase().includes(q),r=[];
@@ -2404,7 +2527,7 @@ function saveJr(form,f){const a=f.app,d=f.d||TODAY();if(!APPS[a])return false;if
   const rows=[...form.querySelectorAll('.prow')].map(r=>({s:r.querySelector('[name=ps]').value,e:r.querySelector('[name=pe]').value}));
   for(let i=0;i<rows.length;i++){const p=rows[i];if(!p.s&&!p.e)continue;if(!p.s||!p.e)return ferr(form,'Complete início e fim do período '+(i+1)+'.');if(p.s===p.e)return ferr(form,'O período '+(i+1)+' começa e termina no mesmo horário.')}
   const periods=rows.filter(p=>p.s&&p.e);let min;
-  if(periods.length)min=unionMin(periods);else if(f.hours){min=parseHours(f.hours);if(!(min>=0))return ferr(form,'Horas inválidas. Use, por exemplo, 6 · 6,5 · 6:30.')}else min=0;
+  if(periods.length)min=unionMin(periods);else{const r=durMin(f.hh,f.mm);if(!r.ok){form.hh&&form.hh.setAttribute('aria-invalid','true');return ferr(form,r.err)}min=r.min??0}
   if(min>24*60)return ferr(form,'O total passa de 24 horas. Confira as horas ou os períodos.');
   let trips=null;if(f.trips!==''&&f.trips!=null){trips=parseInt(f.trips,10);if(!(trips>=0)||String(trips)!==String(f.trips).trim())return ferr(form,'Viagens deve ser um número inteiro.')}
   let km=null,kmSrc=null,odoIni=null,odoFim=null,odoExc=!!f.odoExc;const mode=f.kmMode||'none';
@@ -2413,7 +2536,7 @@ function saveJr(form,f){const a=f.app,d=f.d||TODAY();if(!APPS[a])return false;if
     if(!odoExc){if(odoFim<odoIni)return ferr(form,'A leitura final é menor que a inicial. Corrija as leituras ou marque que são de veículos diferentes/corrigidas.');km=Math.round((odoFim-odoIni)*10)/10}kmSrc='odo'}
   if(km!=null&&km>2000)return ferr(form,'Mais de 2.000 km em um dia: confira o valor.');
   const notes=(f.notes||'').trim();if(!(min>0)&&trips==null&&km==null&&!notes)return ferr(form,'Informe ao menos horas, viagens, quilometragem ou uma observação.');
-  const ex=db.jr.filter(j=>j.app===a&&j.d===d),rec={d,app:a,v:2,min,periods,trips,km,kmSrc,odoIni,odoFim,odoExc,notes,src:undefined,tripsSrc:undefined,at:Date.now()}; // editado pelo usuário: deixa de ser 'oficial'
+  const ex=db.jr.filter(j=>j.app===a&&j.d===d),rec={d,app:a,v:2,min,periods,trips,km,kmSrc,odoIni,odoFim,odoExc,notes,overlap:!!f.overlap,hrsOk:true,src:undefined,tripsSrc:undefined,at:Date.now()}; // editado pelo usuário: deixa de ser 'oficial'
   if(ex.length===1&&ex[0].v===2)Object.assign(ex[0],rec);else{ex.forEach(j=>{db._del[j.id]=1});db.jr=db.jr.filter(j=>!ex.includes(j));db.jr.push(Object.assign({id:uid()},rec))}
   if(kmSrc==='odo'&&!odoExc&&odoFim>0)bumpOdo(Math.round(odoFim),d);if(min>0||trips||km)ensurePass(a,d);else reconcilePass(a,wkStart(d));
   return ex.length?'Jornada de '+fmtD(d)+' atualizada.':'Jornada de '+fmtD(d)+' salva.'}
@@ -2446,7 +2569,9 @@ document.addEventListener('submit',e=>{
   if(k==='goal'){if(!(f.text||'').trim())return;db.goals.push({id,kind:f.kind,text:f.text.trim(),pct:0,last:null});return ok('Meta adicionada.')}
   if(k==='gnew'){return ok(saveGoal(fm,f))}
   if(k==='rank'){const nick=String(f.nick||'').replace(/[<>"\u0000-\u001f]/g,'').trim().slice(0,24);db.cfg.rankNick=nick;db.cfg.rankOut=!f.part;RK.key='';Store.save();if(Cloud.on){clearTimeout(Store.tm);Store.push().then(()=>render())}render();toast(f.part?'Participação salva'+(nick?' como '+nick:' com apelido automático')+'.':'Você saiu da classificação.');return}
-  if(k==='profile'){const nm=(f.name||'').trim();if(!nm)return ferr(fm,'Informe um nome.');if(nm.length>60)return ferr(fm,'Use até 60 caracteres.');Auth.rename(nm).then(()=>{render();toast('Nome atualizado.')});return}
+  if(k==='profile'){const nm=(f.name||'').trim();if(!nm)return ferr(fm,'Informe um nome.');if(nm.length>60)return ferr(fm,'Use até 60 caracteres.');
+    const bv=String(f.birth||'').trim(),be=birthError(bv);if(be)return ferr(fm,be);
+    Promise.all([Auth.rename(nm),(bv!==(Profile.birth||'')?Profile.save(bv):Promise.resolve())]).then(()=>{render();toast('Perfil atualizado.')}).catch(x=>ferr(fm,cloudErr(x)));return}
   if(k==='odo'){if(!db.vehicle)return;if(!f.km){db.vehicle.odo=null;db.vehicle.odoD=null;return ok('Quilometragem removida: aparece como não informada.')}const v=parseOdo(f.km);if(!(v>=0))return ferr(fm,'Quilometragem inválida.');db.vehicle.odo=Math.round(v);db.vehicle.odoD=d;return ok('Quilometragem atualizada.')}
   if(k==='cash'){const v=parseMoney(String(f.v||'').replace(/^-/,''));if(!isFinite(v))return ferr(fm,'Valor inválido.');db.cfg.cash={v:String(f.v).trim().startsWith('-')?-v:v,at:Date.now(),d};return ok('Saldo atualizado.')}
   if(k==='bill'){const v=parseMoney(f.v);if(!(f.name||'').trim())return ferr(fm,'Informe a descrição.');if(!(v>0))return ferr(fm,'Informe um valor válido.');if(!f.due)return ferr(fm,'Informe o vencimento.');const n=f.n?parseInt(f.n,10):0;if(f.n&&!(n>0))return ferr(fm,'Número de parcelas inválido.');
@@ -2485,7 +2610,7 @@ function Particles(sel,active){return{c:null,x:null,ps:[],spr:null,raf:0,last:0,
   init(){if(this.c)return;const c=$(sel);if(!c||!c.getContext)return;this.c=c;this.x=c.getContext('2d');
     const s=document.createElement('canvas');s.width=s.height=64;const g=s.getContext('2d'),r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,'rgba(255,236,190,1)');r.addColorStop(.25,'rgba(232,186,96,.55)');r.addColorStop(1,'rgba(226,178,80,0)');g.fillStyle=r;g.fillRect(0,0,64,64);this.spr=s;
     this.size();addEventListener('resize',()=>this.size());document.addEventListener('visibilitychange',()=>{if(!document.hidden)this.kick()});RM.addEventListener&&RM.addEventListener('change',()=>this.kick())},
-  size(){const c=this.c,dpr=Math.min(devicePixelRatio||1,1.5);this.w=innerWidth;this.h=innerHeight;c.width=Math.round(this.w*dpr);c.height=Math.round(this.h*dpr);this.x.setTransform(dpr,0,0,dpr,0,0);
+  size(){const c=this.c,dpr=Math.min(devicePixelRatio||1,2);this.w=innerWidth;this.h=innerHeight;c.width=Math.round(this.w*dpr);c.height=Math.round(this.h*dpr);this.x.setTransform(dpr,0,0,dpr,0,0);
     const n=Math.round((LOWPOWER?26:58)*Math.min(1,Math.max(.5,this.w*this.h/(1280*800))));while(this.ps.length<n)this.ps.push(this.mk(true));this.ps.length=n;this.draw(0)},
   mk(any){const big=Math.random()<.12;return{x:Math.random()*this.w,y:any?Math.random()*this.h:-10,r:big?2.2+Math.random()*2.2:.6+Math.random()*1.4,v:(big?5:9)+Math.random()*16,a:.25+Math.random()*.55,ph:Math.random()*6.28,sw:.3+Math.random()*.7}},
   draw(dt){const x=this.x,t=performance.now()/1000;x.clearRect(0,0,this.w,this.h);x.globalCompositeOperation='lighter';

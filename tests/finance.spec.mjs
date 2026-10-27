@@ -337,6 +337,88 @@ await test("J. Centavos: 0,1 + 0,2 e arredondamento de 1,005", async (keep) => {
   eq("0,1 + 0,2", r[0], 0.3, 0); eq("1,005", r[1], 1.01, 0); eq("−1,005", r[2], -1.01, 0); eq("soma", r[3], 53.33, 0);
 });
 
+// ---------- Horas trabalhadas (campos Horas/Minutos, formato e regras) ----------
+const durMin = (page, h, m) => page.evaluate(([h, m]) => durMin(h, m), [h, m]);
+const prodP = (page, f, t) => page.evaluate(([f, t]) => { const p = prodSum(f, t); return { n: p.n, hd: p.hd, noH: p.noH, min: p.min, hOp: p.hOp, nph: p.nph, avg: p.avg, off: p.off, incCost: p.c.opCost, op: p.c.op, energy: p.c.energy, estFuel: p.c.estFuel }; }, [f, t || f]);
+
+await test("Horas A: 6h30min = 390 e 7h = 420 minutos", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  eq("6h30", (await durMin(o.page, "6", "30")).min, 390);
+  eq("7h", (await durMin(o.page, "7", "")).min, 420);
+  eq("formato 390", await o.page.evaluate(() => fmtDur(390)), "6h30min");
+  eq("formato 420", await o.page.evaluate(() => fmtDur(420)), "7h00min");
+});
+await test("Horas B: 6h30 + 7h no mesmo dia (apps diferentes) somam 13h30min", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, jr: [{ id: "u", d: T, app: "uber", v: 2, min: 390, periods: [] }, { id: "n", d: T, app: "n99", v: 2, min: 420, periods: [] }] });
+  eq("driverMin soma apps distintos", (await prodP(o.page, T)).min, 810);
+  eq("rótulo", await o.page.evaluate(() => fmtDur(810)), "13h30min");
+});
+await test("Horas C: campo inválido (minutos 75, 6h75) é recusado sem arredondar", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  const r = await durMin(o.page, "6", "75");
+  if (r.ok) throw new Error("6h75 deveria ser inválido: " + JSON.stringify(r));
+  eq("horas com texto também recusa", (await durMin(o.page, "6,5", "")).ok, false);
+  eq("vazios = não informado", (await durMin(o.page, "", "")).min, null);
+  eq(">9h permitido", (await durMin(o.page, "12", "15")).min, 735);
+});
+await test("Horas D: lucro operacional por hora = R$ 44 (300 − 80 em 5h)", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF, kml: 0, price: 0 }, tx: [tx({ d: T, type: "in", app: "uber", v: 300 }), tx({ d: T, type: "fuel", app: "veic", v: 80, unit: "L" })], jr: [{ id: "j", d: T, app: "uber", v: 2, min: 300, periods: [] }] });
+  const p = await prodP(o.page, T);
+  eq("lucro op", p.op, 220); eq("horas", p.min, 300); eq("lucro/h", p.nph, 44);
+});
+await test("Horas E: sem horas informadas, lucro/h fica indefinido (Sem dados de horas)", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 300 })], jr: [{ id: "j", d: T, app: "uber", v: 2, min: 0, periods: [] }] });
+  const p = await prodP(o.page, T);
+  eq("dias", p.n, 1); eq("dias com horas", p.hd, 0); if (p.nph !== null) throw new Error("lucro/h deveria ser nulo: " + p.nph);
+  await o.page.evaluate(() => { tab = "produtividade"; pper = "30"; render(); });
+  const txt = await o.page.evaluate(() => document.querySelector("#view").textContent);
+  if (!txt.includes("Sem dados de horas")) throw new Error("a tela não mostra 'Sem dados de horas'");
+});
+await test("Horas F: Uber + 99 no mesmo dia marcados como simultâneos não dobram as horas", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, jr: [{ id: "u", d: T, app: "uber", v: 2, min: 300, periods: [], overlap: true }, { id: "n", d: T, app: "n99", v: 2, min: 240, periods: [], overlap: true }] });
+  eq("horas = máx dos apps (sobreposição)", (await prodP(o.page, T)).min, 300);
+});
+await test("Horas G: editar as horas atualiza o resumo", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 200 })], jr: [{ id: "j", d: T, app: "uber", v: 2, min: 240, periods: [] }] });
+  eq("antes", (await prodP(o.page, T)).min, 240);
+  await o.page.evaluate(() => { const j = db.jr.find((x) => x.id === "j"); j.min = 360; Store.save(); render(); });
+  eq("depois", (await prodP(o.page, T)).min, 360);
+});
+await test("Horas H: estimativa por km não é contada quando há combustível registrado", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF, kml: 10, price: 6 }, tx: [tx({ d: T, type: "in", app: "uber", v: 300 }), tx({ d: T, type: "fuel", app: "veic", v: 80, unit: "L" })], jr: [{ id: "j", d: T, app: "uber", v: 2, min: 300, periods: [], km: 120 }] });
+  const p = await prodP(o.page, T);
+  eq("energia registrada", p.energy, 80); eq("lucro op (sem somar estimativa)", p.op, 220); eq("estimativa à parte", p.estFuel, 0);
+  await setDb(o.page, { cfg: { pass: OFF, kml: 10, price: 6 }, tx: [tx({ d: T, type: "in", app: "uber", v: 300 })], jr: [{ id: "j", d: T, app: "uber", v: 2, min: 300, periods: [], km: 120 }] });
+  const q = await prodP(o.page, T);
+  eq("sem combustível registrado: energia 0", q.energy, 0); eq("estimativa calculada (120 km × 0,60)", q.estFuel, 72);
+});
+await test("Horas I: período sem registros × dia confirmado como folga", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, off: { "2026-10-20": { v: true, at: 1 } }, tx: [tx({ d: "2026-10-22", type: "in", app: "uber", v: 100 })], jr: [{ id: "j", d: "2026-10-22", app: "uber", v: 2, min: 300, periods: [] }] });
+  const p = await prodP(o.page, "2026-10-19", "2026-10-21");
+  eq("dias com registro no intervalo vazio", p.n, 0); eq("folga confirmada contabilizada", p.off, 1);
+  const p2 = await prodP(o.page, "2026-10-01", T);
+  eq("um dia registrado no mês", p2.n, 1);
+});
+await test("Horas J: revisão só sugere correção coerente (6,30 → 6h30), nunca às cegas", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  const r = await o.page.evaluate(() => {
+    const s378 = hrsSuspect({ v: 2, min: 378, periods: [] }); // 6h18 → 6h30
+    const s390 = hrsSuspect({ v: 2, min: 390, periods: [] }); // já é 6h30, não sugere
+    const s400 = hrsSuspect({ v: 2, min: 400, periods: [] }); // 6h40 não vem de decimal → não sugere
+    const sOk = hrsSuspect({ v: 2, min: 378, periods: [], hrsOk: true }); // já confirmado
+    return { s378, s390, s400, sOk };
+  });
+  if (!r.s378 || r.s378.to !== 390) throw new Error("6h18 deveria sugerir 6h30: " + JSON.stringify(r.s378));
+  if (r.s390 || r.s400 || r.sOk) throw new Error("sugestão indevida: " + JSON.stringify(r));
+});
+
 await browser.close();
 server.close();
 let fail = 0;

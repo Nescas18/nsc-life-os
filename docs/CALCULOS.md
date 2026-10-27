@@ -76,9 +76,35 @@ motor do `index.html`).
 
 ## Energia (combustível ou recarga)
 
-Calculada dia a dia: no dia com abastecimento/recarga registrado vale o valor real; nos demais dias com km
-informado, estimativa `km × custo por km` (consumo e preço configurados). Real e estimativa nunca se somam no
-mesmo dia. Entre Uber e 99, o gasto do dia é dividido por km (ou por faturamento quando falta km).
+**Regra de 27/10/2026 — só o registrado entra no lucro.** O lucro operacional usa apenas o combustível/energia
+**efetivamente registrado** (abastecimentos e recargas lançados) no período. A estimativa por km (`km × custo por
+km`, com consumo e preço configurados) passou a ser **apenas informativa**, mostrada à parte, e nunca é somada ao
+lucro. Antes, somar a estimativa dos dias sem abastecimento ao valor de um abastecimento registrado em outro dia
+podia **contar o combustível duas vezes**. Quando há qualquer abastecimento registrado no período, nenhuma
+estimativa é calculada. A mesma regra vale no app, nos relatórios, na produtividade e no ranking (servidor).
+Entre Uber e 99, o gasto registrado do período é dividido por km (ou por faturamento quando falta km).
+
+## Horas trabalhadas
+
+A duração da jornada é informada em dois campos inteiros, **Horas** e **Minutos** (teclado numérico). Minutos vão
+de 0 a 59; `6h75` é recusado (nunca arredondado em silêncio). Mais de 9 horas é permitido. Os dois campos vazios =
+"não informado" (não vira zero). Internamente guardamos **minutos inteiros** (6h30min = 390) e exibimos `6h30min`.
+
+- **Uber + 99 no mesmo dia:** se você marca que trabalhou nos dois ao mesmo tempo (sobreposição), as horas **não**
+  são somadas duas vezes — vale o maior bloco do dia. Sem essa marca, somam-se normalmente.
+- **Lucro operacional por hora** = lucro operacional dos dias **com horas informadas** ÷ horas desses dias. Ex.:
+  R$ 300 − R$ 80 = R$ 220 em 5h → R$ 44/h. Dias sem horas ficam fora dessa média; sem nenhuma hora, mostramos
+  "Sem dados de horas" (nunca divisão por zero).
+- **Revisão de dados antigos:** o campo único anterior aceitava "6,30", lido como 6,3 h (6h18min). A Produtividade
+  sugere a correção **só** quando os minutos batem exatamente com essa leitura decimal (18 → 30, 9 → 15, 27 → 45…).
+  Nada é convertido automaticamente: cada caso é confirmado por você, e o valor anterior fica guardado em `minOrig`.
+
+## Data de nascimento (perfil)
+
+Opcional, informada no cadastro ou em Ajustes → Perfil. Fica em `public.profiles.birth_date`, protegida por RLS
+(só o próprio dono e administradores leem/editam). Datas impossíveis, futuras ou anteriores a 1900 são recusadas e
+**não** bloqueiam o cadastro (viram vazio no servidor). É apenas complementar para apoio de identificação no
+suporte: **nunca** autentica, gera sessão, redefine senha, aparece em ranking ou em qualquer consulta pública.
 
 ## Passes e pacotes
 

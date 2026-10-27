@@ -1,4 +1,4 @@
-// Ranking calculado no servidor (supabase/migrations/*_nesc_ranking_servidor.sql) testado num Postgres local
+// Ranking calculado no servidor (supabase/migrations/*.sql, aplicadas em ordem) testado num Postgres local
 // (PGlite) — nunca no banco de produção. Inclui paridade com o motor de cálculo do app (index.html) via Playwright.
 // Uso: node tests/ranking.spec.mjs   (requer os pacotes "@electric-sql/pglite" e "playwright")
 import http from "node:http";
@@ -15,8 +15,8 @@ try { ({ PGlite } = req("@electric-sql/pglite")); ({ chromium } = req("playwrigh
 catch (e) { console.error("Instale '@electric-sql/pglite' e 'playwright' (ou use NODE_PATH)."); process.exit(2); }
 
 const migDir = path.join(ROOT, "supabase/migrations");
-const migFile = (await readdir(migDir)).find((f) => f.includes("nesc_ranking_servidor"));
-const MIGRATION = await readFile(path.join(migDir, migFile), "utf8");
+// aplica todas as migrations do projeto em ordem (as mais novas podem substituir funções das anteriores)
+const MIGRATIONS = await Promise.all((await readdir(migDir)).filter((f) => f.endsWith(".sql")).sort().map(async (f) => [f, await readFile(path.join(migDir, f), "utf8")]));
 
 const db = new PGlite();
 await db.exec(`
@@ -32,10 +32,11 @@ await db.exec(`
   create policy "Ranking public read" on public.driver_global_ranking for select to authenticated using (true);
   create policy "Users publish own ranking" on public.driver_global_ranking for insert to authenticated with check (auth.uid() = user_id);
   create policy "Users update own ranking" on public.driver_global_ranking for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  create table public.profiles(id uuid primary key, name text not null default '', email text, occupation text, income_type text, role text not null default 'user', status text not null default 'pending', created_at timestamptz not null default now(), updated_at timestamptz not null default now());
   grant usage on schema public to anon, authenticated;
   grant select, insert, update, delete on all tables in schema public to anon, authenticated;
 `);
-await db.exec(MIGRATION);
+for (const [f, sql] of MIGRATIONS) { try { await db.exec(sql); } catch (e) { console.error("Falha ao aplicar " + f + ": " + e.message); process.exit(1); } }
 
 const U = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
 const results = [];
@@ -131,6 +132,13 @@ await test("10. Ninguém altera a própria posição pelo navegador", async () =
     try { await rank(U(1), ...args); } catch { bad++; }
   }
   assert(bad === 3, "parâmetros inválidos aceitos: " + (3 - bad));
+});
+await test("11. Custo estimado por km não entra no lucro do ranking; só combustível registrado", async () => {
+  const jr = [{ id: "j1", d: "2026-10-02", app: "uber", v: 2, min: 300, periods: [], km: 120 }, { id: "j2", d: "2026-10-03", app: "uber", v: 2, min: 300, periods: [], km: 120 }];
+  await setDocs({ [U(1)]: { cfg: { ...OFF, kml: 10, price: 6 }, jr, tx: [tx("2026-10-02", "in", "uber", 300), tx("2026-10-03", "in", "uber", 300)] } });
+  assert(Number((await rank(U(1), F, T))[0].value) === 600, "sem abastecimento registrado o lucro é 600");
+  await setDocs({ [U(1)]: { cfg: { ...OFF, kml: 10, price: 6 }, jr, tx: [tx("2026-10-02", "in", "uber", 300), tx("2026-10-03", "in", "uber", 300), tx("2026-10-02", "fuel", "veic", 80)] } });
+  assert(Number((await rank(U(1), F, T))[0].value) === 520, "com R$ 80 registrados: 600 − 80, sem somar estimativa do outro dia");
 });
 
 // ---------- paridade com o motor do app ----------

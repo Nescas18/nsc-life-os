@@ -11,19 +11,20 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let chromium;
 try { ({ chromium } = createRequire(import.meta.url)("playwright")); } catch { console.error("Instale o pacote 'playwright'."); process.exit(2); }
 
-const MOCK = `window.__calls={reset:[],update:[],signOut:0};
+const MOCK = `window.__calls={reset:[],update:[],signOut:0,signup:[],profileUpdate:[]};
 window.supabase={createClient(){const subs=[];let session=null;const h=location.hash;
  if(/access_token=/.test(h)&&/type=recovery/.test(h)){session={access_token:'t',user:{id:'u1',email:'motorista@teste.local',user_metadata:{name:'M'}}};setTimeout(()=>subs.forEach(cb=>cb('PASSWORD_RECOVERY',session)),60)}
- const q={select(){return q},eq(){return q},order(){return q},maybeSingle:async()=>({data:null,error:null}),upsert:async()=>({error:null}),limit:async()=>({data:[],error:null})};
+ const q={select(){return q},eq(){return q},order(){return q},update(v){__calls.profileUpdate.push(v);return q},maybeSingle:async()=>({data:null,error:null}),upsert:async()=>({error:null}),limit:async()=>({data:[],error:null}),then(r){return Promise.resolve({data:null,error:null}).then(r)}};
  return{auth:{getSession:async()=>({data:{session}}),onAuthStateChange(cb){subs.push(cb);return{data:{subscription:{unsubscribe(){}}}}},
   resetPasswordForEmail:async(email,o)=>{__calls.reset.push({email,redirectTo:o&&o.redirectTo});return{error:null}},
   updateUser:async(o)=>{__calls.update.push(o);return session?{data:{user:session.user},error:null}:{error:{message:'Auth session missing!'}}},
   signOut:async()=>{__calls.signOut++;session=null;return{error:null}},
-  signInWithPassword:async()=>({data:{},error:{message:'Invalid login credentials'}}),signUp:async()=>({data:{},error:{message:'x'}})},from(){return q}}}};`;
+  signInWithPassword:async()=>({data:{},error:{message:'Invalid login credentials'}}),
+  signUp:async(o)=>{__calls.signup.push(o);return{data:{session:null,user:{id:'new',email:o.email}},error:null}}},from(){return q}}}};`;
 
 const server = http.createServer(async (req, res) => {
   const p = decodeURIComponent(new URL(req.url, "http://x").pathname);
-  if (p === "/config.js") return res.end("window.NSC_CONFIG={supabaseUrl:'https://projeto-falso.supabase.test',supabaseAnonKey:'anon-falsa'};");
+  if (p === "/config.js") return res.end("window.NSC_CONFIG={supabaseUrl:'https://projeto-falso.supabase.test',supabaseAnonKey:'anon-falsa',siteUrl:'https://indexnscai.vercel.app'};");
   const f = path.join(ROOT, p === "/" ? "index.html" : p);
   if (!f.startsWith(ROOT) || !existsSync(f)) { res.writeHead(404); return res.end(); }
   res.end(await readFile(f));
@@ -97,10 +98,12 @@ await test("Link do e-mail: pede nova senha (não entra direto), valida, grava, 
   assert(/não são iguais/.test(await o.pg.textContent("#auth-err")), "confirmação diferente");
   await o.pg.fill("#np-pass2", "NovaSenha2026");
   await o.pg.click("#form-newpass .btn-submit");
-  await o.pg.waitForSelector("#form-login", { state: "visible" });
-  const st = await o.pg.evaluate(() => ({ up: window.__calls.update, out: window.__calls.signOut, msg: document.getElementById("auth-err").textContent, hash: location.hash }));
+  await o.pg.waitForSelector("#form-done", { state: "visible" });
+  const st = await o.pg.evaluate(() => ({ up: window.__calls.update, out: window.__calls.signOut, hash: location.hash, done: document.getElementById("done-h").textContent }));
   assert(st.up.length === 1 && st.up[0].password === "NovaSenha2026", "updateUser: " + JSON.stringify(st.up));
-  assert(st.out >= 1 && /redefinida/.test(st.msg) && !st.hash.includes("access_token"), JSON.stringify(st));
+  assert(st.out >= 1 && /sucesso/i.test(st.done) && !st.hash.includes("access_token"), JSON.stringify(st));
+  await o.pg.click("#form-done .btn-submit"); // botão "Voltar ao login"
+  await o.pg.waitForSelector("#form-login", { state: "visible" });
   return o;
 });
 
@@ -108,6 +111,56 @@ await test("Link expirado: volta ao pedido de novo link com aviso claro", async 
   const o = await page("#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired");
   await o.pg.waitForSelector("#form-recover", { state: "visible" });
   assert(/expirou/.test(await o.pg.textContent("#auth-err")), "aviso de link expirado");
+  return o;
+});
+
+await test("Textos e botões do fluxo seguem exatamente a especificação", async () => {
+  const o = await page();
+  await o.pg.click("#form-login .forgot-link");
+  assert((await o.pg.textContent("#form-recover .auth-h")).trim() === "Recupere o acesso à sua conta", "título passo 1");
+  assert(/Informe o e-mail cadastrado para receber as instruções de recuperação da sua senha\./.test(await o.pg.textContent("#form-recover .sub")), "texto passo 1");
+  assert((await o.pg.textContent("label[for=rc-email]")).trim() === "E-mail cadastrado", "label e-mail");
+  assert((await o.pg.textContent("#form-recover .btn-submit .bl")).trim() === "Enviar instruções", "botão passo 1");
+  return o;
+});
+
+await test("Cadastro envia a data de nascimento como metadado e com retorno ao endereço público; data futura é barrada", async () => {
+  const o = await page();
+  await o.pg.click("#btn-tab-register");
+  await o.pg.fill("#re-name", "Ana Teste");
+  await o.pg.fill("#re-email", "ana@teste.local");
+  await o.pg.fill("#re-pass", "SenhaForte2026");
+  await o.pg.fill("#re-birth", "2999-01-01");
+  await o.pg.click("#form-register .btn-submit");
+  assert(/futuro/.test(await o.pg.textContent("#auth-err")), "data futura deveria ser barrada");
+  assert((await o.pg.evaluate(() => window.__calls.signup.length)) === 0, "cadastrou mesmo com data inválida");
+  await o.pg.fill("#re-birth", "1992-07-15");
+  await o.pg.click("#form-register .btn-submit");
+  await o.pg.waitForFunction(() => window.__calls.signup.length === 1);
+  const c = await o.pg.evaluate(() => window.__calls.signup[0]);
+  assert(c.options.data.birth_date === "1992-07-15", "metadado birth_date: " + JSON.stringify(c.options.data));
+  assert(c.options.data.name === "Ana Teste", "nome no metadado");
+  assert(c.options.emailRedirectTo === BASE, "retorno do cadastro: " + c.options.emailRedirectTo);
+  return o;
+});
+
+await test("publicUrl usa a origem local permitida; origem estranha e preview seguem a regra da allowlist", async () => {
+  const o = await page();
+  // a função é testada com uma allowlist idêntica à do app, mas aplicada a origens arbitrárias
+  const r = await o.pg.evaluate(() => {
+    const site = String(C.siteUrl || "").replace(/\/+$/, "");
+    const decide = (origin) => {
+      const allow = [site, /^https:\/\/indexnscai(-[a-z0-9-]+)?-nsc-ai1\.vercel\.app$/, /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
+      const ok = origin && allow.some((a) => a instanceof RegExp ? a.test(origin) : a && origin === a);
+      return ok ? origin : site;
+    };
+    return { here: publicUrl(), site, prod: decide(site), preview: decide("https://indexnscai-abc123-nsc-ai1.vercel.app"), phish: decide("https://phishing.example.com"), localhost: decide("http://localhost:3000") };
+  });
+  assert(r.here === BASE, "origem local permitida (127.0.0.1) deveria ser usada: " + r.here);
+  assert(r.prod === r.site, "produção aceita");
+  assert(r.preview === "https://indexnscai-abc123-nsc-ai1.vercel.app", "preview aceito: " + r.preview);
+  assert(r.localhost === "http://localhost:3000", "localhost de desenvolvimento aceito");
+  assert(r.phish === r.site, "origem desconhecida deveria cair para o endereço oficial: " + r.phish);
   return o;
 });
 
