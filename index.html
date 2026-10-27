@@ -123,6 +123,7 @@ form.shake{animation:shake .38s}
 .bot-host{position:relative}
 .bot-head{position:absolute;left:0;top:0;width:54px;height:62px;padding:0;border:none;background:none;cursor:pointer;z-index:3;-webkit-tap-highlight-color:transparent;touch-action:manipulation;border-radius:40%}
 .bot-head[hidden],.bot-head.away{display:none}
+.bot-head.corner{position:fixed;left:auto;top:auto;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));pointer-events:auto} /* página inicial e login */
 .bot-head[data-sz=sm]{width:44px;height:51px}
 .bot-head:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
 .bot-float{display:block;width:100%;height:100%;transform-origin:50% 85%}
@@ -1818,8 +1819,8 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
     addEventListener('resize',re);if(window.visualViewport)visualViewport.addEventListener('resize',re);
     if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>this.dock()); // a largura dos títulos muda quando a fonte termina de carregar
     this.idle();
-    document.addEventListener('focusin',e=>{const t=e.target;if(t.closest&&t.closest('#form-register')&&t.name)this.field(t.name)});
-    document.addEventListener('focusout',e=>{const t=e.target;if(t.id==='re-email'&&t.value.trim()&&!EMAIL_RE.test(t.value.trim().toLowerCase()))this.say({id:'a:emailbad',cd:30000,form:true,force:true,mood:'alert',text:'Confira o e-mail, ex.: <b>nome@gmail.com</b>.'});clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),700)});
+    document.addEventListener('focusin',e=>{const t=e.target;if(t.closest&&t.closest('#form-register')&&t.name)this.field(t.name);if(this.hd&&this.hd.classList.contains('corner'))setTimeout(()=>this.dock(),80)});
+    document.addEventListener('focusout',e=>{const t=e.target;if(t.id==='re-email'&&t.value.trim()&&!EMAIL_RE.test(t.value.trim().toLowerCase()))this.say({id:'a:emailbad',cd:30000,form:true,force:true,mood:'alert',text:'Confira o e-mail, ex.: <b>nome@gmail.com</b>.'});clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),700);if(this.hd&&this.hd.classList.contains('corner'))setTimeout(()=>this.dock(),80)});
     this.syncFoot()},
   /* ---------- vida: uma animação ocasional por vez ---------- */
   /* a cada 3,5–7 s: quase sempre uma piscada (às vezes dupla); de vez em quando, um leve balanço. Nada roda junto com
@@ -1838,13 +1839,21 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
      linha do título; top = canto superior direito do cabeçalho, levemente acima do título */
   SPOT:{hoje:['beside','edge','top'],uber:['beside','edge','top'],n99:['beside','edge','top'],historico:['edge','top'],despesas:['beside','edge','top'],
     manutencao:['beside','edge','top'],metas:['beside','edge','top'],financas:['beside','edge','top'],config:['edge','top'],produtividade:['edge','top'],
-    ia:['edge','top'],conquistas:['edge','top'],ranking:['edge','top'],landing:['edge'],auth:['edge','top']},
+    ia:['edge','top'],conquistas:['edge','top'],ranking:['edge','top']},
   host(){if(this.area==='app')return{h:$('#view>.head'),line:'h1',btn:'.hact',key:typeof tab==='string'?tab:'hoje'};
-    if(this.area==='landing')return{h:$('#landing .lp-hero'),line:'.lp-free',key:'landing'};
-    if(this.area.startsWith('auth'))return{h:$('#auth .auth-wrap'),line:'.brand-row',key:'auth'};return{}},
+    if(this.area==='landing'||this.area.startsWith('auth'))return{corner:true}; // página inicial e login: canto inferior da tela
+    return{}},
   /* encaixa a cabeça no cabeçalho da tela atual, num lugar onde não cubra nada; sem lugar livre, tenta um tamanho menor
      e, em último caso, fica recolhida nesta tela (nunca por cima de informação) */
-  dock(){const hd=this.hd;if(!hd||!this.el)return;const{h,line,btn,key}=this.host();
+  dock(){const hd=this.hd;if(!hd||!this.el)return;const o=this.host();
+    /* página inicial e login: fixo no canto inferior direito (acima da área segura do iPhone). Com o teclado aberto,
+       se encostar no campo em edição, se recolhe até o campo perder o foco */
+    if(o.corner){if(this.el.hidden){hd.hidden=true;return}
+      if(hd.parentNode!==this.el)this.el.appendChild(hd);hd.hidden=false;hd.classList.add('corner');hd.classList.remove('away');hd.dataset.sz='';hd.style.left=hd.style.top='';
+      hd.classList.toggle('min',!!this.st().min);const a=document.activeElement;
+      if(a&&a.matches&&a.matches('input,textarea,select')){const r=a.getBoundingClientRect(),q=hd.getBoundingClientRect();if(r.left<q.right+8&&r.right>q.left-8&&r.top<q.bottom+8&&r.bottom>q.top-8)hd.classList.add('away')}
+      return}
+    hd.classList.remove('corner');const{h,line,btn,key}=o;
     if(!h||this.el.hidden||!h.getClientRects().length){hd.hidden=true;return}
     if(hd.parentNode!==h)h.appendChild(hd);h.classList.add('bot-host');hd.hidden=false;
     const min=!!this.st().min;hd.classList.toggle('min',min);hd.classList.remove('away');

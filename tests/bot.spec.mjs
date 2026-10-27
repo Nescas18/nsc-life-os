@@ -356,6 +356,30 @@ await test("M6. Tocar na cabeça abre a dica; ✕ e toque fora fecham (celular)"
   await page.tap(".bot-head"); await page.waitForTimeout(100); await page.touchscreen.tap(30, 500); assert(!(await bubble(page)), "toque fora não fechou");
 });
 
+await test("M7. Página inicial e login: mascote fixo no canto inferior direito (também ao rolar), com as animações; recolhe se o teclado o levar sobre o campo; no app volta ao cabeçalho", async (keep) => {
+  for (const [w, h, mob] of [[1280, 860, false], [375, 812, true], [320, 640, true]]) {
+    const ctx = keep(await ctxOf({ viewport: { width: w, height: h }, isMobile: mob, hasTouch: mob })); const { page } = await open(ctx);
+    await page.waitForTimeout(400);
+    const corner = () => page.evaluate(() => { const hd = document.querySelector(".bot-head"); if (!hd || hd.hidden || hd.classList.contains("away")) return null; const r = hd.getBoundingClientRect(); return { right: Math.round(innerWidth - r.right), bottom: Math.round(innerHeight - r.bottom), pos: getComputedStyle(hd).position }; });
+    for (const [where, go] of [["inicial", null], ["inicial rolada", () => page.evaluate(() => scrollBy(0, 900))], ["login", () => page.evaluate(() => { location.hash = "#entrar"; })]]) {
+      if (go) { await go(); await page.waitForTimeout(400); }
+      const c = await corner();
+      assert(c && c.pos === "fixed" && c.right >= 16 && c.right <= 24 && c.bottom >= 16 && c.bottom <= 24, `${w} ${where}: ` + JSON.stringify(c));
+    }
+    // animações preservadas no canto: piscada ou balanço ocasional (o ciclo sorteia um dos dois a cada 3,5–7 s)
+    const bl = await page.evaluate(() => new Promise((ok) => { const hd = document.querySelector(".bot-head"); const mo = new MutationObserver(() => { if (/\b(blink|turn)\b/.test(hd.className)) { mo.disconnect(); ok(true); } }); mo.observe(hd, { attributes: true, attributeFilter: ["class"] }); setTimeout(() => ok(false), 9000); }));
+    assert(bl, `${w}: nenhuma animação no canto em 9 s`);
+    if (mob) { // teclado aberto: o campo vai para o pé da tela visível; a cabeça não pode ficar por cima dele
+      await page.tap("#form-login input[type=password]"); await page.setViewportSize({ width: w, height: Math.round(h * .5) });
+      await page.evaluate(() => document.activeElement.scrollIntoView({ block: "end" })); await page.waitForTimeout(400);
+      const r = await page.evaluate(() => { const hd = document.querySelector(".bot-head"), f = document.activeElement.getBoundingClientRect(); if (hd.classList.contains("away")) return "recolhido"; const q = hd.getBoundingClientRect(); return q.left < f.right && q.right > f.left && q.top < f.bottom && q.bottom > f.top ? "cobre o campo" : "livre"; });
+      assert(r !== "cobre o campo", `${w}: mascote sobre o campo em edição`);
+    }
+  }
+  const ctx = keep(await ctxOf()); const { page } = await open(ctx, { user: U1, seed: QUIET }); await page.waitForTimeout(300);
+  const app = await page.evaluate(() => { const hd = document.querySelector(".bot-head"); return { corner: hd.classList.contains("corner"), host: hd.parentNode.matches("#view>.head") }; });
+  assert(!app.corner && app.host, "no app deveria ficar no cabeçalho da aba: " + JSON.stringify(app));
+});
 await browser.close(); server.close();
 let fail = 0;
 for (const r of results) { if (!r.ok) fail++; console.log(`${r.ok ? "✓" : "✗"} ${r.name}${r.info ? " — " + r.info : ""}`); }
