@@ -8,7 +8,10 @@
     "mobile:sync": "npm run build && cap sync android",
     "test": "node tests/finance.spec.mjs",
     "test:ui": "node tests/ui.spec.mjs",
-    "test:recovery": "node tests/recovery.spec.mjs"
+    "test:recovery": "node tests/recovery.spec.mjs",
+    "test:landing": "node tests/landing.spec.mjs",
+    "test:ranking": "node tests/ranking.spec.mjs",
+    "test:ranking-ui": "node tests/ranking-ui.spec.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",

@@ -61,6 +61,19 @@ registro; quadrado cinza = folga confirmada.
 É uma visão sobre os registros originais (`tx`, `maint`, `jr`, pagamentos de contas, reservas e folgas); nada é
 copiado. Os totais do Histórico somam só lançamentos financeiros (`tx`) e batem com o motor.
 
+## Ranking
+
+Calculado **no servidor** pela função `nesc_ranking` (migração `supabase/migrations/20261027150000_nesc_ranking_servidor.sql`),
+a partir dos registros salvos de cada conta, com a mesma regra do app (testado em 900 comparações aleatórias contra o
+motor do `index.html`).
+
+- Critérios: lucro operacional do período (padrão) ou faturamento. Períodos: hoje, últimos 7 dias, mês atual.
+- Empates dividem a posição (1, 1, 3). Participa quem teve faturamento ou jornada no período.
+- Mostra só posição, apelido (escolhido ou "Motorista #XXXX") e o valor do critério. Nunca nome, e-mail, veículo,
+  despesas, lançamentos ou identificadores. "Participar da classificação" desmarcado = fica fora.
+- O navegador não grava posição nem valor; a tabela antiga `driver_global_ranking` ficou sem acesso pelo app.
+- Valores são os declarados por cada motorista (o NESC não confere com as plataformas).
+
 ## Energia (combustível ou recarga)
 
 Calculada dia a dia: no dia com abastecimento/recarga registrado vale o valor real; nos demais dias com km
@@ -90,7 +103,8 @@ completo, nunca no lucro operacional.
 ## Testes
 
 `npm test` (ou `node tests/finance.spec.mjs`, 28 cenários), `npm run test:ui` (13 testes de interface) e
-`node tests/recovery.spec.mjs` (recuperação de senha com Supabase simulado).
+`node tests/recovery.spec.mjs` (recuperação de senha com Supabase simulado), `npm run test:landing` (landing page)
+e `npm run test:ranking` (ranking em Postgres local, requer `@electric-sql/pglite`).
 
 `tests/finance.spec.mjs` abre o `index.html` num Chromium em modo local — o `config.js` é
 substituído por uma configuração vazia, então nada toca o banco de produção — e verifica os cenários: sem

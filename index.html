@@ -234,7 +234,7 @@ form[data-etype="fuel"] [data-nofuel]{display:none}form[data-etype] [data-show]{
 .pick3{display:grid;gap:10px;margin-bottom:14px}.pick3 .btn{text-align:left;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:center;padding:14px 16px}.pick3 .btn span{grid-row:span 2;font-size:1.3rem}.pick3 .btn small{font-weight:400;font-size:.78rem;opacity:.75}
 .uacts>.btn{flex:0 0 auto}
 .scope{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:10px 12px;font-size:.84rem;color:var(--mut);line-height:1.5;margin-bottom:12px}.scope b{color:var(--tx)}
-.it.rk .pos1{width:34px;font-size:1.05rem}.it.rk.me{background:color-mix(in srgb,#fff 4%,transparent);border-radius:10px;padding-left:8px;padding-right:8px}
+.it.rk .pos1{width:40px;font-size:1.05rem;color:var(--gold-hi);flex:0 0 40px}.rk-gap{text-align:center;color:var(--faint);padding:2px 0;letter-spacing:.3em}.it.rk.me{background:color-mix(in srgb,#fff 4%,transparent);border-radius:10px;padding-left:8px;padding-right:8px}
 /* velocímetro */
 .gauge{display:grid;grid-template-columns:minmax(0,280px) minmax(0,1fr);gap:16px 24px;align-items:center}
 .gauge svg{width:100%;max-width:280px;height:auto;display:block;overflow:visible}
@@ -367,6 +367,119 @@ input,select,textarea{font-size:16px}
 @media(orientation:landscape) and (max-height:500px){.left-panel{justify-content:flex-start;padding-top:calc(20px + var(--sat))}}
 @media(max-width:900px) and (max-height:680px){.left-panel{padding-top:calc(64px + var(--sat))}.brand-subtitle{display:none}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* ============ LANDING ============ */
+body.boot #auth,body.boot #canvas-container,body.boot #landing{visibility:hidden}
+#boot{position:fixed;inset:0;z-index:50;display:none;place-items:center;background:var(--bg)}body.boot #boot{display:grid}#boot img{border-radius:14px;opacity:.85;animation:bootp 1.4s ease-in-out infinite}@keyframes bootp{50%{opacity:.4}}
+.lp{position:fixed;inset:0;z-index:6;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;color:var(--tx);
+ background:radial-gradient(ellipse 70% 50% at 80% 0%,rgba(170,120,36,.22),transparent 60%),radial-gradient(ellipse 60% 40% at 0% 45%,rgba(120,84,24,.14),transparent 60%),radial-gradient(ellipse 80% 40% at 50% 100%,rgba(140,98,30,.12),transparent 60%),linear-gradient(180deg,#0c0a06 0%,#060606 35%,#050505 100%)}
+.lp[hidden]{display:none}
+#lpfx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.lp-w{width:100%;max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.lp-h{position:sticky;top:0;z-index:10;padding-top:var(--sat);background:linear-gradient(180deg,rgba(6,6,6,.92),rgba(6,6,6,.72));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(226,178,80,.1)}
+.lp-hrow{display:flex;align-items:center;gap:20px;height:68px}
+.lp-logo{display:inline-flex;align-items:center;gap:10px;color:var(--tx);text-decoration:none;font-weight:700;letter-spacing:.18em}.lp-logo img{border-radius:9px}
+.lp-nav{display:flex;align-items:center;gap:4px;margin-left:auto}.lp-nav>a{color:var(--tx2);text-decoration:none;font-size:.9rem;padding:9px 12px;border-radius:9px;transition:color .2s,background .2s}.lp-nav>a:hover{color:var(--tx);background:rgba(255,255,255,.05)}
+.lp-navcta{display:none}
+.lp-hact{display:flex;align-items:center;gap:8px}
+.lp-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:11px 18px;border-radius:12px;font-weight:650;font-size:.92rem;text-decoration:none;color:#140f05;background:linear-gradient(180deg,var(--gold-hi) -40%,var(--gold) 55%,#cf9a35 120%);box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 10px 28px rgba(226,178,80,.18);transition:filter .2s,transform .15s;white-space:nowrap}
+.lp-btn:hover{filter:brightness(1.08)}.lp-btn:active{transform:scale(.98)}.lp-btn.lg{min-height:52px;padding:14px 24px;font-size:1rem}
+.lp-btn.ghost{background:rgba(255,255,255,.05);color:var(--tx);box-shadow:inset 0 0 0 1px var(--line2)}.lp-btn.ghost:hover{background:rgba(255,255,255,.09)}
+.lp-burger{display:none;width:44px;height:44px;border-radius:11px;border:1px solid var(--line2);background:rgba(255,255,255,.04);flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer}.lp-burger span{width:18px;height:2px;border-radius:2px;background:var(--tx);transition:transform .25s,opacity .25s}
+.lp-burger[aria-expanded=true] span:nth-child(1){transform:translateY(7px) rotate(45deg)}.lp-burger[aria-expanded=true] span:nth-child(2){opacity:0}.lp-burger[aria-expanded=true] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.lp-split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:40px}
+.lp-hero{min-height:calc(100vh - 68px);display:flex;flex-direction:column;justify-content:center;padding:40px 0 56px}
+.lp-free{display:inline-flex;align-self:flex-start;align-items:center;gap:8px;padding:7px 14px;border-radius:30px;border:1px solid var(--gold-line);background:var(--gold-a);color:var(--gold-hi);font-size:.82rem;font-weight:600;margin-bottom:22px}.lp-free i{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold)}
+.lp h1{font-size:clamp(2.3rem,5.2vw,4.1rem);line-height:1.04;letter-spacing:-.04em;font-weight:700;margin-bottom:20px}
+.lp-gold{background:linear-gradient(180deg,var(--gold-hi),var(--gold) 70%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lp-lead{font-size:clamp(1.1rem,1.8vw,1.35rem);color:var(--tx);font-weight:560;margin-bottom:12px;line-height:1.4}
+.lp-sub{color:var(--tx2);font-size:1rem;line-height:1.6;max-width:540px;margin-bottom:28px}
+.lp-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:26px}
+.lp-trust{display:flex;flex-wrap:wrap;gap:8px 20px;list-style:none;color:var(--mut);font-size:.85rem}.lp-trust li::before{content:'✓';color:var(--gold);margin-right:7px;font-weight:700}
+.lp-story{padding-bottom:30px}
+.lp-step{min-height:62vh;display:flex;flex-direction:column;justify-content:center;max-width:500px;opacity:.38;transition:opacity .5s}.lp-step.on{opacity:1}
+.lp-step h2{font-size:clamp(1.5rem,2.6vw,2.2rem);letter-spacing:-.03em;line-height:1.12;margin:10px 0 12px}.lp-step p{color:var(--tx2);line-height:1.6;font-size:1rem}
+.lp-k{display:inline-block;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:650}
+.lp-right{position:relative}
+.lp-stick{position:sticky;top:calc(68px + max(12px,(100vh - 68px - 640px)/2));display:flex;justify-content:center;padding:20px 0}
+/* celular */
+.ph{--w:min(280px,calc((100vh - 140px)*9/19.3));--rx:0deg;--ry:0deg;--gx:30%;--gy:20%;width:var(--w);aspect-ratio:9/19.3;position:relative;perspective:1400px}
+.ph-tilt{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(-2deg);transition:transform .08s linear;will-change:transform}
+.ph-back{position:absolute;inset:0;border-radius:52px;background:linear-gradient(135deg,#3a2f1c,#120f0a 60%);transform:translateZ(-14px);box-shadow:0 0 0 1px rgba(226,178,80,.25)}
+.ph-frame{position:absolute;inset:0;border-radius:52px;padding:11px;background:linear-gradient(145deg,#6b5a3a 0%,#2b2418 18%,#0f0d0a 50%,#2a2318 82%,#7a6440 100%);box-shadow:inset 0 0 0 1.5px rgba(255,236,190,.35),inset 0 0 0 4px #0b0a08,0 2px 0 rgba(255,255,255,.08)}
+.ph-btn{position:absolute;width:3px;border-radius:2px;background:linear-gradient(90deg,#6b5a3a,#2b2418)}.ph-btn.b1{left:-3px;top:18%;height:5%}.ph-btn.b2{left:-3px;top:26%;height:9%}.ph-btn.b3{right:-3px;top:24%;height:12%}
+.ph-screen{position:relative;width:100%;height:100%;border-radius:42px;overflow:hidden;background:radial-gradient(ellipse at 70% -10%,rgba(160,112,30,.35),transparent 55%),linear-gradient(180deg,#0e0c08,#050505 45%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.ph-island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:31%;height:26px;border-radius:20px;background:#000;z-index:3}
+.ph-status{position:absolute;top:13px;left:24px;right:22px;display:flex;justify-content:space-between;font-size:11px;font-weight:650;color:#fff;z-index:2}.ph-sig{display:flex;gap:2px;align-items:flex-end}.ph-sig i{width:3px;background:#fff;border-radius:1px}.ph-sig i:nth-child(1){height:5px}.ph-sig i:nth-child(2){height:7px}.ph-sig i:nth-child(3){height:9px}
+.ph-glare{position:absolute;inset:0;border-radius:52px;pointer-events:none;background:radial-gradient(circle at var(--gx) var(--gy),rgba(255,240,210,.16),transparent 45%),linear-gradient(115deg,rgba(255,255,255,.07) 0%,transparent 30%);mix-blend-mode:screen}
+.ph-shadow{position:absolute;left:12%;right:12%;bottom:-34px;height:40px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.75),transparent 70%);filter:blur(6px);transform:translateX(var(--sx,0))}
+.ph-demo{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:9.5px;letter-spacing:.06em;color:rgba(255,255,255,.45);z-index:2}
+@media(hover:none),(pointer:coarse){.ph-tilt{animation:phfloat 7s ease-in-out infinite}@keyframes phfloat{0%,100%{transform:rotateX(4deg) rotateY(-8deg) rotateZ(-2deg)}50%{transform:rotateX(-2deg) rotateY(6deg) rotateZ(-1deg)}}}
+/* app de demonstração dentro do celular */
+.ph-app{position:absolute;inset:44px 12px 26px;font-size:11px;color:var(--tx);display:flex;flex-direction:column;gap:8px}
+.dm-in{animation:dmin .45s var(--ease) both}@keyframes dmin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.dm-top{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 2px}.dm-top b{font-size:14px;letter-spacing:-.02em}.dm-top span{font-size:9.5px;color:var(--mut)}
+.dm-c{background:linear-gradient(180deg,rgba(26,23,18,.95),rgba(14,13,12,.95));border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 11px}
+.dm-c.hl{border-color:rgba(226,178,80,.35);background:linear-gradient(160deg,rgba(226,178,80,.13),rgba(14,13,12,.95) 60%)}
+.dm-l{color:var(--mut);font-size:9.5px;margin-bottom:3px}.dm-v{font-size:21px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}.dm-v.s{font-size:14px}
+.dm-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dm-split{display:flex;gap:10px;margin-top:5px;color:var(--tx2);font-size:10px}.dm-split span{display:inline-flex;align-items:center;gap:4px}
+.dm-dot{width:8px;height:8px;border-radius:2px;display:inline-block}.dm-dot.u{background:#000;box-shadow:inset 0 0 0 1.2px #eee}.dm-dot.n{background:#ffd400}
+.dm-bar{height:5px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:6px}.dm-bar i{display:block;height:100%;background:var(--gold);border-radius:5px;transition:width 1.1s var(--ease)}
+.dm-pos{color:var(--gold-hi)}.dm-neg{color:var(--bad)}
+.dm-delta{display:inline-block;margin-left:6px;font-size:10px;font-weight:650;padding:1px 6px;border-radius:10px;animation:dmin .4s both}.dm-delta.up{background:rgba(95,196,142,.15);color:#8fe0b4}.dm-delta.dn{background:rgba(239,111,102,.15);color:#ffaaa4}
+.dm-seg{display:flex;gap:4px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:3px}.dm-seg span{flex:1;text-align:center;padding:6px 0;border-radius:7px;color:var(--mut);font-size:10px}.dm-seg span.on{background:#f5f5f4;color:#0b0b0d;font-weight:650}
+.dm-field{border:1px solid rgba(226,178,80,.45);border-radius:10px;padding:9px 10px;font-size:15px;font-weight:650;min-height:38px;box-shadow:0 0 0 3px rgba(226,178,80,.12)}.dm-field .cur{display:inline-block;width:1.5px;height:15px;background:var(--gold);vertical-align:-2px;margin-left:1px;animation:blink 1s steps(1) infinite}@keyframes blink{50%{opacity:0}}
+.dm-btn{text-align:center;padding:10px;border-radius:10px;font-weight:700;font-size:11.5px;color:#140f05;background:linear-gradient(180deg,var(--gold-hi) -40%,var(--gold) 60%);transition:transform .15s,filter .15s}.dm-btn.press{transform:scale(.95);filter:brightness(1.15)}
+.dm-toast{align-self:center;background:#f5f5f4;color:#0b0b0d;font-weight:650;font-size:10.5px;padding:7px 12px;border-radius:9px;animation:dmin .35s both}
+.dm-it{display:flex;justify-content:space-between;align-items:center;padding:7px 2px;border-bottom:1px solid rgba(255,255,255,.06)}.dm-it small{display:block;color:var(--mut);font-size:9px;margin-top:1px}.dm-it.new{animation:dmnew 1.6s ease both}@keyframes dmnew{0%{background:rgba(226,178,80,.25)}100%{background:transparent}}
+.dm-rk{display:grid;grid-template-columns:24px 1fr auto;gap:6px;align-items:center;padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.06)}.dm-rk b{color:var(--gold-hi)}.dm-rk.me{background:rgba(226,178,80,.1);border-radius:8px}
+.dm-tag{font-size:8.5px;color:var(--gold-hi);border:1px solid var(--gold-line);border-radius:10px;padding:1px 6px}
+.dm-ring{display:grid;place-items:center;margin:4px auto}.dm-ring svg{width:120px;height:120px;transform:rotate(-90deg)}.dm-ring circle{fill:none;stroke-width:9}.dm-ring .t{stroke:rgba(255,255,255,.08)}.dm-ring .p{stroke:var(--gold);stroke-linecap:round;transition:stroke-dashoffset 1.2s var(--ease)}
+.dm-ringv{margin-top:-82px;margin-bottom:36px;text-align:center}.dm-ringv b{font-size:20px;display:block}.dm-ringv span{color:var(--mut);font-size:9.5px}
+.dm-bars{display:flex;align-items:flex-end;gap:5px;height:44px;margin-top:6px}.dm-bars i{flex:1;background:linear-gradient(180deg,var(--gold),rgba(226,178,80,.25));border-radius:3px 3px 1px 1px;min-height:3px;transition:height .9s var(--ease)}
+/* seções */
+.lp-sec{padding:96px 0;position:relative}
+.lp-h2{font-size:clamp(1.7rem,3.4vw,2.7rem);letter-spacing:-.035em;line-height:1.1;margin:10px 0 34px;max-width:760px}
+.lp-steps{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;counter-reset:s}
+.lp-steps li{position:relative;padding:22px 18px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(24,21,16,.85),rgba(10,10,10,.85))}
+.lp-steps li::after{content:'';position:absolute;top:44px;right:-14px;width:14px;height:1px;background:linear-gradient(90deg,var(--gold-line),transparent)}.lp-steps li:last-child::after{display:none}
+.lp-n{font-size:.78rem;color:var(--gold);font-weight:700;letter-spacing:.1em}.lp-steps h3,.lp-card h3{font-size:1.05rem;margin:12px 0 8px;letter-spacing:-.01em}.lp-steps p,.lp-card p{color:var(--tx2);font-size:.9rem;line-height:1.55}
+.lp-ic{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;margin-top:12px;color:var(--gold-hi);background:var(--gold-a);border:1px solid var(--gold-line)}.lp-ic svg{width:22px;height:22px}
+.lp-card{padding:22px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(24,21,16,.85),rgba(10,10,10,.88));transition:border-color .25s,transform .25s}.lp-card:hover{border-color:var(--gold-line);transform:translateY(-2px)}
+.lp-card.big{padding:28px;background:radial-gradient(ellipse at 100% 0%,rgba(226,178,80,.12),transparent 55%),linear-gradient(180deg,rgba(28,24,17,.9),rgba(10,10,10,.9))}.lp-card.big h3{font-size:1.25rem}
+.lp-feat-main{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:16px}.lp-feat-mini{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.lp-rk{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:48px;align-items:center}
+.lp-list{list-style:none;display:flex;flex-direction:column;gap:14px;margin-bottom:28px;color:var(--tx2);line-height:1.55}.lp-list b{color:var(--tx)}
+.lp-rkdemo ol{list-style:none;margin:12px 0}.lp-rkdemo li{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;padding:12px 8px;border-bottom:1px solid var(--line)}.lp-rkdemo li b{color:var(--gold-hi)}.lp-rkdemo li em{font-style:normal;font-variant-numeric:tabular-nums;font-weight:650}.lp-rkdemo li.me{background:var(--gold-a);border-radius:10px}
+.lp-rkhead{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}.lp-tag{font-size:.72rem;color:var(--gold-hi);border:1px solid var(--gold-line);border-radius:20px;padding:3px 10px}.lp-rkdemo p{color:var(--mut);font-size:.84rem}
+.lp-freebox,.lp-finalbox{text-align:center;max-width:900px;padding:56px 32px;border-radius:28px;border:1px solid var(--gold-line);background:radial-gradient(ellipse at 50% 0%,rgba(226,178,80,.18),transparent 60%),linear-gradient(180deg,rgba(26,22,15,.92),rgba(8,8,8,.92))}
+.lp-freebox .lp-h2,.lp-finalbox .lp-h2{margin:10px auto 18px}.lp-freebox p,.lp-finalbox p{color:var(--tx2);line-height:1.6;max-width:620px;margin:0 auto 14px}.lp-fine{color:var(--mut);font-size:.84rem}.lp-freebox .lp-btn,.lp-finalbox .lp-btn{margin-top:14px}
+.lp-link{display:block;margin-top:16px;color:var(--tx2);text-decoration:underline;text-underline-offset:3px}.lp-link:hover{color:var(--gold)}
+.lp-faq{max-width:860px}.lp-faq details{border-bottom:1px solid var(--line)}.lp-faq summary{list-style:none;cursor:pointer;padding:20px 40px 20px 0;font-weight:600;font-size:1.02rem;position:relative;min-height:44px}.lp-faq summary::-webkit-details-marker{display:none}
+.lp-faq summary::after{content:'+';position:absolute;right:6px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:1.4rem;transition:transform .25s}.lp-faq details[open] summary::after{transform:translateY(-50%) rotate(45deg)}
+.lp-faq details p{color:var(--tx2);line-height:1.6;padding:0 0 20px}
+.lp-foot{border-top:1px solid var(--line);padding:44px 0 calc(28px + var(--sab));position:relative;z-index:1;background:rgba(5,5,5,.6)}
+.lp-footrow{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(2,minmax(0,1fr));gap:30px}.lp-footrow p{color:var(--mut);font-size:.88rem;margin-top:12px;line-height:1.55;max-width:380px}
+.lp-footrow nav{display:flex;flex-direction:column;gap:10px}.lp-footrow nav a{color:var(--tx2);text-decoration:none;font-size:.9rem}.lp-footrow nav a:hover{color:var(--gold)}
+.lp-copy{color:var(--faint);font-size:.8rem;margin-top:30px}
+.lp-rv{opacity:0;transform:translateY(18px);transition:opacity .7s var(--ease),transform .7s var(--ease)}.lp-rv.in{opacity:1;transform:none}
+.lp :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+.auth-back{display:inline-flex;align-items:center;gap:6px;color:var(--mut);text-decoration:none;font-size:.86rem;margin-bottom:18px;min-height:36px}.auth-back:hover{color:var(--gold)}
+@media(max-width:1080px){.lp-nav>a{padding:9px 8px;font-size:.86rem}.lp-steps{grid-template-columns:repeat(3,minmax(0,1fr))}.lp-feat-mini{grid-template-columns:repeat(3,minmax(0,1fr))}.lp-steps li::after{display:none}}
+@media(max-width:900px){
+ .lp-burger{display:flex}.lp-hide-m{display:none}.lp-hact{margin-left:auto}
+ .lp-nav{position:fixed;left:0;right:0;top:calc(68px + var(--sat));flex-direction:column;align-items:stretch;gap:2px;padding:12px 16px 18px;background:rgba(8,8,8,.97);border-bottom:1px solid var(--gold-line);transform:translateY(-8px);opacity:0;visibility:hidden;transition:opacity .2s,transform .2s,visibility .2s;max-height:calc(100vh - 68px);overflow-y:auto}
+ .lp-nav.open{opacity:1;transform:none;visibility:visible}.lp-nav>a{padding:13px 10px;font-size:1rem;border-bottom:1px solid var(--line)}.lp-navcta{display:flex;gap:10px;margin-top:12px}.lp-navcta .lp-btn{flex:1}
+ .lp-hact .lp-btn:not(.lp-hide-m){padding:9px 12px;min-height:40px;font-size:.84rem}
+ .lp-split{grid-template-columns:minmax(0,1fr);gap:0}.lp-hero{min-height:0;padding:36px 0 24px}
+ .lp-hero{grid-row:1}.lp-right{order:0;grid-row:2}.lp-stick{position:relative;top:0;padding:10px 0 40px}.ph{--w:min(250px,66vw)}
+ .lp-left{display:contents}.lp-story{grid-row:3}.lp-step{min-height:0;opacity:1;padding:26px 0;border-top:1px solid var(--line)}
+ .lp-sec{padding:64px 0}.lp-steps{grid-template-columns:minmax(0,1fr)}.lp-feat-main{grid-template-columns:minmax(0,1fr)}.lp-feat-mini{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .lp-rk{grid-template-columns:minmax(0,1fr);gap:28px}.lp-footrow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.lp-footrow>div{grid-column:1/-1}
+ .lp-freebox,.lp-finalbox{padding:38px 20px;border-radius:22px}
+}
+@media(max-width:480px){.lp-w{padding:0 16px}.lp-hide-xs{display:none}.lp-ctas .lp-btn{flex:1 1 100%}.lp-feat-mini{grid-template-columns:minmax(0,1fr)}.lp h1{font-size:2.15rem}}
+@media(prefers-reduced-motion:reduce){.lp{scroll-behavior:auto}.lp-rv{opacity:1;transform:none}.ph-tilt{animation:none!important}}
 </style>
 <script src="config.js"></script>
 <script>
@@ -378,15 +491,140 @@ input,select,textarea{font-size:16px}
    Os valores normalmente vêm de config.js, gerado por scripts/build-config.mjs a partir de variáveis PÚBLICAS. */
 window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:'',functionsUrl:'',uberEnabled:false},window.NSC_CONFIG||{});
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
-<body>
+<body class="boot">
+<!-- ============ LANDING PAGE PÚBLICA ============
+     Primeira tela para visitantes sem sessão. "Entrar" e "Criar conta grátis" abrem o login/cadastro já existentes
+     (#entrar e #criar-conta). O celular mostra uma DEMONSTRAÇÃO isolada: nada aqui lê ou grava dados de contas. -->
+<div id="landing" class="lp" hidden>
+ <canvas id="lpfx" aria-hidden="true"></canvas>
+ <header class="lp-h" id="lp-top">
+  <div class="lp-w lp-hrow">
+   <a class="lp-logo" href="#" data-lpgo="lp-top" aria-label="NESC, início"><img src="/icon-192.png" alt="" width="32" height="32"><b>NESC</b></a>
+   <nav class="lp-nav" id="lp-nav" aria-label="Seções da página">
+    <a href="#" data-lpgo="lp-top">Início</a><a href="#como-funciona" data-lpgo="como-funciona" data-track="cta_how">Como funciona</a><a href="#funcionalidades" data-lpgo="funcionalidades">Funcionalidades</a><a href="#ranking-lp" data-lpgo="ranking-lp" data-track="cta_ranking">Ranking</a><a href="#faq" data-lpgo="faq">Perguntas frequentes</a>
+    <div class="lp-navcta"><a class="lp-btn ghost" href="#entrar" data-track="cta_login">Entrar</a><a class="lp-btn" href="#criar-conta" data-track="cta_signup">Criar conta grátis</a></div>
+   </nav>
+   <div class="lp-hact"><a class="lp-btn ghost lp-hide-m" href="#entrar" data-track="cta_login">Entrar</a><a class="lp-btn" href="#criar-conta" data-track="cta_signup">Criar conta<span class="lp-hide-xs"> grátis</span></a>
+    <button type="button" class="lp-burger" id="lp-burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="lp-nav"><span></span><span></span><span></span></button></div>
+  </div>
+ </header>
+ <div class="lp-main" role="main">
+  <section class="lp-w lp-split" aria-label="Apresentação">
+   <div class="lp-left">
+    <div class="lp-hero" data-scene="auto">
+     <span class="lp-free"><i aria-hidden="true"></i>100% gratuito · sem mensalidade</span>
+     <h1>Você dirige.<br><span class="lp-gold">O NESC organiza seus números.</span></h1>
+     <p class="lp-lead">Controle financeiro 100% gratuito para motoristas de Uber e 99.</p>
+     <p class="lp-sub">Registre seus ganhos, acompanhe suas despesas, veja seu lucro e organize suas metas em um só lugar. Sem mensalidade para usar o NESC.</p>
+     <div class="lp-ctas"><a class="lp-btn lg" href="#criar-conta" data-track="cta_signup">Criar conta grátis</a><a class="lp-btn ghost lg" href="#como-funciona" data-lpgo="como-funciona" data-track="cta_how">Ver como funciona</a></div>
+     <ul class="lp-trust"><li>Sem cartão de crédito</li><li>Uber e 99 no mesmo lugar</li><li>Funciona no celular e no computador</li></ul>
+    </div>
+    <div class="lp-story">
+     <article class="lp-step" data-scene="reg"><span class="lp-k">Ganhos</span><h2>Registre o ganho do dia em segundos</h2><p>Escolha Uber ou 99, digite o valor e pronto: o faturamento do dia e a divisão por aplicativo atualizam na hora.</p></article>
+     <article class="lp-step" data-scene="exp"><span class="lp-k">Despesas</span><h2>Cada gasto desconta do lucro, na hora</h2><p>Combustível, alimentação, lavagem, manutenção. O lucro operacional mostra o que sobrou de verdade, com a conta aberta para conferir.</p></article>
+     <article class="lp-step" data-scene="meta"><span class="lp-k">Metas</span><h2>Metas com o percentual real</h2><p>Defina a meta de faturamento, lucro ou economia e acompanhe o progresso do dia. Passou da meta? O NESC mostra quanto passou.</p></article>
+     <article class="lp-step" data-scene="hist"><span class="lp-k">Histórico</span><h2>Tudo organizado para consultar depois</h2><p>Ganhos, despesas e manutenções em uma lista com filtros por período, aplicativo e categoria.</p></article>
+     <article class="lp-step" data-scene="rank"><span class="lp-k">Ranking</span><h2>Compare seu resultado, sem expor seus dados</h2><p>Classificação por lucro operacional ou faturamento do período, com apelido. Ninguém vê seus lançamentos.</p></article>
+    </div>
+   </div>
+   <div class="lp-right" id="lp-right">
+    <div class="lp-stick">
+     <div class="ph" id="ph" aria-label="Demonstração do aplicativo NESC em um celular (dados fictícios)" role="img">
+      <div class="ph-tilt" id="ph-tilt">
+       <div class="ph-back" aria-hidden="true"></div>
+       <div class="ph-frame"><i class="ph-btn b1"></i><i class="ph-btn b2"></i><i class="ph-btn b3"></i>
+        <div class="ph-screen"><div class="ph-island"></div><div class="ph-status"><span>9:41</span><span class="ph-sig"><i></i><i></i><i></i></span></div>
+         <div class="ph-app" id="phapp" aria-hidden="true"></div>
+         <div class="ph-demo">Demonstração · dados fictícios</div></div>
+        <div class="ph-glare" id="ph-glare"></div>
+       </div>
+      </div>
+      <div class="ph-shadow" id="ph-shadow"></div>
+     </div>
+    </div>
+   </div>
+  </section>
+
+  <section class="lp-sec" id="como-funciona" aria-labelledby="cf-h">
+   <div class="lp-w"><span class="lp-k">Como funciona</span><h2 class="lp-h2" id="cf-h">Cinco passos, nenhum mistério</h2>
+    <ol class="lp-steps">
+     <li class="lp-rv"><span class="lp-n">01</span><i class="lp-ic" data-ic="conta"></i><h3>Crie sua conta</h3><p>Cadastro com nome, e-mail e senha. Depois, se quiser, cadastre o veículo para calcular o custo por km.</p></li>
+     <li class="lp-rv"><span class="lp-n">02</span><i class="lp-ic" data-ic="uber"></i><h3>Registre seus ganhos</h3><p>Informe o valor recebido na Uber e na 99 ao fim do expediente. O registro é manual e leva segundos.</p></li>
+     <li class="lp-rv"><span class="lp-n">03</span><i class="lp-ic" data-ic="despesas"></i><h3>Registre suas despesas</h3><p>Combustível, manutenção e outros custos entram no cálculo do seu resultado.</p></li>
+     <li class="lp-rv"><span class="lp-n">04</span><i class="lp-ic" data-ic="financas"></i><h3>Acompanhe seus resultados</h3><p>Faturamento, despesas, lucro operacional, histórico e metas, por dia, semana ou mês.</p></li>
+     <li class="lp-rv"><span class="lp-n">05</span><i class="lp-ic" data-ic="metas"></i><h3>Organize sua rotina</h3><p>Use seus números para definir metas, reservar dinheiro para a parcela e lembrar da manutenção.</p></li>
+    </ol></div>
+  </section>
+
+  <section class="lp-sec" id="funcionalidades" aria-labelledby="fn-h">
+   <div class="lp-w"><span class="lp-k">Funcionalidades</span><h2 class="lp-h2" id="fn-h">O que você encontra no NESC</h2>
+    <div class="lp-feat-main">
+     <div class="lp-card big lp-rv"><i class="lp-ic" data-ic="hoje"></i><h3>Painel financeiro</h3><p>Faturamento, despesas, lucro operacional e meta do dia em uma tela, com gráfico diário feito só com o que você registrou.</p></div>
+     <div class="lp-card big lp-rv"><i class="lp-ic" data-ic="uber2"></i><h3>Uber e 99 separados</h3><p>Ganhos, jornada, quilometragem e passes de cada aplicativo, com o resultado de cada um.</p></div>
+     <div class="lp-card big lp-rv"><i class="lp-ic" data-ic="despesas"></i><h3>Despesas e lucro</h3><p>Cada gasto entra na conta do lucro operacional. A composição dos custos fica aberta para conferir.</p></div>
+    </div>
+    <div class="lp-feat-mini">
+     <div class="lp-card lp-rv"><i class="lp-ic" data-ic="historico"></i><h3>Histórico</h3><p>Registros antigos com filtros, busca e ordenação.</p></div>
+     <div class="lp-card lp-rv"><i class="lp-ic" data-ic="metas"></i><h3>Metas</h3><p>Faturamento, lucro, limite de despesas e economia.</p></div>
+     <div class="lp-card lp-rv"><i class="lp-ic" data-ic="manutencao"></i><h3>Manutenção</h3><p>Serviços, custos, quilometragem e próximas revisões.</p></div>
+     <div class="lp-card lp-rv"><i class="lp-ic" data-ic="financas"></i><h3>Relatórios</h3><p>Comparação com o período anterior, contas a pagar e reservas.</p></div>
+     <div class="lp-card lp-rv"><i class="lp-ic" data-ic="ranking"></i><h3>Ranking</h3><p>Sua posição por lucro operacional ou faturamento.</p></div>
+    </div></div>
+  </section>
+
+  <section class="lp-sec" id="ranking-lp" aria-labelledby="rk-h">
+   <div class="lp-w lp-rk">
+    <div><span class="lp-k">Ranking</span><h2 class="lp-h2" id="rk-h">Veja sua posição sem expor seus números</h2>
+     <ul class="lp-list"><li><b>Critério claro:</b> lucro operacional do período (faturamento − combustível, passes e outros gastos) ou, se preferir, faturamento.</li><li><b>Períodos:</b> hoje, últimos 7 dias ou mês atual.</li><li><b>Privacidade:</b> aparecem só a posição, um apelido e o valor do critério. Nada de nome, e-mail, veículo ou lançamentos. Você pode sair do ranking quando quiser.</li><li><b>Sem atalhos:</b> a posição é calculada no servidor a partir dos registros; ninguém edita a própria colocação.</li></ul>
+     <a class="lp-btn" href="#criar-conta" data-track="cta_ranking">Conhecer o ranking</a></div>
+    <div class="lp-card lp-rkdemo lp-rv" aria-label="Exemplo ilustrativo de ranking com dados fictícios"><div class="lp-rkhead"><b>Lucro operacional · 7 dias</b><span class="lp-tag">Exemplo ilustrativo · dados fictícios</span></div>
+     <ol><li><b>1º</b><span>Motorista #A7F2</span><em>R$ 1.284,50</em></li><li><b>2º</b><span>Noturno do ABC</span><em>R$ 1.102,30</em></li><li class="me"><b>3º</b><span>Você</span><em>R$ 968,90</em></li><li><b>3º</b><span>Motorista #19C4</span><em>R$ 968,90</em></li><li><b>5º</b><span>Rota Leste</span><em>R$ 811,00</em></li></ol>
+     <p>Empates dividem a posição: depois de dois 3º lugares vem o 5º.</p></div>
+   </div>
+  </section>
+
+  <section class="lp-sec lp-free-sec" aria-labelledby="fr-h">
+   <div class="lp-w lp-freebox lp-rv"><span class="lp-k">Gratuito</span><h2 class="lp-h2" id="fr-h">Seu dinheiro merece organização. Não mais uma mensalidade.</h2>
+    <p>O NESC foi pensado para ajudar motoristas de aplicativo a acompanhar seus números sem adicionar uma assinatura mensal à rotina. Não há plano pago nem cobrança dentro do NESC.</p>
+    <p class="lp-fine">As taxas, passes e pacotes da Uber e da 99 continuam sendo cobrados por elas, como sempre. Para usar o NESC você só precisa de internet.</p>
+    <a class="lp-btn lg" href="#criar-conta" data-track="cta_signup">Começar gratuitamente</a></div>
+  </section>
+
+  <section class="lp-sec" id="faq" aria-labelledby="faq-h">
+   <div class="lp-w lp-faq"><span class="lp-k">Dúvidas</span><h2 class="lp-h2" id="faq-h">Perguntas frequentes</h2>
+    <details><summary>O NESC é gratuito?</summary><p>Sim. Não há mensalidade, plano pago ou cobrança dentro do NESC. As taxas e pacotes da Uber e da 99 continuam sendo cobrados por elas.</p></details>
+    <details><summary>O NESC funciona para Uber e 99?</summary><p>Sim. Você registra os ganhos de cada aplicativo separadamente e vê o resultado de cada um e o total. O registro é manual: o NESC não importa dados automaticamente das plataformas.</p></details>
+    <details><summary>Posso registrar minhas despesas?</summary><p>Sim: combustível ou recarga, manutenção e outros gastos, como alimentação e lavagem. Gastos gerais do veículo são divididos entre Uber e 99.</p></details>
+    <details><summary>Como acompanho meu lucro operacional?</summary><p>Na tela Início e em Relatórios. Lucro operacional = faturamento − combustível/energia − passes rateados − outros gastos. Manutenção e custos fixos (como a parcela do carro) aparecem no "resultado completo".</p></details>
+    <details><summary>Posso consultar registros antigos?</summary><p>Sim, na aba Histórico, com filtros por período, tipo, aplicativo e categoria, busca e ordenação.</p></details>
+    <details><summary>Como funcionam as metas?</summary><p>Você define uma meta de faturamento, lucro operacional, limite de despesas, economia ou pagamento de uma conta. O percentual é o realizado dividido pela meta: se passar da meta, o NESC mostra quanto passou.</p></details>
+    <details><summary>Como funciona o ranking?</summary><p>Ele ordena os participantes pelo lucro operacional (ou pelo faturamento) de hoje, dos últimos 7 dias ou do mês. O cálculo é feito no servidor a partir dos registros. Aparecem só posição, apelido e o valor do critério.</p></details>
+    <details><summary>Como recupero minha senha?</summary><p>Na tela de entrada, toque em "Esqueceu a senha?" e informe seu e-mail. Você recebe um link para criar uma nova senha.</p></details>
+    <details><summary>Meus dados financeiros ficam públicos?</summary><p>Não. Seus lançamentos só podem ser lidos pela sua conta. No ranking aparecem apenas posição, apelido e o valor do critério do período, e você pode escolher não participar.</p></details>
+   </div>
+  </section>
+
+  <section class="lp-sec lp-final" aria-labelledby="fi-h">
+   <div class="lp-w lp-finalbox lp-rv"><h2 class="lp-h2" id="fi-h">Comece a entender para onde vai o dinheiro das suas corridas.</h2>
+    <p>Organize seus ganhos, acompanhe seus gastos e tenha uma visão mais clara da sua rotina financeira.</p>
+    <a class="lp-btn lg" href="#criar-conta" data-track="cta_signup">Criar minha conta grátis</a><a class="lp-link" href="#entrar" data-track="cta_login">Já tenho uma conta. Entrar.</a></div>
+  </section>
+ </div>
+ <footer class="lp-foot"><div class="lp-w lp-footrow">
+  <div><a class="lp-logo" href="#" data-lpgo="lp-top"><img src="/icon-192.png" alt="" width="28" height="28"><b>NESC</b></a><p>Controle financeiro gratuito para motoristas de Uber e 99.</p><p class="lp-fine">Esta página registra apenas contagens anônimas de cliques (sem cookies e sem dados pessoais). Não use o celular enquanto dirige.</p></div>
+  <nav aria-label="Rodapé"><a href="#como-funciona" data-lpgo="como-funciona">Como funciona</a><a href="#funcionalidades" data-lpgo="funcionalidades">Funcionalidades</a><a href="#ranking-lp" data-lpgo="ranking-lp">Ranking</a><a href="#faq" data-lpgo="faq">Perguntas frequentes</a></nav>
+  <nav aria-label="Conta"><a href="#entrar" data-track="cta_login">Entrar</a><a href="#criar-conta" data-track="cta_signup">Criar conta</a></nav>
+ </div><div class="lp-w lp-copy">© 2026 NESC</div></footer>
+</div>
+<div id="boot" aria-hidden="true"><img src="/icon-192.png" alt="" width="56" height="56"></div>
 
 <div id="canvas-container"></div>
 
 <div class="layout-container" id="auth">
   <div class="left-panel">
    <div class="auth-wrap">
+    <a class="auth-back" href="#" id="auth-back">← Voltar para o início</a>
     <div class="brand-row"><img class="brand-mark" src="/icon-192.png" width="44" height="44" alt="" /><h1 class="brand-title">NESC</h1></div>
     <p class="brand-line">Um só lugar para<br><span class="rot" id="rot">seus ganhos na Uber</span></p>
     <p class="brand-subtitle">Ganhos, custos, metas e rotina com cálculos que você consegue conferir.</p>
@@ -448,8 +686,8 @@ const Cloud={on:!!(C.supabaseUrl&&C.supabaseAnonKey),sb:null,
   async init(){if(!this.on)return false;if(this.sb)return true;if(!window.supabase)await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js');this.sb=window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return true},
   async pull(id){const{data,error}=await this.sb.from('lifeos_user_data').select('data,updated_at').eq('user_id',id).maybeSingle();if(error)throw error;return data&&data.data},
   async push(id,doc){const{error}=await this.sb.from('lifeos_user_data').upsert({user_id:id,data:doc,updated_at:new Date().toISOString()});if(error)throw error},
-  async publishRank(row){const{error}=await this.sb.from('driver_global_ranking').upsert(row,{onConflict:'user_id'});if(error)throw error},
-  async readRanks(f,t){const{data,error}=await this.sb.from('driver_global_ranking').select('user_id,display_name,vehicle,period_start,period_end,revenue,operating_profit,highlighted_app,updated_at').eq('period_start',f).eq('period_end',t).order('operating_profit',{ascending:false}).limit(100);if(error)throw error;return data||[]}
+  /* ranking: calculado no servidor a partir dos registros salvos (função nesc_ranking); o navegador só consulta */
+  async ranking(f,t,metric){const{data,error}=await this.sb.rpc('nesc_ranking',{p_from:f,p_to:t,p_metric:metric,p_limit:50});if(error)throw error;return data||[]}
 };
 const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
 const Auth={
@@ -495,7 +733,8 @@ const Store={sync:Cloud.on?'conectando…':'local',
   load(){const raw=LS.get(this.key());try{db=Object.assign(empty(),JSON.parse(raw||'{}'))}catch(e){db=empty()}
     if(raw&&!db._v3&&!LS.get(this.key()+'_pre_v3'))LS.set(this.key()+'_pre_v3',raw); // cópia de segurança dos dados antes da atualização v3
     migrate();db._v3=1},
-  save(){db._t=Date.now();LS.set(this.key(),JSON.stringify(db));if(LS.fail&&!LS.warned){LS.warned=1;toast('Armazenamento do navegador indisponível: os dados valem só nesta sessão. Use Backup para guardá-los.')}if(Cloud.on){LS.set(this.key()+'_pending','1');clearTimeout(this.tm);this.tm=setTimeout(()=>this.push(),1200)}},
+  save(){db._t=Date.now();if(typeof RK!=='undefined')RK.key=''; // ranking recalcula com os dados novos
+    LS.set(this.key(),JSON.stringify(db));if(LS.fail&&!LS.warned){LS.warned=1;toast('Armazenamento do navegador indisponível: os dados valem só nesta sessão. Use Backup para guardá-los.')}if(Cloud.on){LS.set(this.key()+'_pending','1');clearTimeout(this.tm);this.tm=setTimeout(()=>this.push(),1200)}},
   async pull(){if(!Cloud.on||!user.id)return;try{const r=await Cloud.pull(user.id);if(r&&!r._v3&&!LS.get(this.key()+'_pre_v3'))LS.set(this.key()+'_pre_v3',JSON.stringify(r));if(r){const pend=LS.get(this.key()+'_pending')==='1';db=pend?mergeDb(db,r):mergeDb(r,{});LS.set(this.key(),JSON.stringify(db));migrate();if(pend)await this.push()}else await this.push();this.setSync('sincronizado');render()}catch(e){this.setSync('offline · dados locais');}},
   async push(){if(!Cloud.on||!user.id)return;try{await Cloud.push(user.id,db);LS.set(this.key()+'_pending','0');this.setSync('sincronizado')}catch(e){this.setSync('pendente · tentará novamente')}},
   setSync(s){this.sync=s;const el=$('#sync');if(el)el.textContent='Dados: '+s}
@@ -750,7 +989,7 @@ async function handleAuth(e,mode){
   let ok=false;
   try{
     const u=mode==='login'?await Auth.signIn(email,pass):await Auth.signUp(f.get('name').trim(),email,pass);
-    ok=true;b.classList.remove('loading');b.classList.add('done');bl.textContent=mode==='login'?'Acesso liberado':'Conta criada';
+    ok=true;if(mode==='register')track('signup_done');b.classList.remove('loading');b.classList.add('done');bl.textContent=mode==='login'?'Acesso liberado':'Conta criada';
     Auth.start(u);enter(u,true,mode==='register');
   }catch(x){err.textContent=x.message||'Não foi possível concluir. Tente novamente.';err.classList.toggle('info',!!x.info);
     if(!x.info){fields.filter(i=>i.type!=='text'||mode==='register').forEach(i=>{if(i.name!=='name')i.setAttribute('aria-invalid','true')});e.target.classList.remove('shake');void e.target.offsetWidth;e.target.classList.add('shake')}}
@@ -785,7 +1024,7 @@ async function handleNewPass(e){e.preventDefault();const fm=e.target,b=fm.queryS
     b.classList.remove('loading');bl.textContent=b.dataset.label;b.disabled=false;switchTab('login','Senha redefinida. Entre com a nova senha.',true)}
   catch(x){const m=String(x&&(x.code||x.message)||'').toLowerCase();err.textContent=m.includes('same')?'A nova senha precisa ser diferente da anterior.':m.includes('weak')?'Senha fraca. Use pelo menos 8 caracteres com letras e números.':m.includes('session')||m.includes('jwt')||m.includes('expired')?'O link expirou. Peça um novo link de recuperação.':cloudErr(x);
     b.disabled=false;b.classList.remove('loading');bl.textContent=b.dataset.label}}
-async function startRecovery(){if(!Cloud.on){switchTab('recover');return}
+async function startRecovery(){showAuth('recover');if(!Cloud.on)return;
   if(RECOV==='expired'){cleanUrl();switchTab('recover','O link de recuperação expirou ou já foi usado. Peça um novo abaixo.');return}
   switchTab('newpass','Validando o link…',true);
   try{await Cloud.init();let done=false;const show=s=>{if(done)return;done=true;const em=s&&s.user&&s.user.email;document.getElementById('np-who').textContent=em?'Escolha uma nova senha para '+em+'.':'Escolha uma nova senha para sua conta.';switchTab('newpass')};
@@ -839,6 +1078,11 @@ function updateCameraPosition(){
   else{camBase=new THREE.Vector3(3,8,38);camLook=new THREE.Vector3(3,-13,0)} // celular: planeta no topo, formulário embaixo
   camera.position.copy(camBase);camera.lookAt(camLook);needRender=true;
 }
+/* three.js só é baixado quando o login ou o app aparecem: a landing abre sem esperar o 3D */
+const THREE_URL='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';let threeP=null;
+const ensureThree=()=>threeP||(threeP=window.THREE?Promise.resolve():new Promise(ok=>{const s=document.createElement('script');s.src=THREE_URL;s.onload=ok;s.onerror=()=>{console.warn('three.js indisponível');ok()};document.head.appendChild(s)}));
+function initLogin(){if(initLogin.done)return;initLogin.done=true;ensureThree().then(initLoginScene)}
+function initLoginScene(){
 try{
   if(!window.THREE)throw new Error('three.js não carregou');
   scene=new THREE.Scene();
@@ -885,6 +1129,7 @@ try{
   dust=new THREE.Points(dg,new THREE.PointsMaterial({size:.5,color:0x9a958a,map:createParticleTexture(),transparent:true,opacity:.45,depthWrite:false,blending:THREE.AdditiveBlending}));scene.add(dust);
   loginOn=true;
 }catch(e){container.innerHTML='<div class="gl-fallback" aria-hidden="true"><i></i></div>';console.warn('Cena 3D do login indisponível:',e.message)}
+if(loginOn)requestAnimationFrame(animate)}
 /* mouse (desktop): paralaxe suave; sai da janela → volta ao repouso */
 addEventListener('pointermove',e=>{if(!loginOn)return;if(e.pointerType==='mouse'){ptr.tx=(e.clientX/innerWidth-.5)*2;ptr.ty=(e.clientY/innerHeight-.5)*2}
   else if(ptr.lx!=null){ptr.spin+=(e.clientX-ptr.lx)*.00035;ptr.lx=e.clientX}},{passive:true});
@@ -927,7 +1172,6 @@ function animate(now){
 let zoomFrom,zoomTo;
 function loginZoom(){if(!loginOn)return;zoomFrom=camera.position.clone();zoomTo=planet.position.clone().add(new THREE.Vector3(-2,4,11));zoomT=performance.now()}
 function stopLogin(){if(!loginOn)return;loginOn=false;cancelAnimationFrame(loginRaf);try{scene.traverse(o=>{o.geometry&&o.geometry.dispose();if(o.material){o.material.map&&o.material.map.dispose();o.material.dispose()}});renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove()}catch(e){}}
-if(loginOn)requestAnimationFrame(animate);
 RM.addEventListener&&RM.addEventListener('change',()=>{needRender=true});
 addEventListener('resize',()=>{if(!loginOn)return;camera.aspect=innerWidth/innerHeight;updateCameraPosition();camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 
@@ -936,7 +1180,8 @@ addEventListener('resize',()=>{if(!loginOn)return;camera.aspect=innerWidth/inner
    nas áreas dos respectivos elementos. Pausa com a aba oculta, respeita movimento reduzido. */
 const G3={r:null,fail:false,views:[],angle:.6,last:0,frame:0,
   init(){if(this.r)return true;if(this.fail)return false;
-    try{if(!window.THREE)throw new Error('three.js indisponível');const r=new THREE.WebGLRenderer({antialias:!LOWPOWER,alpha:true,powerPreference:'low-power'});
+    if(!window.THREE){ensureThree().then(()=>{if(window.THREE&&tab==='hoje'&&$('#globe'))mountGlobe()});return false} // carrega e monta depois
+    try{const r=new THREE.WebGLRenderer({antialias:!LOWPOWER,alpha:true,powerPreference:'low-power'});
       r.setPixelRatio(Math.min(devicePixelRatio,LOWPOWER?1:2));r.setSize(innerWidth,innerHeight);r.setScissorTest(true);r.setClearColor(0x000000,0);r.domElement.id='gl';r.domElement.setAttribute('aria-hidden','true');
       if(r.outputEncoding!==undefined)r.outputEncoding=THREE.sRGBEncoding;
       $('#app').appendChild(r.domElement);this.r=r;
@@ -945,7 +1190,7 @@ const G3={r:null,fail:false,views:[],angle:.6,last:0,frame:0,
       requestAnimationFrame(t=>this.loop(t));return true}
     catch(e){this.fail=true;console.warn('WebGL indisponível:',e.message);return false}},
   fallback(el,msg){el.innerHTML=el.id==='globe'?'<div class="gl-orb" aria-hidden="true"></div>':'<div class="st3">'+(msg||'Visualização 3D indisponível neste dispositivo. Todos os dados e cálculos continuam funcionando.')+'</div>'},
-  add(el,o={}){if(!el)return null;if(!this.init()){this.fallback(el);return null}
+  add(el,o={}){if(!el)return null;if(!this.init()){this.fallback(el);return null}el.innerHTML='';
     this.views=this.views.filter(v=>v.el!==el||(this.dispose(v),false));
     const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(o.fov||40,1,.1,100);cam.position.set(...(o.pos||[0,1.6,7]));cam.lookAt(...(o.look||[0,0,0]));
     const v={el,scene:sc,cam,tick:null,w:0,h:0};this.views.push(v);return v},
@@ -1498,29 +1743,24 @@ function gaugeHTML(){const c=cfg(),T=TODAY(),inc=CS(T,T).inc,g=+c.goal||0,gp=goa
 function mountGauge(){const el=$('.gauge[data-f]');if(!el)return;const f=clamp(+el.dataset.f,0,1),gp=el.querySelector('.gp'),nd=el.querySelector('.nd');gLast=f;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{gp.style.strokeDashoffset=GLEN*(1-f);nd.style.transform=`rotate(${-90+180*f}deg)`}))}
 
-/* ============ RANKING LOCAL ============ */
-let globalRankCache=[],globalRankKey='',globalRankLoading='';
-async function refreshGlobalRanking(f,t){
- if(!Cloud.on||!user||!user.id)return;
- const key=f+'|'+t;if(globalRankKey===key||globalRankLoading===key)return;globalRankLoading=key;
- try{
-  await Cloud.init();
-  const c=CS(f,t),u=AS('uber',f,t),n=AS('n99',f,t);
-  await Cloud.publishRank({user_id:user.id,display_name:user.name,vehicle:vehShort(db.vehicle)||'Veículo não cadastrado',period_start:f,period_end:t,revenue:c.inc,operating_profit:c.op,highlighted_app:u.op===n.op?null:(u.op>n.op?'Uber':'99'),updated_at:new Date().toISOString()});
-  globalRankCache=await Cloud.readRanks(f,t);globalRankKey=key;
- }catch(e){console.warn('Ranking global indisponível',e)}finally{globalRankLoading='';if(tab==='ranking')render()}
-}
-function rankOf(dbx,name,f,t,me){const saved=db;try{db=dbx;migrate();const c=CS(f,t),u=AS('uber',f,t),n=AS('n99',f,t),act=c.inc>0||c.jr.some(hasAct);
-    return{name,veh:vehShort(db.vehicle)||'Veículo não cadastrado',op:c.op,revenue:c.inc,best:u.op===n.op?'—':u.op>n.op?'Uber':'99',act,me}}finally{db=saved}}
-function rankRows(f,t){if(Cloud.on){
- const rows=globalRankCache.filter(r=>r.period_start===f&&r.period_end===t).map(r=>({name:r.display_name,veh:r.vehicle||'Veículo não cadastrado',op:Number(r.operating_profit)||0,revenue:Number(r.revenue)||0,best:r.highlighted_app||'—',act:true,me:r.user_id===user.id}));
- if(!rows.some(r=>r.me)){const mine=rankOf(db,user.name,f,t,true);if(mine.act)rows.push(mine)}
- return rows.sort((a,b)=>b.op-a.op)
- }
- const rows=[rankOf(db,user.name,f,t,true)];
+/* ============ RANKING ============
+   Nuvem: posição calculada no servidor (nesc_ranking) com a mesma regra de lucro operacional do app, a partir dos
+   registros salvos de cada conta. Mostra só posição, apelido e o valor do critério. Empates dividem a posição (1, 1, 3).
+   Modo local (sem nuvem): contas deste dispositivo que ativaram o compartilhamento. */
+let rmet='lucro';const RK={key:'',rows:[],state:'idle',err:''};
+const RMET={lucro:'Lucro operacional',faturamento:'Faturamento'};
+async function loadRanking(f,t,force){const key=f+'|'+t+'|'+rmet;if(!force&&RK.key===key&&RK.state!=='error')return;RK.key=key;RK.state='loading';
+  try{await Cloud.init();if(LS.get(Store.key()+'_pending')==='1'){clearTimeout(Store.tm);await Store.push()} // garante que o servidor já tem seus últimos registros
+    const rows=await Cloud.ranking(f,t,rmet);if(RK.key!==key)return;RK.rows=rows;RK.state='ok'}
+  catch(e){if(RK.key!==key)return;RK.state='error';const m=String(e&&e.message||'');RK.err=/fetch|network/i.test(m)?'Sem conexão com o servidor.':'Não foi possível carregar o ranking agora.';console.warn('Ranking',e)}
+  finally{if(tab==='ranking'&&RK.key===key)render()}}
+const rkAlias=(c,uid)=>String(c&&c.rankNick||'').trim().slice(0,24)||'Motorista #'+(uid||'????').slice(0,4).toUpperCase();
+function rankOf(dbx,name,f,t,me){const saved=db;try{db=dbx;migrate();const c=CS(f,t),act=c.inc>0||c.jr.some(hasAct);
+    return{alias:name,value:rmet==='lucro'?c.op:c.inc,act,is_me:me}}finally{db=saved}}
+function localRankRows(f,t){const rows=[];if(cfg().rankOut!==true)rows.push(rankOf(db,rkAlias(cfg(),'')||'Você',f,t,true));
  let users={};try{users=JSON.parse(LS.get('nsc_users')||'{}')}catch(e){}
- Object.keys(users).forEach(em=>{if(em===user.email)return;let d;try{d=JSON.parse(LS.get('nsc_db_'+em)||'null')}catch(e){d=null}if(!d||!d.cfg||d.cfg.rankShare!==true)return;rows.push(rankOf(Object.assign(empty(),d),users[em].name||em.split('@')[0],f,t,false))});
- return rows.filter(r=>r.act).sort((a,b)=>b.op-a.op)}
+ Object.keys(users).forEach(em=>{if(em===user.email)return;let d;try{d=JSON.parse(LS.get('nsc_db_'+em)||'null')}catch(e){d=null}if(!d||!d.cfg||d.cfg.rankShare!==true||d.cfg.rankOut===true)return;rows.push(rankOf(Object.assign(empty(),d),rkAlias(d.cfg,em.replace(/[^a-z0-9]/gi,'')),f,t,false))});
+ const L_=rows.filter(r=>r.act).sort((a,b)=>b.value-a.value);L_.forEach((r,i)=>{r.pos=i&&L_[i-1].value===r.value?L_[i-1].pos:i+1;r.row_no=i+1;r.participants=L_.length});return L_}
 
 Object.assign(V,{
 financas(){
@@ -1584,15 +1824,24 @@ ia(){const sug=['Quanto lucrei nos últimos 7 dias?','Qual aplicativo me deu mai
 conquistas(){const R=achEval(),rec=records();
   return`<div class="grid"><div class="c s12"><h3>Conquistas verificáveis</h3><p class="sub" style="margin-bottom:10px">Cada conquista tem critério claro e mostra a evidência registrada. Não premiamos mais horas ao volante, direção arriscada ou menos descanso.</p><div class="list">${R.map(a=>{const got=db.ach[a.id];return`<div class="it" style="align-items:flex-start"><span style="font-size:1.4rem;opacity:${got?1:.3}">${a.i}</span><div class="g"><b>${a.n}</b> ${got?'<span class="tag ok">conquistada em '+fmtD(got.d)+'</span>':'<span class="tag">em aberto</span>'}<small>Critério: ${a.crit}</small><small>${got?'Evidência: '+esc(got.ev):a.r.prog?'Progresso: '+esc(a.r.prog):''}</small></div></div>`}).join('')}</div></div>
   <div class="c s12"><h3>Recordes pessoais</h3><div class="kpis">${rec.map(r=>kpi(r[0],r[1],r[2])).join('')}</div></div></div>`},
-ranking(){const[f,t]=range(rper),rows=rankRows(f,t),me=rows.find(r=>r.me),others=rows.length-(me?1:0),share=cfg().rankShare===true;
-  if(Cloud.on)refreshGlobalRanking(f,t);
-  return`<div class="finbar">${seg('rper',rper,PERIODS)}<span class="sub">${fmtD(f)}${f!==t?' – '+fmtD(t):''}</span></div><div class="grid">
-  <div class="c s12"><h3>${Cloud.on?'Ranking global de motoristas':'Ranking local deste dispositivo'}</h3>
-   <div class="scope"><b>Escopo:</b> ${Cloud.on?'participantes que abriram o ranking no mesmo período. Mostra nome, veículo e valores agregados de faturamento e lucro, sem expor os lançamentos individuais.':`você${others?' e '+others+' outra(s) conta(s) deste dispositivo que ativaram o compartilhamento':''}. Não é uma competição com motoristas da Uber ou da 99.`} Posição calculada pelo lucro operacional do período, com o mesmo método para todos.</div>
-   ${rows.length?`<div class="list">${rows.map((r,i)=>`<div class="it rk${r.me?' me':''}"><b class="pos1">${i+1}º</b><div class="g"><b>${i+1}º lugar · ${esc(r.veh)} · ${esc(r.name)}</b>${r.me?' <span class="tag ok">você</span>':''}<small>Faturamento: ${brl(r.revenue||0)} · App destaque: ${r.best}</small></div><b class="${r.op>=0?'pos':'neg'}">${brl(r.op)}</b></div>`).join('')}</div>`
-   :`<p class="empty">Sem registros válidos neste período. Registre faturamento ou jornada nas abas Uber e 99 para aparecer no ranking.</p>`}
-   ${!Cloud.on?`<label class="chkl" style="margin-top:14px"><input type="checkbox" data-rankshare ${share?'checked':''}> Compartilhar meu nome, veículo e lucro operacional com outras contas deste dispositivo</label>`:''}
-   ${!me&&rows.length?'<p class="note">Você não aparece porque não tem registros neste período.</p>':''}</div></div>`},
+ranking(){const[f,t]=range(rper),c=cfg(),out=c.rankOut===true,mine=CS(f,t),myAct=mine.inc>0||mine.jr.some(hasAct),myVal=rmet==='lucro'?mine.op:mine.inc;
+  if(Cloud.on)loadRanking(f,t);
+  const rows=Cloud.on?(RK.state==='ok'&&RK.key===f+'|'+t+'|'+rmet?RK.rows:null):localRankRows(f,t),me=rows&&rows.find(r=>r.is_me),N=rows&&rows.length?rows[0].participants:0;
+  const row=(r,prev)=>`${prev&&r.row_no-prev.row_no>1?'<div class="rk-gap" aria-hidden="true">⋯</div>':''}<div class="it rk${r.is_me?' me':''}"><b class="pos1">${r.pos}º</b><div class="g"><b>${esc(r.alias)}</b>${r.is_me?' <span class="tag ok">você</span>':''}</div><b class="${Number(r.value)>0?'pos':Number(r.value)<0?'neg':''}">${brl(Number(r.value))}</b></div>`;
+  const list=rows==null?(RK.state==='error'?`<div class="cempty2">${esc(RK.err)}<button type="button" class="btn sm" data-rkretry>Tentar novamente</button></div>`:'<div class="cempty2" aria-busy="true">Calculando a classificação…</div>')
+   :rows.length?`<div class="list">${rows.map((r,i)=>row(r,rows[i-1])).join('')}</div>`:'<div class="cempty2">Ninguém registrou resultados neste período ainda.</div>';
+  const myMsg=out?'Você optou por não participar. Seus números continuam privados.':!myAct?'Registre seus primeiros resultados neste período para participar da classificação.':rows&&!me?'Seu resultado ainda está sendo sincronizado. Toque em atualizar em alguns segundos.':me?`Sua posição: <b>${me.pos}º de ${N}</b> · ${RMET[rmet]}: <b>${brl(Number(me.value))}</b>`:'';
+  return`<div class="finbar">${seg('rper',rper,PERIODS)}${seg('rmet',rmet,RMET)}<span class="sub">${fmtD(f)}${f!==t?' – '+fmtD(t):''}</span>${Cloud.on?'<button type="button" class="btn ghost sm" data-rkretry>Atualizar</button>':''}</div><div class="grid">
+  <div class="c s8"><h3>${Cloud.on?'Classificação':'Ranking local deste dispositivo'} por ${RMET[rmet].toLowerCase()}</h3>
+   <div class="scope"><b>Critério:</b> ${rmet==='lucro'?'lucro operacional do período = faturamento − combustível/energia − passes rateados − outros gastos (a mesma conta do Início e de Relatórios)':'faturamento bruto registrado no período (Uber + 99)'}. Empates dividem a posição. ${Cloud.on?'Calculado no servidor a partir dos registros salvos de cada conta; ninguém consegue editar a própria posição. Valores são os declarados por cada motorista.':'Inclui só contas deste aparelho que ativaram o compartilhamento.'}</div>
+   ${myMsg?`<p class="sub" style="margin:0 0 10px">${myMsg}</p>`:''}${list}</div>
+  <form class="c s4" data-form="rank" novalidate><h3>Sua participação</h3>
+   <p class="sub" style="margin:-6px 0 12px">No ranking aparecem só a posição, o apelido e o valor do critério escolhido. Nunca seu nome, e-mail, veículo, despesas ou lançamentos.</p>
+   <div class="f"><label for="rk-nick">Apelido público (opcional)</label><input id="rk-nick" name="nick" maxlength="24" value="${esc(c.rankNick||'')}" placeholder="Sem apelido: Motorista #XXXX" autocomplete="off"></div>
+   <label class="chkl"><input type="checkbox" name="part" value="1" ${out?'':'checked'}> Participar da classificação</label>
+   ${!Cloud.on?`<label class="chkl"><input type="checkbox" data-rankshare ${c.rankShare===true?'checked':''}> Compartilhar com outras contas deste dispositivo</label>`:''}
+   <div class="err" data-err></div><button class="btn">Salvar participação</button></form>
+  </div>`},
 metas(){const c=cfg(),fin=db.goals.filter(g=>g.kind==='fin'),dg=db.goals.filter(g=>g.kind==='dia'),lg=db.goals.filter(g=>g.kind==='longo');
   const row=g=>g.kind==='dia'
    ?`<div class="it"><button class="chk ${g.last===TODAY()?'on':''}" data-goal="${g.id}" aria-label="${g.last===TODAY()?'Desmarcar':'Concluir'} meta">${g.last===TODAY()?'✓':''}</button><div class="g ${g.last===TODAY()?'done':''}">${esc(g.text)}<small>${g.last===TODAY()?'Concluída hoje':'Marque quando concluir hoje'}</small></div>${del('goals',g.id)}</div>`
@@ -2044,7 +2293,7 @@ document.addEventListener('click',e=>{
   if(T.closest('[data-onboard]')){openOnboard();return}
   if(T.closest('[data-more]')){openSheet();return}
   if(T.closest('[data-account]')){openAccount();return}
-  if(T.closest('[data-logout]')){const b=T.closest('[data-logout]');b.disabled=true;Auth.end().then(()=>{user=null;db=null;location.replace(location.pathname)});return}
+  if(T.closest('[data-logout]')){const b=T.closest('[data-logout]');b.disabled=true;Auth.end().then(()=>{user=null;db=null;try{history.replaceState(null,'',location.pathname+'#entrar')}catch(e){}location.reload()}); /* recarrega limpo, sem deixar o app no histórico */return}
   if(T.closest('[data-addrec]')){openAddRec();return}
   const rc=T.closest('[data-rec]');if(rc){const k=rc.dataset.rec;k==='inc'?openInc(APPS[tab]?tab:'uber'):k==='exp'?openExp():openMaint(null);return}
   const mt=T.closest('[data-maint]');if(mt){e.preventDefault();openMaint(mt.dataset.maint);return}
@@ -2072,6 +2321,8 @@ document.addEventListener('click',e=>{
   const fp=T.closest('[data-fper]');if(fp){fper=fp.dataset.fper;render();return}
   const hp=T.closest('[data-hper]');if(hp){hper=hp.dataset.hper;render();return}
   const rp=T.closest('[data-rper]');if(rp){rper=rp.dataset.rper;render();return}
+  const rmt=T.closest('[data-rmet]');if(rmt){rmet=rmt.dataset.rmet;render();return}
+  if(T.closest('[data-rkretry]')){const[f,t]=range(rper);RK.key='';loadRanking(f,t,true);render();return}
   const pp=T.closest('[data-pper]');if(pp){pper=pp.dataset.pper;render();return}
   const ak=T.closest('[data-ask]');if(ak){ask(ak.dataset.ask);return}
   if(T.closest('[data-addper]')){const f=T.closest('form'),box=f.querySelector('.periods');if(!box.children.length&&f.dataset.typed==null)f.dataset.typed=f.hours.value;box.insertAdjacentHTML('beforeend',periodRow(null));f.hours.readOnly=true;box.lastElementChild.querySelector('input').focus();perTotal(f);return}
@@ -2181,7 +2432,7 @@ document.addEventListener('submit',e=>{
   if(k==='ask'){const q=(f.q||'').trim();if(q)ask(q);fm.reset();return}
   if(k==='uberdc'){closeModal();UberLink.disconnect(!!f.purge,!!f.local);return}
   if(k==='uberrev'){const msg=applyUberReview(f);closeModal();render();toast(msg);return}
-  const sig=k+JSON.stringify(f);if(!['jr','odo','cash','own','edtx','gnew','profile'].includes(k)&&sig===lastSig&&Date.now()-lastT<1500)return;lastSig=sig;lastT=Date.now();
+  const sig=k+JSON.stringify(f);if(!['jr','odo','cash','own','edtx','gnew','profile','rank'].includes(k)&&sig===lastSig&&Date.now()-lastT<1500)return;lastSig=sig;lastT=Date.now();
   if(k==='visit'){saveVisit(fm,f);return}
   if(k==='inc'){const v=parseMoney(f.v),a=f.app,dd=f.d||d;if(!APPS[a])return ferr(fm,'Escolha Uber ou 99.');if(!(v>0))return ferr(fm,'Informe um valor válido, ex.: 250 · 250,50 · 250.50.');if(dd>d)return ferr(fm,'A data não pode ser futura.');
     const ex=db.tx.filter(t=>t.type==='in'&&appOf(t)===a&&t.d===dd);if(ex.length){lastSig='';dupDialog(a,dd,v,ex);return}
@@ -2194,6 +2445,7 @@ document.addEventListener('submit',e=>{
     x.v=v;x.d=f.d;x.at=Date.now();{if(['fuel','maint','other'].includes(f.type))x.type=f.type;x.desc=(f.desc||'').trim()||L[x.type];x.app=x.type==='fuel'?'veic':['veic','uber','n99'].includes(f.app)?f.app:x.app}return ok('Registro atualizado.')}
   if(k==='goal'){if(!(f.text||'').trim())return;db.goals.push({id,kind:f.kind,text:f.text.trim(),pct:0,last:null});return ok('Meta adicionada.')}
   if(k==='gnew'){return ok(saveGoal(fm,f))}
+  if(k==='rank'){const nick=String(f.nick||'').replace(/[<>"\u0000-\u001f]/g,'').trim().slice(0,24);db.cfg.rankNick=nick;db.cfg.rankOut=!f.part;RK.key='';Store.save();if(Cloud.on){clearTimeout(Store.tm);Store.push().then(()=>render())}render();toast(f.part?'Participação salva'+(nick?' como '+nick:' com apelido automático')+'.':'Você saiu da classificação.');return}
   if(k==='profile'){const nm=(f.name||'').trim();if(!nm)return ferr(fm,'Informe um nome.');if(nm.length>60)return ferr(fm,'Use até 60 caracteres.');Auth.rename(nm).then(()=>{render();toast('Nome atualizado.')});return}
   if(k==='odo'){if(!db.vehicle)return;if(!f.km){db.vehicle.odo=null;db.vehicle.odoD=null;return ok('Quilometragem removida: aparece como não informada.')}const v=parseOdo(f.km);if(!(v>=0))return ferr(fm,'Quilometragem inválida.');db.vehicle.odo=Math.round(v);db.vehicle.odoD=d;return ok('Quilometragem atualizada.')}
   if(k==='cash'){const v=parseMoney(String(f.v||'').replace(/^-/,''));if(!isFinite(v))return ferr(fm,'Valor inválido.');db.cfg.cash={v:String(f.v).trim().startsWith('-')?-v:v,at:Date.now(),d};return ok('Saldo atualizado.')}
@@ -2209,33 +2461,123 @@ document.addEventListener('submit',e=>{
   if(k==='batt'){const v=parseDec(f.soh);if(!(v>0&&v<=100))return ferr(fm,'Informe a saúde entre 0 e 100%.');db.batt.push({id,d:f.d||d,soh:v,src:f.src,note:''});return ok('Leitura registrada.')}
 });
 
-/* ============ FUNDO VIVO DO APP (Canvas 2D) ============
-   Poucas partículas douradas descendo devagar, com brilho que pulsa; halos e degradê ficam no CSS (custo zero).
-   Fica atrás de tudo (pointer-events:none). ~30 quadros/s, pausa com a aba oculta, desenha uma vez só com
-   movimento reduzido e usa menos partículas em aparelhos modestos ou telas pequenas. */
-const BG={c:null,x:null,ps:[],spr:null,raf:0,last:0,w:0,h:0,dpr:1,
-  init(){if(this.c)return;const c=$('#bgfx');if(!c||!c.getContext)return;this.c=c;this.x=c.getContext('2d');
+/* ============ ANALYTICS PRÓPRIO E ANÔNIMO ============
+   Só contagens de eventos da landing (tabela landing_events, que aceita apenas inserção de nomes fixos).
+   Sem cookies, sem identificador, sem dados pessoais ou financeiros. Respeita "Do Not Track". */
+const TRACK_EV=['landing_view','cta_signup','cta_login','cta_how','cta_ranking','signup_done'];
+function track(ev,src){try{if(!TRACK_EV.includes(ev)||!C.supabaseUrl||!C.supabaseAnonKey||navigator.doNotTrack==='1'||window.doNotTrack==='1')return;
+  fetch(C.supabaseUrl.replace(/\/+$/,'')+'/rest/v1/landing_events',{method:'POST',keepalive:true,headers:{apikey:C.supabaseAnonKey,Authorization:'Bearer '+C.supabaseAnonKey,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({event:ev,source:src?String(src).slice(0,40):null})}).catch(()=>{})}catch(e){}}
+
+/* ============ ROTAS PÚBLICAS ============
+   /            → landing (visitante sem sessão)      #entrar → login existente
+   #criar-conta → cadastro existente                  #recuperar-senha → recuperação
+   Com sessão, o app abre direto (como antes). No app instalado (Capacitor/PWA) a entrada padrão é o login. */
+const IN_APP=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())||matchMedia('(display-mode: standalone)').matches;
+const AUTH_ROUTES={'#entrar':'login','#criar-conta':'register','#recuperar-senha':'recover'};
+function showAuth(mode,msg,info){$('#auth-back').style.display=IN_APP?'none':'';$('#landing').hidden=true;LP.stop();$('#auth').style.display='';container.style.display='';document.body.classList.remove('boot');initLogin();switchTab(mode,msg,info)}
+function showLanding(){$('#auth').style.display='none';container.style.display='none';const l=$('#landing');const was=l.hidden;l.hidden=false;document.body.classList.remove('boot');LP.start();
+  if(was){try{if(!sessionStorage.getItem('nesc_lv')){sessionStorage.setItem('nesc_lv','1');track('landing_view',document.referrer?new URL(document.referrer).hostname:'direto')}}catch(e){}}}
+function route(){if(user||RECOV)return;const m=AUTH_ROUTES[location.hash];if(m)showAuth(m);else if(IN_APP)showAuth('login');else showLanding()}
+addEventListener('hashchange',route);
+
+/* ============ LANDING: menu, rolagem, revelação, fundo ============ */
+function Particles(sel,active){return{c:null,x:null,ps:[],spr:null,raf:0,last:0,w:0,h:0,
+  init(){if(this.c)return;const c=$(sel);if(!c||!c.getContext)return;this.c=c;this.x=c.getContext('2d');
     const s=document.createElement('canvas');s.width=s.height=64;const g=s.getContext('2d'),r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,'rgba(255,236,190,1)');r.addColorStop(.25,'rgba(232,186,96,.55)');r.addColorStop(1,'rgba(226,178,80,0)');g.fillStyle=r;g.fillRect(0,0,64,64);this.spr=s;
-    this.size();addEventListener('resize',()=>this.size());document.addEventListener('visibilitychange',()=>{if(!document.hidden)this.kick()});RM.addEventListener&&RM.addEventListener('change',()=>this.kick());this.kick()},
-  size(){const c=this.c;this.dpr=Math.min(devicePixelRatio||1,1.5);this.w=innerWidth;this.h=innerHeight;c.width=Math.round(this.w*this.dpr);c.height=Math.round(this.h*this.dpr);this.x.setTransform(this.dpr,0,0,this.dpr,0,0);
+    this.size();addEventListener('resize',()=>this.size());document.addEventListener('visibilitychange',()=>{if(!document.hidden)this.kick()});RM.addEventListener&&RM.addEventListener('change',()=>this.kick())},
+  size(){const c=this.c,dpr=Math.min(devicePixelRatio||1,1.5);this.w=innerWidth;this.h=innerHeight;c.width=Math.round(this.w*dpr);c.height=Math.round(this.h*dpr);this.x.setTransform(dpr,0,0,dpr,0,0);
     const n=Math.round((LOWPOWER?26:58)*Math.min(1,Math.max(.5,this.w*this.h/(1280*800))));while(this.ps.length<n)this.ps.push(this.mk(true));this.ps.length=n;this.draw(0)},
   mk(any){const big=Math.random()<.12;return{x:Math.random()*this.w,y:any?Math.random()*this.h:-10,r:big?2.2+Math.random()*2.2:.6+Math.random()*1.4,v:(big?5:9)+Math.random()*16,a:.25+Math.random()*.55,ph:Math.random()*6.28,sw:.3+Math.random()*.7}},
   draw(dt){const x=this.x,t=performance.now()/1000;x.clearRect(0,0,this.w,this.h);x.globalCompositeOperation='lighter';
-    for(const p of this.ps){if(dt){p.y+=p.v*dt;p.x+=Math.sin(t*.4+p.ph)*p.sw*dt*6;if(p.y>this.h+12){Object.assign(p,this.mk(false))}}
-      const k=p.r*7,al=p.a*(.65+.35*Math.sin(t*1.3+p.ph));x.globalAlpha=al;x.drawImage(this.spr,p.x-k/2,p.y-k/2,k,k)}
+    for(const p of this.ps){if(dt){p.y+=p.v*dt;p.x+=Math.sin(t*.4+p.ph)*p.sw*dt*6;if(p.y>this.h+12)Object.assign(p,this.mk(false))}
+      const k=p.r*7;x.globalAlpha=p.a*(.65+.35*Math.sin(t*1.3+p.ph));x.drawImage(this.spr,p.x-k/2,p.y-k/2,k,k)}
     x.globalAlpha=1;x.globalCompositeOperation='source-over'},
-  kick(){cancelAnimationFrame(this.raf);if(!this.c||!user)return;if(RM.matches){this.draw(0);return}this.last=0;const loop=now=>{if(document.hidden||!$('#app.on'))return;this.raf=requestAnimationFrame(loop);if(now-this.last<33)return;const dt=this.last?Math.min(.1,(now-this.last)/1000):0;this.last=now;this.draw(dt)};this.raf=requestAnimationFrame(loop)}};
+  kick(){cancelAnimationFrame(this.raf);if(!this.c||!active())return;if(RM.matches){this.draw(0);return}this.last=0;const loop=now=>{if(document.hidden||!active())return;this.raf=requestAnimationFrame(loop);if(now-this.last<33)return;const dt=this.last?Math.min(.1,(now-this.last)/1000):0;this.last=now;this.draw(dt)};this.raf=requestAnimationFrame(loop)}}}
+const LPFX=Particles('#lpfx',()=>!$('#landing').hidden);
+
+/* ============ CELULAR: inclinação com o mouse (desktop) ============
+   Gira no máximo ~9° e volta devagar ao centro. Sem mouse (toque), uma flutuação leve em CSS faz o papel. */
+const TILT={tx:0,ty:0,x:0,y:0,raf:0,
+  bind(){const zone=$('#lp-right'),ph=$('#ph');if(!zone||!ph||this.b)return;this.b=1;
+    zone.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||RM.matches)return;const r=ph.getBoundingClientRect();this.tx=clamp((e.clientX-(r.left+r.width/2))/(r.width*1.2),-1,1);this.ty=clamp((e.clientY-(r.top+r.height/2))/(r.height*1.1),-1,1);this.run()});
+    zone.addEventListener('pointerleave',()=>{this.tx=this.ty=0;this.run()})},
+  run(){if(this.raf)return;const ph=$('#ph'),sh=$('#ph-shadow');const step=()=>{const k=this.tx||this.ty?.12:.05;this.x+=(this.tx-this.x)*k;this.y+=(this.ty-this.y)*k;
+    ph.style.setProperty('--ry',(this.x*9).toFixed(2)+'deg');ph.style.setProperty('--rx',(-this.y*7).toFixed(2)+'deg');ph.style.setProperty('--gx',(30+this.x*35).toFixed(1)+'%');ph.style.setProperty('--gy',(20+this.y*30).toFixed(1)+'%');sh.style.setProperty('--sx',(-this.x*14).toFixed(1)+'px');
+    if(Math.abs(this.tx-this.x)+Math.abs(this.ty-this.y)>.002)this.raf=requestAnimationFrame(step);else this.raf=0};this.raf=requestAnimationFrame(step)}};
+
+/* ============ CELULAR: demonstração do NESC ============
+   Estado isolado (não toca em db, Store ou Supabase). A matemática segue o app: lucro operacional =
+   faturamento − despesas da demonstração; meta = faturamento ÷ meta × 100 (sem teto no número). */
+const LP={on:false,tm:[],scene:'',lock:'',idx:0,st:null,io:null,rv:null,
+  base(){return{uber:146.3,n99:88.4,exp:42,goal:300,hist:[{t:'Ganho · 99',d:'13:05',v:88.4},{t:'Combustível',d:'11:20',v:-42},{t:'Ganho · Uber',d:'10:48',v:146.3}],bars:[118,204,96,231,187,152]}},
+  pick:a=>a[Math.floor(Math.random()*a.length)],
+  later(fn,ms){if(!this.on)return;const id=setTimeout(()=>{this.tm=this.tm.filter(x=>x!==id);if(this.on)fn()},RM.matches?Math.min(ms,60):ms);this.tm.push(id)},
+  clear(){this.tm.forEach(clearTimeout);this.tm=[]},
+  inc(){return r2(this.st.uber+this.st.n99)},op(){return r2(this.inc()-this.st.exp)},
+  start(){if(this.on)return;this.on=true;if(!this.st)this.st=this.base();LPFX.init();LPFX.kick();TILT.bind();this.observe();
+    document.querySelectorAll('.lp-ic[data-ic]').forEach(i=>{if(!i.innerHTML){const k=i.dataset.ic;i.innerHTML=k==='uber'?'<span class="idn uber" style="width:18px;height:18px"></span>':k==='uber2'?'<span style="display:flex;gap:4px"><span class="idn uber"></span><span class="idn n99"></span></span>':ICON(k)}});
+    this.go(this.lock||'dash')},
+  stop(){this.on=false;this.clear()},
+  observe(){if(this.io)return;const root=$('#landing');
+    this.rv=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');this.rv.unobserve(e.target)}}),{root,threshold:.15});document.querySelectorAll('.lp-rv').forEach(el=>this.rv.observe(el));
+    const vis=new Map();this.io=new IntersectionObserver(es=>{es.forEach(e=>vis.set(e.target,e.intersectionRatio));let best=null,br=0;vis.forEach((r,el)=>{if(r>br){br=r;best=el}});
+      document.querySelectorAll('.lp-step').forEach(s=>s.classList.toggle('on',s===best&&br>.5));
+      let sc=best&&br>.5&&innerWidth>900?best.dataset.scene:'';if(sc==='auto')sc=''; // primeira dobra: sequência automática // no celular o aparelho não fica fixo: só a sequência automática
+      if(sc&&sc!==this.lock){this.lock=sc;this.go(sc)}else if(!sc&&this.lock){this.lock='';this.next(2600)}},{root,threshold:[0,.5,.75]});
+    document.querySelectorAll('[data-scene]').forEach(el=>this.io.observe(el))},
+  next(ms){this.later(()=>{if(this.lock)return;const order=['reg','exp','meta','hist','rank','dash'];this.idx=(order.indexOf(this.scene)+1)%order.length;this.go(order[this.idx])},ms)},
+  put(html){const a=$('#phapp');if(a)a.innerHTML=`<div class="dm-in" style="display:flex;flex-direction:column;gap:8px">${html}</div>`},
+  dash(delta){const s=this.st,g=goalPct(this.inc(),s.goal),mx=Math.max(...s.bars,this.inc());
+    this.put(`<div class="dm-top"><b>Olá, motorista</b><span>Hoje</span></div>
+     <div class="dm-c hl"><div class="dm-l">Faturamento de hoje · Uber + 99</div><div class="dm-v">${brl(this.inc())}${delta&&delta.k==='in'?`<span class="dm-delta up">+${brl(delta.v)}</span>`:''}</div><div class="dm-split"><span><i class="dm-dot u"></i>Uber ${brl(s.uber)}</span><span><i class="dm-dot n"></i>99 ${brl(s.n99)}</span></div></div>
+     <div class="dm-row"><div class="dm-c"><div class="dm-l">Despesas</div><div class="dm-v s">${brl(s.exp)}</div></div><div class="dm-c"><div class="dm-l">Lucro operacional</div><div class="dm-v s dm-pos">${brl(this.op())}${delta&&delta.k==='exp'?`<span class="dm-delta dn">−${brl(delta.v)}</span>`:''}</div></div></div>
+     <div class="dm-c"><div class="dm-l">Meta de faturamento · ${pctTxt(g.pct)}${g.over?' · superada':''}</div><div class="dm-bar"><i style="width:${g.bar}%"></i></div></div>
+     <div class="dm-c"><div class="dm-l">Últimos dias</div><div class="dm-bars">${s.bars.concat(this.inc()).map((v,i,a)=>`<i style="height:${Math.max(6,v/mx*100)}%;${i===a.length-1?'background:var(--gold-hi)':''}"></i>`).join('')}</div></div>`)},
+  type(sel,text,done){let i=0;const el=()=>$(sel);const tick=()=>{const f=el();if(!f)return;i++;f.innerHTML='R$ '+text.slice(0,i)+'<i class="cur"></i>';if(i<text.length)this.later(tick,120+Math.random()*80);else this.later(done,450)};this.later(tick,500)},
+  go(sc){if(!this.on)return;this.clear();this.scene=sc;const s=this.st;
+    if(this.inc()>620)this.st=Object.assign(this.base(),{goal:s.goal}); // mantém a demonstração em valores realistas
+    if(sc==='dash'){this.dash();this.next(4200);return}
+    if(sc==='reg'){const app=this.pick(['uber','n99']),v=this.pick([31.75,42.3,58.9,73.5,86.4,64.2]);
+      this.put(`<div class="dm-top"><b>Registrar ganho</b><span>Hoje</span></div><div class="dm-seg"><span class="${app==='uber'?'on':''}">Uber</span><span class="${app==='n99'?'on':''}">99</span></div><div class="dm-l" style="margin-top:4px">Valor faturado no dia</div><div class="dm-field" id="dmf"><i class="cur"></i></div><div class="dm-btn" id="dmb">Salvar ganho</div>`);
+      this.type('#dmf',num(v,2),()=>{const b=$('#dmb');if(b)b.classList.add('press');this.later(()=>{s[app]=r2(s[app]+v);s.hist.unshift({t:'Ganho · '+(app==='uber'?'Uber':'99'),d:'agora',v,nw:1});const a=$('#phapp>div');if(a)a.insertAdjacentHTML('beforeend','<div class="dm-toast">Ganho de '+brl(v)+' salvo</div>');
+        this.later(()=>{this.dash({k:'in',v});if(!this.lock)this.next(3600)},1100)},350)});return}
+    if(sc==='exp'){const v=this.pick([25,38.5,50,64.9,19.9]),cat=this.pick(['Combustível','Alimentação','Lavagem']),before=this.op();
+      this.put(`<div class="dm-top"><b>Registrar gasto</b><span>Hoje</span></div><div class="dm-seg"><span class="${cat==='Combustível'?'on':''}">Combustível</span><span>Manutenção</span><span class="${cat!=='Combustível'?'on':''}">Outros</span></div><div class="dm-l" style="margin-top:4px">Valor · ${cat}</div><div class="dm-field" id="dmf"><i class="cur"></i></div><div class="dm-c"><div class="dm-l">Lucro operacional agora</div><div class="dm-v s">${brl(before)}</div></div><div class="dm-btn" id="dmb">Salvar gasto</div>`);
+      this.type('#dmf',num(v,2),()=>{const b=$('#dmb');if(b)b.classList.add('press');this.later(()=>{s.exp=r2(s.exp+v);s.hist.unshift({t:cat,d:'agora',v:-v,nw:1});this.dash({k:'exp',v});if(!this.lock)this.next(3800)},450)});return}
+    if(sc==='meta'){const g0=goalPct(r2(this.inc()-s.hist.filter(h=>h.nw&&h.v>0).reduce((a,h)=>a+h.v,0)),s.goal),g=goalPct(this.inc(),s.goal),C_=2*Math.PI*52;
+      this.put(`<div class="dm-top"><b>Metas</b><span>Hoje</span></div><div class="dm-c hl"><div class="dm-l">Meta de faturamento do dia</div><div class="dm-ring"><svg viewBox="0 0 120 120"><circle class="t" cx="60" cy="60" r="52"/><circle class="p" id="dmr" cx="60" cy="60" r="52" stroke-dasharray="${C_}" stroke-dashoffset="${C_*(1-g0.bar/100)}"/></svg></div><div class="dm-ringv"><b id="dmp">${pctTxt(g0.pct)}</b><span>${brl(this.inc())} de ${brl(s.goal)}</span></div></div>
+       <div class="dm-c"><div class="dm-l">Cálculo</div><div style="font-size:10.5px;color:var(--tx2)">${brl(this.inc())} ÷ ${brl(s.goal)} × 100 = ${pctTxt(g.pct)}</div></div><div class="dm-c"><div class="dm-l">${g.hit?'Meta alcançada':'Falta'}</div><div class="dm-v s">${g.hit?'+'+brl(r2(this.inc()-s.goal)):brl(r2(s.goal-this.inc()))}</div></div>`);
+      this.later(()=>{const r=$('#dmr'),p=$('#dmp');if(r)r.style.strokeDashoffset=C_*(1-g.bar/100);if(p)p.textContent=pctTxt(g.pct);s.hist.forEach(h=>delete h.nw)},500);this.next(4600);return}
+    if(sc==='hist'){this.put(`<div class="dm-top"><b>Histórico</b><span>Este mês</span></div><div class="dm-c" style="padding:4px 10px">${s.hist.slice(0,6).map((h,i)=>`<div class="dm-it ${i===0?'new':''}"><div>${h.t}<small>${h.d==='agora'?'Hoje · agora':'Hoje · '+h.d}</small></div><b class="${h.v>0?'dm-pos':'dm-neg'}">${h.v>0?'+':'−'}${brl(Math.abs(h.v))}</b></div>`).join('')}</div><div class="dm-c"><div class="dm-l">Receitas − despesas</div><div class="dm-v s">${brl(this.op())}</div></div>`);this.next(4200);return}
+    if(sc==='rank'){const rows=[['Motorista #A7F2',312.4],['Noturno do ABC',268.9],['Rota Leste',231],['Motorista #19C4',190.7],['Você',this.op(),1]].sort((a,b)=>b[1]-a[1]);let pos=0;rows.forEach((r,i)=>{r.p=i&&rows[i-1][1]===r[1]?rows[i-1].p:i+1});
+      this.put(`<div class="dm-top"><b>Ranking</b><span class="dm-tag">exemplo</span></div><div class="dm-seg"><span class="on">Hoje</span><span>7 dias</span><span>Mês</span></div><div class="dm-l">Lucro operacional · hoje</div><div class="dm-c" style="padding:4px 6px">${rows.map(r=>`<div class="dm-rk ${r[2]?'me':''}"><b>${r.p}º</b><span>${r[0]}</span><span>${brl(r[1])}</span></div>`).join('')}</div><div class="dm-l" style="text-align:center">Só posição, apelido e valor do critério</div>`);this.next(4400);return}}
+};
+document.addEventListener('click',e=>{const T=e.target;if(!T.closest)return;
+  const tr=T.closest('[data-track]');if(tr)track(tr.dataset.track,tr.closest('section,header,footer')?.id||tr.closest('section,header,footer')?.className.split(' ')[0]||'');
+  const lg=T.closest('[data-lpgo]');if(lg&&T.closest('#landing')){e.preventDefault();const id=lg.dataset.lpgo,el=document.getElementById(id);closeLpNav();if(el){el.scrollIntoView({behavior:RM.matches?'auto':'smooth',block:'start'});if(id!=='lp-top'){el.setAttribute('tabindex','-1');el.focus({preventScroll:true})}}return}
+  const bg=T.closest('#lp-burger');if(bg){const n=$('#lp-nav'),o=!n.classList.contains('open');n.classList.toggle('open',o);bg.setAttribute('aria-expanded',o);bg.setAttribute('aria-label',o?'Fechar menu':'Abrir menu');if(o){const a=n.querySelector('a');a&&a.focus()}return}
+  if(T.closest('#lp-nav a'))closeLpNav();
+  if($('#lp-nav.open')&&!T.closest('#lp-nav')&&!T.closest('#lp-burger'))closeLpNav()},true);
+function closeLpNav(){const n=$('#lp-nav'),b=$('#lp-burger');if(n&&n.classList.contains('open')){n.classList.remove('open');b.setAttribute('aria-expanded','false');b.setAttribute('aria-label','Abrir menu')}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#lp-nav.open')){closeLpNav();$('#lp-burger').focus()}});
+/* fundo vivo do app: mesmas partículas da landing, atrás de tudo, só com o app aberto */
+const BG=Particles('#bgfx',()=>!!user&&!!$('#app.on'));
 /* ============ ENTRADA NO APP ============ */
 function enter(u,anim){
   user=u;Store.load();
-  const done=()=>{stopLogin();$('#auth').style.display='none';container.style.display='none';const a=$('#app');a.classList.add('on');a.classList.toggle('navc',navState());BG.init();BG.kick();if(anim&&!RM.matches)a.classList.add('reveal');render();if(anim)requestAnimationFrame(()=>requestAnimationFrame(()=>a.classList.remove('reveal')));
+  const done=()=>{stopLogin();$('#landing').hidden=true;LP.stop();document.body.classList.remove('boot');if(AUTH_ROUTES[location.hash])try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}$('#auth').style.display='none';container.style.display='none';const a=$('#app');a.classList.add('on');a.classList.toggle('navc',navState());BG.init();BG.kick();if(anim&&!RM.matches)a.classList.add('reveal');render();if(anim)requestAnimationFrame(()=>requestAnimationFrame(()=>a.classList.remove('reveal')));
     Store.pull();
     if(UBER_RET){tab='uber';render();const m={connected:'Conta Uber conectada. Use "Sincronizar" para importar os dados oficiais.',access_pending:'Conta Uber conectada, mas a Uber ainda não liberou o acesso aos dados.',denied:UBER_MSG.access_denied,error:UBER_MSG[UBER_RET.reason]||'Não foi possível conectar a Uber.'}[UBER_RET.r];if(m)toast(m);UBER_RET.r='';}
     /* O cadastro do veículo é opcional e fica disponível nas abas Uber e 99. */};
   if(!anim||RM.matches){done();return}
   loginZoom();$('#auth').classList.add('leaving');container.classList.add('leaving');setTimeout(done,950);
 }
-(async()=>{if(RECOV){startRecovery();return}const s=await Auth.session();if(s&&s.email)enter(s)})();
+/* entrada: recuperação de senha → sessão salva → app; sem sessão → landing (ou login, se a URL pedir).
+   Enquanto a sessão é conferida, uma tela neutra evita mostrar a landing para quem já está logado. */
+(async()=>{if(RECOV){startRecovery();return}
+  let maybe=false;try{maybe=Cloud.on?Object.keys(localStorage).some(k=>/^sb-.*-auth-token/.test(k)):!!(LS.get('nsc_session')&&LS.get('nsc_session')!=='null')}catch(e){}
+  if(!maybe)route();
+  const s=await Auth.session();if(s&&s.email)enter(s);else route()})();
 </script>
 </body>
 </html>

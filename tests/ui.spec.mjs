@@ -62,7 +62,7 @@ async function loggedPage(ctx, seed = SEED) {
 
 await test("Login: erro mostra mensagem, marca campos e devolve o botão", async (keep) => {
   const ctx = await ctxFor(keep), page = await ctx.newPage();
-  await page.goto(BASE);
+  await page.goto(BASE + "#entrar");
   await page.fill("#li-email", "ninguem@nesc.local");
   await page.fill("#li-pass", "senhaerrada");
   await page.click("#form-login .btn-submit");
@@ -74,8 +74,7 @@ await test("Login: erro mostra mensagem, marca campos e devolve o botão", async
 
 await test("Criar conta → entra no app; Sair → volta ao login e recarregar não reabre o app", async (keep) => {
   const ctx = await ctxFor(keep), page = await ctx.newPage();
-  await page.goto(BASE);
-  await page.click("#btn-tab-register");
+  await page.goto(BASE + "#criar-conta");
   await page.fill("#re-name", "Pessoa Teste");
   await page.fill("#re-email", "nova@nesc.local");
   await page.fill("#re-pass", "segredo123");
@@ -113,7 +112,7 @@ await test("Sem rolagem horizontal em 8 larguras (login, todas as áreas e modal
   for (const w of WIDTHS) {
     const ctx = await ctxFor(keep, { viewport: { width: w, height: 820 }, hasTouch: w < 700, isMobile: w < 700 });
     const lp = await ctx.newPage();
-    await lp.goto(BASE);
+    await lp.goto(BASE + "#entrar");
     const lw = await lp.evaluate(() => document.documentElement.scrollWidth - innerWidth);
     if (lw > 0) bad.push(`login@${w}: +${lw}px`);
     await lp.close();
@@ -154,7 +153,7 @@ await test("Sem WebGL: login e globo mostram alternativas estáticas, sem erros"
   const p1 = await ctx.newPage();
   const errs = [];
   p1.on("pageerror", (e) => errs.push(e.message));
-  await p1.goto(BASE);
+  await p1.goto(BASE + "#entrar");
   assert(await p1.locator(".gl-fallback").count(), "fallback do login ausente");
   await p1.close();
   const { page, errors } = await loggedPage(ctx);
@@ -167,7 +166,7 @@ await test("Movimento reduzido: app funciona e a frase do login não alterna", a
   const page = await ctx.newPage();
   const errs = [];
   page.on("pageerror", (e) => errs.push(e.message));
-  await page.goto(BASE);
+  await page.goto(BASE + "#entrar");
   const a = await page.textContent("#rot");
   await page.waitForTimeout(3300);
   assert((await page.textContent("#rot")) === a, "a frase mudou com movimento reduzido");
@@ -240,8 +239,8 @@ if (THREE_JS) {
     const page = await ctx.newPage();
     const errs = [];
     page.on("pageerror", (e) => errs.push(e.message));
-    await page.goto(BASE);
-    await page.waitForTimeout(800);
+    await page.goto(BASE + "#entrar");
+    await page.waitForTimeout(1500);
     assert(await page.evaluate(() => loginOn), "cena do login não iniciou");
     await page.mouse.move(1200, 100);
     await page.waitForTimeout(700);

@@ -33,7 +33,7 @@ const BASE = `http://127.0.0.1:${server.address().port}/`;
 const browser = await chromium.launch();
 const results = [];
 const assert = (c, m) => { if (!c) throw new Error(m); };
-async function page(hash = "") {
+async function page(hash = "#entrar") {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await ctx.route(/cdnjs\.cloudflare\.com/, (r) => r.abort());
   await ctx.route(/cdn\.jsdelivr\.net/, (r) => r.fulfill({ body: MOCK, contentType: "text/javascript" }));
