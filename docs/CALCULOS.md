@@ -159,3 +159,17 @@ substituído por uma configuração vazia, então nada toca o banco de produçã
 registros, só ganhos, só despesas, ambos, custos fixos, Uber e 99 no mesmo dia, hoje/7 dias/mês, virada da
 meia-noite, decimais, meta diária, editar/excluir, atualização da tela, períodos entre meses, conta sem histórico
 e a regressão do passe. Requer `playwright` instalado.
+
+## Cor do resultado (lucro, prejuízo, equilíbrio)
+
+Uma única função (`resTone`, constante `RESULT_EVEN`) define a cor do lucro operacional e do resultado completo em
+Uber, 99, Início e Relatórios:
+
+- **Equilíbrio (dourado):** `|resultado| ≤ tolerância`, com tolerância = 3% do faturamento do período, nunca menos
+  de R$ 5,00 nem mais de R$ 20,00. Ex.: R$ 150 − R$ 149 = R$ 1,00.
+- **Lucro (verde):** resultado acima da tolerância. Ex.: R$ 350 − R$ 120 = R$ 230,00.
+- **Prejuízo (vermelho):** resultado abaixo de −tolerância. Ex.: R$ 100 − R$ 130 = −R$ 30,00.
+
+O teto de R$ 20 impede que um prejuízo expressivo vire "neutro" em dias de faturamento alto. A regra só muda a cor
+(e o rótulo "Lucro", "Prejuízo" ou "Equilíbrio" na lista de dias); nenhum valor é alterado.
+

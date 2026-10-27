@@ -232,6 +232,7 @@ await test("Manutenção: aba própria com quilometragem e \"restam 1.500 km\"; 
   await page.evaluate(() => { tab = "uber"; render(); });
   assert(!(await page.locator("#view #manut").count()), "manutenção ainda dentro da aba Uber");
   await page.evaluate(() => openOnboard());
+  await page.waitForTimeout(100); // espera o foco automático do modal (30 ms) para não disputar o preenchimento
   await page.fill("#ob-odo", "-5");
   await page.click("#mbox form[data-form=ob] button.btn");
   const okErr = await page.waitForFunction(() => /inválida/.test((document.getElementById("oberr") || {}).textContent || ""), null, { timeout: 8000 }).then(() => true, () => false);

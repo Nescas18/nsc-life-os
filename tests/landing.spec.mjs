@@ -152,6 +152,21 @@ await test("Analytics anônimo: CTA envia só o nome do evento (sem dados pessoa
   } finally { CONFIG = "window.NSC_CONFIG={};"; }
 });
 
+await test("Anel da meta: percentual (inclusive acima de 100%) cabe inteiro no miolo do círculo, até em 320 px", async (keep) => {
+  const { page } = await open(keep, { viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true });
+  const r = await page.evaluate(() => ["86%", "107,03%", "125,50%", "1000,00%"].map((t) => {
+    const box = document.createElement("div"); box.className = "lp-phone"; box.innerHTML = `<div class="dm-ring"><svg viewBox="0 0 120 120"><circle class="t" cx="60" cy="60" r="52"/><circle class="p" cx="60" cy="60" r="52" transform="rotate(-90 60 60)"/><text class="dm-rt" x="60" y="56" text-anchor="middle" dominant-baseline="central" font-size="${ringFs(t)}">${t}</text></svg></div>`;
+    document.body.appendChild(box); const b = box.querySelector("text").getBBox(); box.remove();
+    // miolo do anel: raio 52 − meia espessura (4,5) = 47,5. Os quatro cantos da caixa do texto precisam ficar dentro.
+    const far = Math.max(...[[b.x, b.y], [b.x + b.width, b.y], [b.x, b.y + b.height], [b.x + b.width, b.y + b.height]].map(([x, y]) => Math.hypot(x - 60, y - 60)));
+    return { t, fs: ringFs(t), w: Math.round(b.width), far: Math.round(far * 10) / 10 };
+  }));
+  const bad = r.filter((x) => x.far > 47.5);
+  assert(!bad.length, "texto encosta ou sai do anel: " + JSON.stringify(bad));
+  assert(r.find((x) => x.t === "107,03%").fs >= 14, "fonte pequena demais para 107,03%");
+  return r.map((x) => `${x.t}: fonte ${x.fs}, largura ${x.w}, canto mais distante ${x.far}`).join(" · ");
+});
+
 await browser.close(); server.close();
 let fail = 0;
 for (const r of results) { if (!r.ok) fail++; console.log(`${r.ok ? "✓" : "✗"} ${r.name}${r.info ? " — " + r.info : ""}`); }

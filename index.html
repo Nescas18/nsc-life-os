@@ -156,6 +156,9 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;padding:calc(30px + var(--sat)) 36
 .sub{color:var(--mut);font-size:.82rem;margin-top:4px;line-height:1.45}
 .note{color:var(--mut);font-size:.78rem;line-height:1.5;margin-top:10px}
 .pos{color:var(--ok)}.neg{color:var(--bad)}.wrn{color:var(--warn)}
+.res-pos{color:var(--ok)}.res-neg{color:var(--bad)}.res-even{color:var(--gold-hi)}
+.tag.rt-pos{color:var(--ok);border-color:rgba(95,196,142,.4)}.tag.rt-neg{color:var(--bad);border-color:rgba(239,111,102,.4)}.tag.rt-even{color:var(--gold-hi);border-color:var(--gold-line)}
+.resd .it{gap:10px}.resd .it b{font-variant-numeric:tabular-nums;white-space:nowrap}.resd .tag{flex:0 0 auto;min-width:76px;text-align:center}
 .bar{height:6px;border-radius:6px;background:var(--panel2);overflow:hidden;margin-top:14px}
 .bar i{display:block;height:100%;background:var(--gold);border-radius:6px;transition:width .4s}
 .hero{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:200px;overflow:hidden;position:relative;background:radial-gradient(ellipse at 85% 50%,rgba(226,178,80,.08),transparent 60%),var(--panel)}
@@ -461,8 +464,8 @@ body.boot #auth,body.boot #canvas-container,body.boot #landing{visibility:hidden
 .dm-it{display:flex;justify-content:space-between;align-items:center;padding:7px 2px;border-bottom:1px solid rgba(255,255,255,.06)}.dm-it small{display:block;color:var(--mut);font-size:9px;margin-top:1px}.dm-it.new{animation:dmnew 1.6s ease both}@keyframes dmnew{0%{background:rgba(226,178,80,.25)}100%{background:transparent}}
 .dm-rk{display:grid;grid-template-columns:24px 1fr auto;gap:6px;align-items:center;padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.06)}.dm-rk b{color:var(--gold-hi)}.dm-rk.me{background:rgba(226,178,80,.1);border-radius:8px}
 .dm-tag{font-size:8.5px;color:var(--gold-hi);border:1px solid var(--gold-line);border-radius:10px;padding:1px 6px}
-.dm-ring{display:grid;place-items:center;margin:4px auto}.dm-ring svg{width:120px;height:120px;transform:rotate(-90deg)}.dm-ring circle{fill:none;stroke-width:9}.dm-ring .t{stroke:rgba(255,255,255,.08)}.dm-ring .p{stroke:var(--gold);stroke-linecap:round;transition:stroke-dashoffset 1.2s var(--ease)}
-.dm-ringv{margin-top:-82px;margin-bottom:36px;text-align:center}.dm-ringv b{font-size:20px;display:block}.dm-ringv span{color:var(--mut);font-size:9.5px}
+.dm-ring{display:grid;place-items:center;margin:4px auto}.dm-ring svg{width:120px;height:120px;max-width:100%}.dm-rt{fill:#fff;font-weight:700;font-variant-numeric:tabular-nums}.dm-rs{fill:var(--mut)}.dm-ring circle{fill:none;stroke-width:9}.dm-ring .t{stroke:rgba(255,255,255,.08)}.dm-ring .p{stroke:var(--gold);stroke-linecap:round;transition:stroke-dashoffset 1.2s var(--ease)}
+.dm-ringv{margin:2px 0 4px;text-align:center}.dm-ringv span{color:var(--mut);font-size:9.5px}
 .dm-bars{display:flex;align-items:flex-end;gap:5px;height:44px;margin-top:6px}.dm-bars i{flex:1;background:linear-gradient(180deg,var(--gold),rgba(226,178,80,.25));border-radius:3px 3px 1px 1px;min-height:3px;transition:height .9s var(--ease)}
 /* seções */
 .lp-sec{padding:96px 0;position:relative}
@@ -1098,21 +1101,22 @@ async function startRecovery(){showAuth('recover');if(!Cloud.on)return;
     const{data}=await Cloud.sb.auth.getSession();if(data&&data.session)show(data.session);
     setTimeout(()=>{if(!done){switchTab('recover','Este link de recuperação é inválido ou já expirou. Peça um novo abaixo.')}},4000)}
   catch(x){switchTab('recover','Não foi possível validar o link agora. Tente novamente.')}}
-/* ============ MUNDO 1 · PLANETA DO LOGIN ============
-   Planeta escuro com anel de partículas douradas/brancas, poeira distante e luz de contorno que circula.
-   Mouse: paralaxe e inclinação do anel. Toque: onda nas partículas e giro ao arrastar (sem bloquear a rolagem). */
+/* ============ MUNDO 1 · GLOBO DIGITAL DO LOGIN ============
+   Terra formada por milhares de pontos dourados (só onde há terra firme), grade de latitude e longitude pontilhada,
+   contorno luminoso e arcos de dados que saem de São Paulo. A América do Sul fica de frente: o globo oscila em torno
+   dela em vez de dar voltas completas. Mouse: leve inclinação. Toque: arrastar gira e o globo volta sozinho;
+   tocar acelera os pulsos dos arcos. Nada bloqueia a rolagem. */
 const container=document.getElementById('canvas-container');
-// LOWPOWER mede o ORÇAMENTO de geometria/partículas (quantidade), nunca a resolução de desenho.
+// LOWPOWER mede o ORÇAMENTO de geometria (quantidade de pontos), nunca a resolução de desenho.
 const LOWPOWER=(navigator.hardwareConcurrency||8)<=4||(navigator.deviceMemory||8)<=2;
 // Nitidez: a resolução do canvas segue a densidade real da tela (retina/alta DPI), com teto para não estourar
-// a memória de GPU. Antes, celulares (que costumam reportar poucos núcleos) caíam para pixelRatio 1 e o planeta
-// ficava borrado e com a borda serrilhada. Agora o serrilhado some com antialias + densidade correta.
+// a memória de GPU. Antes, celulares (que costumam reportar poucos núcleos) caíam para pixelRatio 1 e ficavam borrados.
 const GLDPR=Math.max(1,Math.min(devicePixelRatio||1,2.5));
 const RM=matchMedia('(prefers-reduced-motion:reduce)');
-let loginOn=false,loginRaf=0,scene,camera,renderer,planet,particleSystem,particleCount,orbitAngles,orbitSpeed,orbitRadius,baseY,dust,glow,rimLight,signals;
-/* estado da interação: paralaxe do mouse (x,y → alvo tx,ty), onda e giro do toque; tudo volta ao repouso sozinho */
+let loginOn=false,loginRaf=0,scene,camera,renderer,globe,spin,stars,orbit,hub,arcs=[],baseRotY=0,tilt=0,dragY=0,camD=6,landPts,gridPts,orbitPts,landN=1;
+/* estado da interação: paralaxe do mouse (x,y → alvo tx,ty), toque e giro; tudo volta ao repouso sozinho */
 const ptr={x:0,y:0,tx:0,ty:0,wave:0,spin:0,lx:null};
-let camBase,camLook,nDraw=0,perf={n:0,sum:0,done:false},waving=false,loginT=0,needRender=true;
+let perf={n:0,sum:0,done:false},loginT=0,needRender=true;
 function createParticleTexture(){
   const c=document.createElement('canvas');c.width=c.height=64;
   const x=c.getContext('2d'),g=x.createRadialGradient(32,32,0,32,32,32);
@@ -1122,102 +1126,87 @@ function createParticleTexture(){
 }
 function glowTexture(){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);
   g.addColorStop(0,'rgba(255,214,130,.55)');g.addColorStop(.35,'rgba(226,178,80,.22)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,128,128);const t=new THREE.Texture(c);t.needsUpdate=true;return t}
-/* textura procedural do planeta (gigante gasoso em bronze e ouro): ruído 3D amostrado na esfera, então não há
-   emenda na longitude. Gerada uma vez, depois do primeiro quadro, para não atrasar o formulário de login. */
-function planetTexture(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d'),im=x.createImageData(w,h),d=im.data;
-  const P=new Uint8Array(512);for(let i=0;i<256;i++)P[i]=i;for(let i=255;i>0;i--){const j=Math.floor(Math.random()*(i+1)),t=P[i];P[i]=P[j];P[j]=t}for(let i=0;i<256;i++)P[i+256]=P[i];
-  const fade=t=>t*t*(3-2*t),lerp=(a,b,t)=>a+(b-a)*t,hh=(i,j,k)=>P[P[P[i&255]+(j&255)]+(k&255)]/255;
-  const vn=(X,Y,Z)=>{const i=Math.floor(X),j=Math.floor(Y),k=Math.floor(Z),u=fade(X-i),v=fade(Y-j),q=fade(Z-k);
-    return lerp(lerp(lerp(hh(i,j,k),hh(i+1,j,k),u),lerp(hh(i,j+1,k),hh(i+1,j+1,k),u),v),lerp(lerp(hh(i,j,k+1),hh(i+1,j,k+1),u),lerp(hh(i,j+1,k+1),hh(i+1,j+1,k+1),u),v),q)};
-  const fbm=(X,Y,Z,o)=>{let s=0,a=.5,f=1;for(let n=0;n<o;n++){s+=a*vn(X*f,Y*f,Z*f);a*=.5;f*=2.07}return s};
-  const pal=[[10,8,6],[34,23,12],[74,50,22],[132,94,40],[196,150,72],[232,196,124]];
-  for(let py=0;py<h;py++){const lat=(py/(h-1)-.5)*Math.PI,Y=Math.sin(lat),cl=Math.cos(lat);
-    for(let px=0;px<w;px++){const lon=px/w*Math.PI*2,X=cl*Math.cos(lon),Z=cl*Math.sin(lon);
-      const n=fbm(X*2.2+5,Y*2.2,Z*2.2,4),tb=fbm(X*6,Y*6+3,Z*6,3);
-      let b=.5+.5*Math.sin(Y*12+n*5.5+tb*1.3);b=b*.7+fbm(X*12,Y*34,Z*12,3)*.38-.08;
-      const sx=X-.6,sy=(Y+.3)*1.8,sz=Z-.58,sd=Math.sqrt(sx*sx+sy*sy+sz*sz);if(sd<.2)b=lerp(b,.92-sd,(1-sd/.2)*.75); // tempestade oval
-      b=Math.max(0,Math.min(.999,b));const fi=b*(pal.length-1),i0=Math.floor(fi),t=fi-i0,c0=pal[i0],c1=pal[i0+1],o=(py*w+px)*4;
-      d[o]=lerp(c0[0],c1[0],t);d[o+1]=lerp(c0[1],c1[1],t);d[o+2]=lerp(c0[2],c1[2],t);d[o+3]=255}}
-  x.putImageData(im,0,0);const T=new THREE.CanvasTexture(c);T.anisotropy=4;return T}
-/* atmosfera: brilho de borda (fresnel) mais forte do lado iluminado */
-function atmosphere(r,light){return new THREE.Mesh(new THREE.SphereGeometry(r,64,64),new THREE.ShaderMaterial({uniforms:{c:{value:new THREE.Color(0xe8b25a)},l:{value:light.clone().normalize()}},
-  vertexShader:'varying vec3 vN;varying vec3 vW;void main(){vN=normalize(mat3(modelMatrix)*normal);vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}',
-  fragmentShader:'uniform vec3 c;uniform vec3 l;varying vec3 vN;varying vec3 vW;void main(){vec3 v=normalize(cameraPosition-vW);float f=pow(1.-max(dot(vN,v),0.),2.6);float s=.18+.82*max(dot(vN,l),0.);gl_FragColor=vec4(c*f*s*1.5,f*s);}',
-  transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}))}
-function updateCameraPosition(){
-  if(innerWidth>900){camBase=new THREE.Vector3(-6,18,38);camLook=new THREE.Vector3(2,0,0)}
-  else{camBase=new THREE.Vector3(3,8,38);camLook=new THREE.Vector3(3,-13,0)} // celular: planeta no topo, formulário embaixo
-  camera.position.copy(camBase);camera.lookAt(camLook);needRender=true;
-}
+/* ponto nítido: disco cheio com borda suave (a textura de partícula tem núcleo pequeno e deixaria os continentes apagados) */
+function dotTexture(){const c=document.createElement('canvas');c.width=c.height=32;const x=c.getContext('2d'),g=x.createRadialGradient(16,16,0,16,16,16);
+  g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.55,'rgba(255,255,255,1)');g.addColorStop(.8,'rgba(255,255,255,.4)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,32,32);const t=new THREE.Texture(c);t.needsUpdate=true;return t}
+/* Máscara terra/oceano 720×360 (0,5°), linha 0 = 90°N. Fonte: Natural Earth 1:50m (domínio público), via world-atlas.
+   Codificada em RLE: comprimentos alternados mar/terra em base 36. Decodificada uma vez, só quando o 3D aparece. */
+const LAND_RLE='7fm,1,3,3,2,p,gy,1,2,5,2,h,2,6,10,5,3,13,gg,5,3,15,c,3,2,1,4,5,4,2,1,12,gc,1i,7,5,1,1v,2,5,9,6,3z,2,bi,4,6,6,2,d,1,p,9,26,2,h,3s,5,22,2,9e,8,5,3,1,c,4,k,6,2u,3e,2,1,1,1,5,6,6,4,5,2,3,1l,a,98,e,1,2,2,5,2,q,6,2n,1,5,1z,1,1,2,3,1,2,3,17,4,6,4,2,1,1,2,1,2,1v,a,9a,i,2,8,2,f,1,3,d,2i,2,2,1l,7,1,1,2,4,2,2,2,b,3n,2,2,c,8l,5,l,f,1,i,k,2l,1o,1,1,7,1,6,8,2,3x,9,5,3,8j,7,3,3,7,c,1,p,9,2q,1r,1,2,j,4e,9,8j,4,3,5,7,3,1,1,1,1,2,o,6,2u,4,1,1s,1,4,7,4,3,4a,7,6,1,7q,1,2,6,f,3,a,5,b,4,1,f,f,2u,3,1,1v,5,6,7,bz,8,k,2,s,1,6,a,1,2,n,2r,1,1,1u,6,3z,1,o,8,7g,9,3,2,8,2,n,8,5,p,h,2m,1,1,23,2,2q,6,1s,c,2c,1,4w,7,6,4,1,1,6,4,9,2,1,2,1,6,9,8,g,2,m,9,1,1,2,2c,3,1,4f,2,2,a,1j,3,5,q,1,1,73,2,2,b,5,7,6,9,c,6,a,6,18,27,4c,c,1k,14,1,2,17,1,3,6,1,7,5g,n,2,3,7,4,4,5,2,q,17,23,1,1,1,2,46,8,1j,1e,1b,b,1,4,2,5,1,1,5d,7,v,3,3,h,1,6,1a,20,1,2,47,8,1g,1,1,1e,1h,2,5c,9,3,2,3e,21,46,7,1k,1b,4,2,1j,1,5a,g,k,2,8,8,4,9,6,5,8,1,1d,1p,1,9,45,7,1i,1,1,3,1,16,2,2,1,2,2,1,1j,4,55,g,2,3,c,1,3,3,8,5,5,8,5,6,2,8,1,8,16,1m,2,4,4a,5,s,3,i,b,1,13,4,l,a,a,s,2,53,d,1,7,2,4,3,2,2,5,6,2,2,7,3,3,2,2,5,6,2,a,1d,2,1,1k,1,8,45,6,r,7,5,1,7,1,2,1t,1,v,o,2,55,c,3,j,1,6,8,9,3,2,8,7,3,8,2,4,1,5,13,1r,2,2,45,6,q,8,5,1,5,4,4,2k,1,2,j,a,2,8,4t,8,3,m,1,6,a,5,3,3,8,8,1,l,2,1,10,4,1,1q,43,8,q,8,2,4,1,b,2,1,1,2k,6,1,d,b,2,6,1v,15,2,1t,3,a,p,g,7,9,6,2,r,y,1,1,1j,2,6,44,1,1,5,m,b,2,5,4,9,1,2l,5,b,1,r,1j,16,1,1,d,1x,s,f,8,7,10,1,3,t,3,3,1b,1,4,3,5,2h,1,2,2,1,1,1,2,1,2,1e,6,k,a,3,i,1,48,26,r,15,1,n,5,1,m,a,a,a,f,1,i,2,1,r,2,1,1g,2,3,2l,2,1,3,1,b,1j,2,f,b,3,h,1,4a,22,17,j,3,1,7,3,1,3,3,9,t,1,2,5,2,4,6,e,3,7,2,5,i,1,1,o,6,1,1,1,1i,2c,2,1,j,1,2,1,3,1h,6,9,b,2,4t,g,3,2,c,14,1e,5,7,1,q,a,e,1,9,7,5,3,1,1,5,3,1,7,8,5,1,2,1,3,i,v,1g,2c,z,1,1,q,3,l,9,6,9,3,59,5,h,3,q,2v,2,9,4,3,7,1,6,6,4,6,1,4,6,7,a,1,3,c,z,1e,29,4,2,14,m,1,8,2,8,3,2,d,4,8,3,5,1,4n,1,16,n,2u,d,2,2,3,d,4,4,c,3,1,1,7,c,3,3,d,1,1,r,1,1,17,2f,1,1,1,2,1a,a,4,9,6,1,1,1,10,3,6,1,5x,m,2s,5,5,3,b,3,3,1,2,2,2,1,f,3,9,9,5,5,g,m,1,2,1,1,10,2o,1f,7,3,7,1c,4,64,m,34,1,14,1,b,9,1,9,i,i,15,2q,1f,6,3,5,1c,4,66,2,5,i,31,1,1a,1,4,i,n,h,12,2n,13,2,e,7,1d,2,3,3,5z,1,i,8,4,6,46,2,1,k,e,2,8,i,v,1,4,p,2,b,3,1k,1,1,14,6,6,4,3,1,7l,2,g,6,4b,2,5,1,3,m,b,5,6,j,3,1,r,s,4,2,c,1i,k,4,l,b,7s,7,7,c,4e,3,4,d,l,4,3,m,p,z,i,1h,h,8,i,b,83,3,d,9,2,43,2,8,9,6,1,g,1,1,r,1,3,j,x,1,2,h,1f,j,7,l,3,5,2,7i,1,2,1,4,14,42,3,a,9,1,7,f,s,k,1,1,11,d,1g,l,6,o,4,7t,15,3t,1,4,6,6,3,4,g,g,q,m,14,6,1g,1,1,m,5,8n,m,4,c,40,a,1,d,2,c,7,2,4,s,k,2q,m,6,8q,w,41,i,3,m,1,2,5,3,1,t,h,2q,m,6,8o,1,4,u,41,j,1,6,1,3,6,1,3,9,5,x,e,1z,1,o,o,8,7v,2,o,10,41,r,1,3,c,19,e,2n,p,8,7k,6,5,2,k,15,t,2,34,x,c,1a,c,2n,o,9,7i,7,3,5,h,19,1,2,n,1,6,4,2w,y,g,17,1,3,7,2n,p,8,7h,8,1,5,h,17,3,2,o,2,9,5,2s,y,g,2,1,6,1,12,2,1,2,2b,1,c,r,2,1,4,7,7,70,e,7,2,1,6,1,1j,i,2,4,i,2,1,2h,z,g,8,3,3u,1,1,q,j,70,d,5,1x,g,4,2,o,2g,y,h,8,4,3t,1,1,9,1,f,a,6m,7,1,b,6,a,6,1y,1,4,1,1,2,1,7,v,3,1,2b,1,1,u,h,1,2,4,7,3t,8,3,c,d,6l,z,6,2,1,25,7,2,2,w,2,1,2b,v,t,34,1,2,4,k,4,6,a,b,1,4,6g,10,7,29,4,3,3,x,1,2,1,1,2a,v,u,35,3,v,a,4,1,b,6f,y,c,25,4,4,3,y,2,1,1,1,2a,w,t,33,9,n,2,3,9,3,1,6,3,3,6d,10,c,24,3,19,2,3,2g,o,u,33,7,m,4,4,9,8,6j,z,e,21,4,1b,1,2,1,1,2h,h,2,4,u,34,6,l,6,4,6,a,6i,10,f,1x,4,1h,2,2,2i,j,x,30,1,2,6,k,4,4,1,1,2,e,6g,11,d,1y,2,2,1,1i,2s,b,z,1,1,2w,1,4,7,k,2,1,5,4,1,c,6e,13,d,1v,3,1o,1,5,2o,5,17,2r,6,4,4,k,3,2,2,b,2,3,6f,4,1,z,d,b,1,3g,2n,6,16,2p,9,4,6,j,4,2,2,6,6q,3,1,1,1,5,1,q,8,1u,1,1v,1,4,2p,6,12,2,5,2l,8,6,6,h,b,1,6u,2,4,4,1,q,8,1r,1,1z,1,5,1,1,2l,6,1a,2l,7,3,a,a,7k,1,2,q,8,3s,1,4,1,1,2l,2,1,3,1a,2l,7,4,b,6,7m,1,3,p,5,1i,1,2d,1,7,2j,7,1a,2i,8,4,c,6,7p,r,4,1c,2,2p,2n,3,19,2l,3,7,c,6,7m,2,3,q,3,45,2n,1,16,3,2,2y,9,3,7n,3,3,q,2,44,2,2,3r,4,2,2v,7,5,7q,3,3,p,1,47,3g,5,1,2,4,5,2,2u,1,2,1,a,7q,3,4,m,2,4a,4,2,36,6,2,a,2,1,1,35,7s,3,4,50,4,2,32,a,2,8,5,1,3,2w,7w,3,2,2,1,51,3,2,2z,2,7,c,9,2t,1,3,7v,4,2,55,1,3,2y,1,9,b,b,2q,81,4,1,56,3,1,2x,1,9,b,a,2,2,2q,7y,5,1,57,3a,j,1,2,2,2u,29,1,5k,6,2,56,3a,1,1,6,1,e,1,2u,26,3,n,6,4r,7,3,56,2t,1,g,2,2,2,3,3a,1r,2,8,6,l,8,4q,8,1,57,3e,3,1,1,1,3a,s,1,x,6,4,6,k,a,4p,o,1,4s,2r,1,g,4,6,3c,q,3,w,7,7,1,l,8,4r,9,2,b,1,4v,36,3,5,3g,r,5,s,9,2,6,j,8,4r,b,2,8,1,4x,32,6,3,3i,k,2,6,5,r,l,g,7,4r,b,4,3,1,51,30,8,2,3j,i,6,5,6,p,m,g,7,4p,c,7,51,30,3f,p,4,2,8,7,6,m,p,e,8,4h,1,4,e,8,50,2z,3g,o,e,1,1,6,8,k,r,c,a,4e,3,1,d,8,53,2z,3h,n,b,2,4,6,9,i,r,d,9,4c,j,1,4,2,55,2z,3f,o,b,2,6,7,7,h,9,6,c,e,8,1,2,48,k,1,5b,2u,3l,l,n,6,6,j,5,b,8,g,b,46,n,1,59,2u,3l,j,e,3,a,6,4,9,1,1,2,3,5,13,7,1,2,3p,2,f,l,3,58,2t,3m,j,g,2,b,4,2,1,2,6,1,3,4,1a,6,3s,3,d,n,4,58,2s,3m,i,5,2,a,2,d,1,6,7,6,1b,8,3o,4,4,2,6,p,4,58,2n,1,1,1,1,3m,i,i,2,d,2,7,6,5,1b,8,3n,5,1,7,4,p,4,59,2m,1,2,2n,1,z,j,w,1,9,4,8,18,a,3j,g,5,n,4,5b,2k,2,2,3o,h,w,2,a,1,2,3,4,19,a,3k,e,7,m,3,5e,2j,1,1,2s,1,w,g,r,5,b,1,1,3,7,19,a,3m,3,1,b,5,k,4,5d,2k,3r,e,n,1,7,3,d,3,9,1a,7,3m,2,5,9,5,i,5,5e,2k,3v,5,2,1,b,4,1,b,7,1,p,6,2,6,1,1,1,u,4,3t,9,7,e,8,5f,2k,3w,1,c,k,12,1,5,3,4,4p,c,6,7,1,5,9,5g,2k,3v,1,a,n,1e,4o,d,6,d,a,5g,2h,3x,3,1,1,4,p,p,4,1,1,d,2,4,4n,e,6,6,d,2,1,5i,2g,3w,10,16,2,5,4m,f,1,a,5,1,3,2,2,5o,2b,3z,x,1f,4q,h,1,3,3,2,6,5v,26,3z,11,1d,4q,i,1,1,1,3,4,2,1,5x,24,3y,13,1c,4r,b,1,6,5,1,1,63,23,3i,1,f,1a,e,3,p,4s,f,1,2,4,66,21,3y,1e,9,6,o,4t,i,2,68,1z,3z,1e,9,a,j,4v,f,4,68,3,4,1r,3z,1h,7,f,5,5,3,4v,6t,3,3,1r,3z,1k,4,5n,6t,3,3,19,1,1,2,1,4,9,40,78,1,1,6u,3,3,z,1,1,2,7,8,1,3,5,3y,39,4,3z,6u,4,2,y,8,2,1,1,c,4,3x,2e,1,3,1,q,5,3z,6v,3,2,x,q,4,3h,1,d,2j,1,r,5,3x,6u,1,2,2,3,t,t,4,3j,1,a,2h,1,u,6,3v,g,1,6f,1,1,3,4,q,t,5,3r,2l,4,r,6,3t,6y,5,3,q,u,5,3p,2n,4,r,7,3r,71,3,3,p,v,4,3p,2n,4,s,7,3,1,1,2,3h,h,1,6m,2,4,o,v,4,3n,2p,5,r,e,3h,g,1,6o,1,4,p,v,3,3n,2q,5,q,2,1,9,1,2,3g,75,2,5,m,x,1,3n,2s,4,r,1,1,8,2,9,3,1,1,6,2y,75,3,5,l,12,1,3i,2s,4,t,6,4,l,2v,5,2,71,3,5,k,13,1,3g,2u,4,t,5,5,l,2t,5,2,74,2,5,j,4j,2v,6,13,k,2r,5,3,75,1,6,h,4k,2v,6,15,j,2o,7,3,7d,g,s,9,a,1,37,2x,6,15,m,14,1,1c,a,2,7f,f,r,2,3,7,3g,2y,5,16,i,6,1,11,2,17,e,1,7f,g,t,1,5,5,3d,30,4,15,k,5,1,y,5,14,7y,f,f,6,h,4,3b,30,4,14,m,4,1,t,a,v,5,1,56,1,2t,h,d,7,i,4,3b,2z,5,12,o,1,4,s,b,s,7,1,80,h,d,6,k,7,38,2y,6,10,1,1,s,r,d,r,5f,2,2r,i,c,6,s,3,1,2,30,30,7,x,u,p,h,p,7,3,56,1,2t,i,a,7,t,8,2x,30,7,y,u,o,h,p,5,4,83,g,9,8,u,8,2x,2z,7,w,w,n,j,n,6,4,85,h,1,c,j,4,5,6,1,1,2,1,3,3,2r,31,6,u,x,m,l,n,t,4,7k,r,1a,1,2p,31,7,r,z,l,m,o,s,3,7m,p,41,32,7,p,10,j,o,p,r,4,7o,m,40,33,7,m,14,i,o,3,1,1,1,k,q,4,7q,7,1,c,1h,2,2h,33,8,j,16,f,q,4,3,l,p,3,7u,2,5,a,1,8,3r,34,6,j,17,e,y,m,n,3,83,i,3c,1,d,35,6,i,19,c,10,m,m,3,84,i,3o,39,4,d,1d,c,10,m,o,1,85,i,3o,39,3,c,1f,b,10,m,n,2,2,1,86,d,3q,39,1,1,1,8,1i,b,10,m,m,1,1,1,1,1,1,3,85,2,1,8,18,1,2g,3b,1,5,1m,c,10,3,2,h,m,2,4,1,89,8,3p,3c,1,2,1p,a,p,1,b,3,2,h,n,1,8f,7,n,2,31,3c,1r,a,11,3,5,d,o,1,3,2,1,2,88,6,m,2,34,39,f,1,1d,9,p,1,b,3,6,c,q,1,5,1,89,4,k,4,3,4,2x,3b,a,5,1e,8,11,2,7,c,q,2,1,1,1,2,8a,4,g,e,e,1,2l,39,3,b,1e,8,10,3,7,a,s,1,1,1,8d,5,g,7,1,b,3,4,2,1,2l,3n,1e,7,12,1,b,4,p,1,7,2,8d,1,1,3,f,7,2,j,2o,3l,1f,5,2,1,10,1,c,3,o,1,7,1,2,1,8f,3,5,4,4,8,2,k,2n,3k,1g,6,1,2,z,3,a,2,o,1,9,1,4,1,8d,8,2,2,2,v,2o,3j,1g,3,4,2,y,4,z,1,e,3,8f,3,4,12,2l,3i,1i,2,4,3,y,4,19,7,8g,3,3,13,2l,3h,1o,3,z,2,18,3,1,5,8h,1,5,13,2l,3f,1p,4,z,2,x,1,9,1,3,3,1,1,8o,13,2l,3d,1q,4,10,3,u,2,d,3,8q,14,2m,p,5,2h,1q,3,11,4,s,3,d,3,8q,1b,2g,k,a,2g,2v,4,r,5,d,1,8q,1e,2e,c,1,4,d,2e,2l,4,7,5,p,8,92,1f,2f,4,o,2d,2n,5,5,6,m,8,94,1g,3d,26,2o,5,4,6,l,8,96,1g,3b,1,1,24,2q,5,4,5,9,1,a,8,96,1h,3e,22,2s,5,4,4,j,9,95,1i,3e,21,2q,1,3,5,3,4,g,d,93,1k,3d,1z,2x,5,3,4,e,e,k,1,44,1,4c,1m,3b,1z,2z,6,3,2,b,1,2,e,j,1,8i,1m,3b,1x,2y,1,3,7,d,j,5,1,6,1,5,2,8f,1n,3c,1w,30,1,2,7,d,i,4,9,6,2,8f,1n,1,1,3a,1v,35,6,1,1,b,h,k,1,7t,2,k,1m,2,4,38,1u,37,7,b,h,4,1,f,1,6,1,7m,1,l,1s,1,2,34,1u,38,7,c,g,4,1,6,1,7,3,6,5,3,1,7y,1s,1,5,32,1u,35,1,3,8,b,e,5,2,1,3,h,6,82,1r,1,9,30,1s,3a,8,2,1,8,d,6,5,5,1,a,1,3,4,4,2,1,2,7t,21,30,1r,39,1,2,8,a,d,5,6,l,1,7,6,7t,23,2x,1o,3f,a,2,1,4,d,5,3,1,2,k,1,1,3,3,b,7p,29,2s,1n,3f,9,c,2,1,5,6,3,1,3,7,2,3,4,4,5,1,e,i,1,72,2d,2r,1m,3g,8,h,2,1,1,6,2,1,3,8,1,7,1,4,1,1,k,7i,2e,2r,1k,3i,7,r,2,2,3,o,k,d,1,1,1,6z,2g,2r,1i,3l,5,r,2,2,1,t,i,c,2,71,2j,2n,1i,1,1,3k,4,r,2,4,1,t,h,a,2,72,2k,2m,1i,3p,1,1h,1,2,1,7,h,4,6,6,1,6w,2k,2n,1i,3p,4,1g,1,8,i,4,2,9,1,6x,2i,2n,1i,3o,6,4,2,19,1,9,g,h,1,6x,2h,2o,1h,3q,c,1g,h,k,1,6u,2h,2o,1h,3t,1,2,a,n,1,9,1,d,c,2,5,i,1,3,1,6s,2g,2p,1g,3z,9,f,4,p,3,2,7,5,4,i,2,6u,2g,2p,1g,47,1,1,1,1,3,3,4,6,4,r,6,6,4,o,1,6p,2e,2p,1h,4p,3,y,1,8,4,2,1,l,1,6o,2d,2q,1h,4g,2,6,3,19,5,k,2,6q,2c,2r,1h,4n,1,1e,4,7a,2a,2t,1i,4l,1,25,1,6o,29,2u,1h,51,1,1,1,j,2,7s,27,2v,1h,5,1,4t,2,3,2,h,2,7s,26,2v,1i,h,1,4j,1,1,8,1,1,9,3,7t,25,2u,1j,h,1,4i,c,b,3,7s,23,2v,1k,h,2,4g,c,b,4,2g,1,5c,22,2v,1k,f,4,4g,d,a,4,7t,22,2v,1k,f,4,48,3,4,d,1,1,9,4,7t,22,2u,1m,d,5,46,6,3,c,c,7,7s,20,2u,1l,d,7,45,6,1,f,b,8,16,1,6l,1z,2u,1l,c,6,1,1,44,o,a,8,7u,1x,2u,1k,9,b,43,1,1,q,8,8,19,1,m,1,5z,1v,2u,1j,a,a,42,1,1,u,5,9,19,1,k,1,63,1t,2t,1h,c,b,41,y,4,a,3l,1,4c,1s,2t,1f,e,b,41,1c,1r,2,66,1q,2v,1e,e,b,41,1d,7y,1q,2w,1c,f,a,41,1e,7y,1q,2w,1a,i,9,41,1f,7y,1o,2y,17,k,9,3z,1i,7x,1n,2z,17,k,8,i,1,3e,1n,7v,1n,30,17,i,9,3s,1t,v,1,4,1,6t,1m,31,17,h,a,e,1,3c,1u,w,1,6x,1m,32,17,g,9,3q,1x,w,2,6v,1l,34,16,g,9,3p,1y,y,1,6t,1l,35,16,g,9,3n,23,7p,1g,3a,16,g,8,3p,22,7p,1e,3c,16,g,8,3o,24,7o,1b,3f,16,g,8,3o,25,7n,1a,3g,15,i,6,3p,26,1,1,7k,19,3i,11,m,3,3s,25,1,1,7k,18,3j,z,4j,26,7l,18,3j,10,4g,1,1,26,7k,19,3j,10,4h,27,7k,19,3k,z,4i,26,7k,19,3k,y,4j,27,7j,19,3l,x,4k,26,7i,19,3n,v,4l,26,7i,18,3p,t,4n,25,7i,17,3q,s,4o,25,7i,14,1,2,3r,r,4o,24,7j,14,3u,q,4p,24,7j,14,3v,o,4r,23,7j,13,3w,n,4s,r,6,16,7j,13,3x,l,4t,o,c,12,7k,12,3x,k,4v,j,i,10,7l,12,3x,j,4w,h,l,6,1,r,7l,11,40,f,4y,h,n,4,1,s,7l,r,1,9,41,6,56,9,w,2,2,r,7m,s,3,4,44,1,5c,5,y,1,3,1,1,p,7l,u,aw,o,19,2,6b,u,as,2,3,m,1b,2,69,w,ax,l,1d,1,68,x,ax,k,1d,1,1,1,65,x,ay,k,1d,3,65,w,b0,i,1f,3,2,2,60,v,b3,6,1,5,1i,8,60,s,d0,7,62,l,d5,6,63,n,d5,5,63,m,d7,3,63,n,bi,1,1o,3,63,i,bn,8,1b,2,1,5,65,1,1,f,bo,7,1a,6,67,1,1,j,bm,5,1b,5,68,1,1,g,2,1,bm,5,1a,5,68,2,1,g,bq,2,1a,5,m,1,5q,f,d1,8,6c,f,cz,7,6c,1,1,g,cy,7,6e,e,d0,8,6f,c,d1,7,6d,2,1,c,d2,5,6e,g,jl,h,jj,1,1,f,ji,h,jj,g,jk,f,7l,1,1,1,bw,f,jl,1,1,c,jn,c,jo,1,1,a,jq,a,i,4,j2,1,1,9,1,1,h,1,j8,1,1,3,1,4,jr,2,1,1,1,4,jq,2,1,2,2,5,js,1,3,5,1o,1,i4,1,1,9,1,1,1j,1,i6,1,1,2,8wj,1,1,3,jo,1,2,3,jr,1,2,4,2,1,jn,2,1,4,jt,4,jv,5,jq,1,2,6,1,1,69,a,2i,9,a,7,x,7,2,2,8o,1,2,5,69,1,3,c,1w,10,3,b,f,8,5,n,18,1,73,2,1,5,6c,k,1e,1o,3,7,3,1c,89,3,65,16,v,3h,1,4,85,4,5z,1j,i,3s,84,5,1,1,5,1,57,2,d,1m,h,42,1,2,2,3,7e,4,6,8,1,1,59,5,9,1o,f,4j,70,1,6,5,2,c,4d,1,x,8,1,1,3,1n,e,4o,78,2,2,b,3j,1,5,1,9,1,7,1,5,1,4,1,e,2,8,21,a,4x,6w,3,5,5,2,b,34,1,4,2,e,e,1,e,4,3,2,2,7,2a,6,4z,1,a,6p,8,2,d,2t,3,3,3,d,3s,6,5e,6g,6,1,8,2,c,2r,4e,7,5k,4x,7,1,2,1c,1,1,4,3,d,2q,4e,2,1,2,5k,4u,1,m,1,4,1,16,e,2k,1,2,4g,2,5o,4u,c,3,2,1,5,2,6,3,1,a,3,6,3,1,1,7,g,2,2,2g,4m,1,5j,3p,1,5,5,10,4,1,10,2,9,2,u,28,1,9,a4,3y,4,c,3,3,2,j,27,2a,1,b,a0,3a,3,d,8,5,f,5,2,l,22,1,1,2g,a1,2,1,34,1r,5,9,6,1x,2j,a0,30,4f,2a,ad,2p,5,1,4b,29,al,2l,2,1,2,6,3t,a,1,2a,ar,26,8,5,1,4,2,5,3u,2f,ax,6,1,1x,h,1,49,25,b1,5,1,25,3y,1,9,1m,b,g,b5,1,1,1,2,1n,2,d,41,5,5,i,4,y,a,j,az,1,3,1s,8,h,3x,k,4,3,2,x,f,d,5,8,al,24,5,l,41,i,2,u,g,m,1,1,1,a,ab,2r,45,j,1,9,4,c,i,t,ai,2w,43,7,3,f,6,b,a,s,aw,2d,50,1f,b8,2j,4x,1a,be,2g,4v,9,2,d,g,5,bh,2d,54,b,cf,19,b,h,5b,5,cl,1d,iz,19,j3,p,i,62u';
+let LANDM=null;
+function landMask(){if(LANDM)return LANDM;const W=720,H=360,b=new Uint8Array(W*H);let i=0,v=0;
+  for(const t of LAND_RLE.split(',')){const n=parseInt(t,36);if(v)b.fill(1,i,i+n);i+=n;v^=1}return LANDM={W,H,b}}
+function isLand(lat,lon){const m=landMask();const x=((Math.floor((lon+180)/360*m.W)%m.W)+m.W)%m.W,y=Math.min(m.H-1,Math.max(0,Math.floor((90-lat)/180*m.H)));return m.b[y*m.W+x]===1}
+/* latitude/longitude → ponto na esfera (Y para cima) */
+function ll2v(lat,lon,r){const p=(90-lat)*Math.PI/180,t=(lon+180)*Math.PI/180;return new THREE.Vector3(-r*Math.sin(p)*Math.cos(t),r*Math.cos(p),r*Math.sin(p)*Math.sin(t))}
+/* esfera de Fibonacci: pontos uniformes, sem amontoar nos polos; ficam só os que caem em terra firme */
+function landDots(n,r,emph){const ga=Math.PI*(3-Math.sqrt(5)),pos=[],col=[];
+  for(let i=0;i<n;i++){const y=1-2*(i+.5)/n,lat=Math.asin(y)*180/Math.PI,lon=((ga*i)%(2*Math.PI))*180/Math.PI-180;if(!isLand(lat,lon))continue;
+    const v=ll2v(lat,lon,r);pos.push(v.x,v.y,v.z);const sa=emph&&lat<13&&lat>-56&&lon>-82&&lon<-34,b=(sa?1:.8)+Math.random()*(sa?0:.12);col.push(b,b*(sa?.87:.78),b*(sa?.62:.5))}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));return g}
+/* grade de latitude/longitude a cada 15°, feita de pontos (como na referência) */
+function gridDots(r){const p=[];for(let la=-75;la<=75;la+=15)for(let lo=-180;lo<180;lo+=1.5){const v=ll2v(la,lo,r);p.push(v.x,v.y,v.z)}
+  for(let lo=-180;lo<180;lo+=15)for(let la=-87;la<=87;la+=1.5){const v=ll2v(la,lo,r);p.push(v.x,v.y,v.z)}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));return g}
+/* contorno luminoso (fresnel) e halo externo suave, ambos dourados */
+function rimMat(c,pw,k){return new THREE.ShaderMaterial({uniforms:{c:{value:new THREE.Color(c)},p:{value:pw},k:{value:k}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  vertexShader:'varying vec3 vN;varying vec3 vV;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);vN=normalize(normalMatrix*normal);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
+  fragmentShader:'uniform vec3 c;uniform float p;uniform float k;varying vec3 vN;varying vec3 vV;void main(){float f=pow(1.-abs(dot(vN,vV)),p)*k;gl_FragColor=vec4(c*f,f);}'})}
+function haloMat(c){return new THREE.ShaderMaterial({uniforms:{c:{value:new THREE.Color(c)}},side:THREE.BackSide,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  vertexShader:'varying vec3 vN;varying vec3 vV;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);vN=normalize(normalMatrix*normal);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
+  fragmentShader:'uniform vec3 c;varying vec3 vN;varying vec3 vV;void main(){float f=pow(clamp(-dot(vN,vV)*1.95,0.,1.),2.4)*.55;gl_FragColor=vec4(c*f,f);}'})}
+/* arcos de dados: de São Paulo para outras cidades, acima da superfície, com um pulso de luz que percorre o arco */
+const HUB=[-23.55,-46.63],DEST=[[38.72,-9.14],[40.71,-74.0],[25.76,-80.19],[4.71,-74.07],[-12.05,-77.04],[-33.45,-70.67],[-34.6,-58.38],[-8.84,13.23],[19.43,-99.13],[-3.12,-60.02],[-3.73,-38.52],[51.5,-0.12]];
+function arcMesh(a,b){const va=ll2v(a[0],a[1],1),vb=ll2v(b[0],b[1],1),ang=va.angleTo(vb),pts=[];
+  for(let i=0;i<=48;i++){const t=i/48;pts.push(va.clone().lerp(vb,t).normalize().multiplyScalar(1.004+Math.sin(Math.PI*t)*(.04+ang*.2)))}
+  const mat=new THREE.ShaderMaterial({uniforms:{uT:{value:Math.random()*1.3},uC:{value:new THREE.Color(0xffd98a)}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+    vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'uniform float uT;uniform vec3 uC;varying vec2 vUv;void main(){float d=vUv.x-uT;float pulse=smoothstep(.18,0.,abs(d))*step(d,.02)*.75;float base=.34*smoothstep(0.,.06,vUv.x)*smoothstep(1.,.9,vUv.x);float a=base+pulse;gl_FragColor=vec4(uC*a,a);}'});
+  return{mesh:new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),64,.0058,5,false),mat),mat,spd:.16+Math.random()*.16}}
+/* posição e tamanho do globo na tela: no computador, centralizado à direita do formulário; no celular, no topo,
+   acima do "Voltar para o início", sem cortar nem cobrir o logotipo. setViewOffset desloca a imagem sem distorcer. */
+function layoutGlobe(){if(!camera)return;const w=innerWidth,h=innerHeight;let cx,cy,D;
+  if(w<=900){const pad=Math.min(230,Math.max(110,h*.24)),sat=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sat'))||0;D=Math.max(110,Math.min(w*.7,pad-6));cx=w/2;cy=sat+pad+6-D/2}
+  else{const L=Math.min(560,Math.max(400,w*.46));cx=L+(w-L)/2;cy=h/2;D=Math.min((w-L)*.72,h*.76)}
+  const f=(h/2)/Math.tan(camera.fov*Math.PI/360),rp=D/2*.84; // 16% de folga para o halo
+  camD=1/Math.sin(Math.atan(rp/f));camera.aspect=w/h;
+  /* pontos em pixels de tela: diâmetro ~60% do espaçamento real entre eles, para continentes bem definidos em qualquer tamanho */
+  if(landPts){const px=Math.min(3.4,Math.max(1.4,Math.sqrt(4*Math.PI/landN)*rp*.64));landPts.material.size=px;gridPts.material.size=orbitPts.material.size=Math.max(.9,px*.62)}
+  camera.position.set(0,0,camD);camera.lookAt(0,0,0);camera.setViewOffset(w,h,w/2-cx,h/2-cy,w,h);camera.updateProjectionMatrix();needRender=true}
 /* three.js só é baixado quando o login ou o app aparecem: a landing abre sem esperar o 3D */
 const THREE_URL='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';let threeP=null;
 const ensureThree=()=>threeP||(threeP=window.THREE?Promise.resolve():new Promise(ok=>{const s=document.createElement('script');s.src=THREE_URL;s.onload=ok;s.onerror=()=>{console.warn('three.js indisponível');ok()};document.head.appendChild(s)}));
-/* arcos de "sinal" saindo da superfície do planeta (inspirados no globo verde de referência, mas em tom dourado):
-   cada arco é um tubo fino com um pulso de luz que percorre seu comprimento; o grupo é filho do planeta e gira com ele. */
-function makeSignals(r){const grp=new THREE.Group(),N=LOWPOWER?4:6,mats=[];
-  for(let i=0;i<N;i++){
-    const th=(i/N)*Math.PI*2+Math.random()*.4,ph=(.28+Math.random()*.42)*Math.PI; // latitudes médias e altas
-    const base=new THREE.Vector3(Math.sin(ph)*Math.cos(th),Math.cos(ph),Math.sin(ph)*Math.sin(th)).normalize();
-    const tang=new THREE.Vector3(-Math.sin(th),.3,Math.cos(th)).normalize(),hop=.55+Math.random()*.4;
-    const p0=base.clone().multiplyScalar(r*1.002),p2=base.clone().addScaledVector(tang,hop).normalize().multiplyScalar(r*1.002);
-    const apex=base.clone().addScaledVector(tang,hop/2).normalize().multiplyScalar(r*(1.4+Math.random()*.28));
-    const geo=new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(p0,apex,p2),48,.022*r,7,false);
-    const mat=new THREE.ShaderMaterial({uniforms:{uT:{value:Math.random()},uC:{value:new THREE.Color(0xffd98a)}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-      vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-      fragmentShader:'uniform float uT;uniform vec3 uC;varying vec2 vUv;void main(){float d=abs(vUv.x-uT);float pulse=smoothstep(.16,0.,d);float rim=smoothstep(.5,1.,abs(vUv.y-.5)*2.);float base=.18*smoothstep(0.,.1,vUv.x)*smoothstep(1.,.88,vUv.x);float a=(base+pulse*1.1)*(1.-rim*.5);if(a<.004)discard;gl_FragColor=vec4(uC*(a*1.9),a);}'});
-    grp.add(new THREE.Mesh(geo,mat));mats.push({mat,spd:.22+Math.random()*.3});
-  }
-  grp.userData.mats=mats;return grp;
-}
 function initLogin(){if(initLogin.done)return;initLogin.done=true;ensureThree().then(initLoginScene)}
 function initLoginScene(){
 try{
   if(!window.THREE)throw new Error('three.js não carregou');
   scene=new THREE.Scene();
-  scene.fog=new THREE.FogExp2(0x040405,0.0012);
-  camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,1000);
-  updateCameraPosition();
+  camera=new THREE.PerspectiveCamera(30,innerWidth/innerHeight,.1,200);
   renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
-  renderer.setSize(innerWidth,innerHeight);
-  renderer.setPixelRatio(GLDPR);
-  renderer.setClearColor(0x040405,1);
-  container.appendChild(renderer.domElement);
-  renderer.domElement.setAttribute('aria-hidden','true');
-  planet=new THREE.Mesh(new THREE.SphereGeometry(3.2,LOWPOWER?72:120,LOWPOWER?72:120),new THREE.MeshStandardMaterial({color:0x17120b,roughness:.86,metalness:.12}));planet.rotation.z=THREE.MathUtils.degToRad(-14);
-  planet.position.set(3,0,0);scene.add(planet);
-  scene.add(new THREE.AmbientLight(0x2a2218,.55)); // lado noturno quase escuro, sem virar um buraco preto
-  const KEY=new THREE.Vector3(16,7,4),dirLight=new THREE.DirectionalLight(0xffdcaa,1.9);dirLight.position.copy(KEY);scene.add(dirLight); // luz lateral dourada: dia/noite com terminador
-  const atm=atmosphere(3.2*1.075,KEY);atm.position.set(3,0,0);scene.add(atm);
-  /* anéis translúcidos entre o planeta e o anel de partículas (preenchem o vão escuro, no mesmo plano inclinado) */
-  const rg=new THREE.Group(),ring=new THREE.Mesh(new THREE.RingGeometry(3.95,5.6,160,1),new THREE.ShaderMaterial({uniforms:{ri:{value:3.95},ro:{value:5.6}},side:THREE.DoubleSide,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-    vertexShader:'varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader:'uniform float ri;uniform float ro;varying vec2 vP;void main(){float t=(length(vP)-ri)/(ro-ri);float b=.55+.45*sin(t*44.)*sin(t*11.+1.3);float a=smoothstep(0.,.1,t)*smoothstep(1.,.78,t)*b*.2;gl_FragColor=vec4(vec3(.9,.7,.36)*a*1.4,a);}'}));
-  ring.rotation.x=-Math.PI/2;rg.add(ring);rg.position.set(3,0,0);rg.rotation.set(THREE.MathUtils.degToRad(12),0,THREE.MathUtils.degToRad(8));scene.add(rg);
-  const applyTex=()=>{try{const m=planet.material,T=planetTexture(LOWPOWER?768:1024,LOWPOWER?384:512);T.anisotropy=renderer.capabilities.getMaxAnisotropy?Math.min(8,renderer.capabilities.getMaxAnisotropy()):4;m.map=T;m.bumpMap=T;m.bumpScale=.035;m.color.set(0xffffff);m.needsUpdate=true;needRender=true}catch(e){}};
-  (window.requestIdleCallback||((f)=>setTimeout(f,60)))(applyTex,{timeout:900});
-  /* sinais emitidos da superfície: arcos dourados com um pulso que viaja, girando junto com o planeta */
-  signals=makeSignals(3.2);planet.add(signals);
-  rimLight=new THREE.PointLight(0xe2b250,2.2,40);rimLight.position.set(-4,3,-6);scene.add(rimLight); // contorno dourado que circula devagar
-  glow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture(),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.55}));glow.scale.set(15,15,1);glow.position.copy(planet.position);scene.add(glow);
-  particleCount=LOWPOWER?14000:30000;nDraw=particleCount;const geometry=new THREE.BufferGeometry();
-  const positions=new Float32Array(particleCount*3),colors=new Float32Array(particleCount*3);orbitAngles=new Float32Array(particleCount);orbitSpeed=new Float32Array(particleCount);orbitRadius=new Float32Array(particleCount);baseY=new Float32Array(particleCount);
-  const innerRadius=5.5,outerRadius=23;
-  for(let i=0;i<particleCount;i++){
-    const r=innerRadius+Math.pow(Math.random(),1.8)*(outerRadius-innerRadius),a=Math.random()*Math.PI*2,y=(Math.random()-.5)*(.8*(r/outerRadius)),k=(r-innerRadius)/(outerRadius-innerRadius);
-    positions[i*3]=planet.position.x+Math.cos(a)*r;positions[i*3+1]=y;positions[i*3+2]=planet.position.z+Math.sin(a)*r;baseY[i]=y;
-    orbitRadius[i]=r;orbitAngles[i]=a;orbitSpeed[i]=(.005+(1/r)*.04)*(.8+Math.random()*.4);
-    const gold=Math.random()<.62*(1-k)+.06,b=.55+Math.random()*.45; // anel interno mais dourado, bordas brancas
-    if(gold){colors[i*3]=.89*b;colors[i*3+1]=.70*b;colors[i*3+2]=.32*b}else{const w=.6+Math.random()*.4;colors[i*3]=w;colors[i*3+1]=w;colors[i*3+2]=w*.97}
-  }
-  geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));geometry.setAttribute('color',new THREE.BufferAttribute(colors,3));
-  particleSystem=new THREE.Points(geometry,new THREE.PointsMaterial({size:.42,map:createParticleTexture(),vertexColors:true,transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending}));
-  particleSystem.rotation.z=THREE.MathUtils.degToRad(8);particleSystem.rotation.x=THREE.MathUtils.degToRad(12);
-  scene.add(particleSystem);
-  /* camada de profundidade: poeira distante, gira mais devagar que o anel */
-  const dn=LOWPOWER?700:1600,dp=new Float32Array(dn*3);for(let i=0;i<dn;i++){const u=Math.acos(2*Math.random()-1),v=Math.random()*Math.PI*2,r=60+Math.random()*80;dp[i*3]=r*Math.sin(u)*Math.cos(v);dp[i*3+1]=r*Math.cos(u)*.6;dp[i*3+2]=r*Math.sin(u)*Math.sin(v)}
-  const dg=new THREE.BufferGeometry();dg.setAttribute('position',new THREE.BufferAttribute(dp,3));
-  dust=new THREE.Points(dg,new THREE.PointsMaterial({size:.5,color:0x9a958a,map:createParticleTexture(),transparent:true,opacity:.45,depthWrite:false,blending:THREE.AdditiveBlending}));scene.add(dust);
-  loginOn=true;
+  renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(GLDPR);renderer.setClearColor(0x040405,1);
+  container.appendChild(renderer.domElement);renderer.domElement.setAttribute('aria-hidden','true');
+  globe=new THREE.Group();spin=new THREE.Group();globe.add(spin);scene.add(globe);
+  /* corpo escuro: esconde os pontos do lado de trás */
+  const body=new THREE.Mesh(new THREE.SphereGeometry(.992,72,48),new THREE.MeshBasicMaterial({color:0x060504}));body.renderOrder=0;spin.add(body);
+  const grid=gridPts=new THREE.Points(gridDots(1.001),new THREE.PointsMaterial({size:1,sizeAttenuation:false,color:0xc9a35a,map:createParticleTexture(),transparent:true,opacity:.42,depthWrite:false}));grid.renderOrder=1;spin.add(grid);
+  const N=LOWPOWER?26000:40000,land=landPts=new THREE.Points(landDots(N,1.002,true),new THREE.PointsMaterial({size:2,sizeAttenuation:false,map:dotTexture(),vertexColors:true,transparent:true,opacity:1,depthWrite:false}));landN=N;land.renderOrder=2;spin.add(land);
+  const rim=new THREE.Mesh(new THREE.SphereGeometry(1.004,72,48),rimMat(0xffcf73,3.2,1.25));rim.renderOrder=3;globe.add(rim);
+  const halo=new THREE.Mesh(new THREE.SphereGeometry(1.17,64,40),haloMat(0xe2a948));halo.renderOrder=-1;globe.add(halo);
+  arcs=DEST.map(d=>arcMesh(HUB,d));arcs.forEach(a=>{a.mesh.renderOrder=4;spin.add(a.mesh)});
+  hub=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture(),color:0xffe2a0,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));hub.scale.set(.13,.13,1);hub.position.copy(ll2v(HUB[0],HUB[1],1.012));spin.add(hub);
+  DEST.forEach(d=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:createParticleTexture(),color:0xffd98a,transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending}));s.scale.set(.028,.028,1);s.position.copy(ll2v(d[0],d[1],1.008));spin.add(s)});
+  /* órbita discreta: anel de pontos inclinado e dois satélites */
+  orbit=new THREE.Group();const on=260,op=[];for(let i=0;i<on;i++){const a=i/on*Math.PI*2;op.push(Math.cos(a)*1.34,0,Math.sin(a)*1.34)}
+  const og=new THREE.BufferGeometry();og.setAttribute('position',new THREE.Float32BufferAttribute(op,3));
+  orbit.add(orbitPts=new THREE.Points(og,new THREE.PointsMaterial({size:1,sizeAttenuation:false,color:0x9c8150,map:createParticleTexture(),transparent:true,opacity:.55,depthWrite:false})));
+  orbit.userData.sats=[0,3.1].map(a=>{const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:createParticleTexture(),color:0xffe2a0,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(.045,.045,1);sp.userData.a=a;orbit.add(sp);return sp});
+  orbit.rotation.set(1.22,0,-.32);globe.add(orbit);
+  /* estrelas distantes, poucas e fracas: dão profundidade sem competir com o globo */
+  const sp=[];for(let i=0;i<(LOWPOWER?260:480);i++){const u=Math.acos(2*Math.random()-1),v=Math.random()*Math.PI*2,r=30+Math.random()*40;sp.push(r*Math.sin(u)*Math.cos(v),r*Math.cos(u)*.7,r*Math.sin(u)*Math.sin(v)-20)}
+  const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));
+  stars=new THREE.Points(sg,new THREE.PointsMaterial({size:1.3,sizeAttenuation:false,color:0xa8a090,map:createParticleTexture(),transparent:true,opacity:.32,depthWrite:false}));scene.add(stars);
+  /* América do Sul de frente: gira até o centro do continente ficar voltado para a câmera e inclina para centralizar a latitude */
+  const c=ll2v(-16,-57,1);baseRotY=-Math.atan2(c.x,c.z);const z=Math.hypot(c.x,c.z);tilt=Math.atan2(c.y,z);spin.rotation.y=baseRotY;globe.rotation.x=tilt;
+  layoutGlobe();loginOn=true;
 }catch(e){container.innerHTML='<div class="gl-fallback" aria-hidden="true"><i></i></div>';console.warn('Cena 3D do login indisponível:',e.message)}
 if(loginOn)requestAnimationFrame(animate)}
 /* mouse (desktop): paralaxe suave; sai da janela → volta ao repouso */
@@ -1227,44 +1216,35 @@ document.addEventListener('mouseleave',()=>{ptr.tx=ptr.ty=0});
 /* toque (celular): onda nas partículas e giro do anel ao arrastar; não chama preventDefault, então a rolagem continua normal */
 addEventListener('pointerdown',e=>{if(!loginOn||e.pointerType==='mouse')return;ptr.wave=Math.min(1,ptr.wave+.55);ptr.lx=e.clientX},{passive:true});
 addEventListener('pointerup',()=>{ptr.lx=null},{passive:true});addEventListener('pointercancel',()=>{ptr.lx=null},{passive:true});
-let zoomT=0;
+let zoomT=0,zoomFrom=0;
 function animate(now){
   if(!loginOn)return;
   loginRaf=requestAnimationFrame(animate);
   if(document.hidden){loginT=0;return}
   now=now||performance.now();const dt=loginT?Math.min(.1,(now-loginT)/1000):1/60;loginT=now;
   const mot=!RM.matches;
-  if(!mot&&!zoomT&&!needRender)return; // movimento reduzido: só redesenha quando algo muda
+  if(!mot&&!zoomT&&!needRender)return; // movimento reduzido: globo parado, só redesenha quando algo muda
   needRender=false;
-  /* aparelho lento: mede os primeiros quadros e, se passar de ~30 ms por quadro, desenha metade das partículas */
-  if(mot&&!perf.done){perf.n++;perf.sum+=dt;if(perf.n>=90){perf.done=true;if(perf.sum/perf.n>.03){nDraw=Math.floor(particleCount/2);particleSystem.geometry.setDrawRange(0,nDraw);dust.visible=false;if(GLDPR>1.3)try{renderer.setPixelRatio(Math.max(1,GLDPR*.72))}catch(e){}}}} // aparelho lento: menos partículas e, se preciso, menos resolução — a nitidez do planeta vem do antialias
-  const f=dt*60,t=now/1000,p=particleSystem.geometry.attributes.position.array;
+  /* aparelho lento: mede os primeiros quadros e, se passar de ~30 ms por quadro, tira estrelas/órbita e reduz a resolução */
+  if(mot&&!perf.done){perf.n++;perf.sum+=dt;if(perf.n>=90){perf.done=true;if(perf.sum/perf.n>.03){stars.visible=false;orbit.visible=false;if(GLDPR>1.3)try{renderer.setPixelRatio(Math.max(1,GLDPR*.72))}catch(e){}}}}
+  const f=dt*60,t=now/1000;
   if(mot){
     ptr.x+=(ptr.tx-ptr.x)*Math.min(1,.05*f);ptr.y+=(ptr.ty-ptr.y)*Math.min(1,.05*f);
-    const sp=.6+ptr.spin*60;ptr.spin*=Math.pow(.94,f);
-    const wv=ptr.wave>.003;ptr.wave*=Math.pow(.965,f);
-    for(let i=0;i<nDraw;i++){
-      orbitAngles[i]+=orbitSpeed[i]*sp*f;const r=orbitRadius[i];
-      p[i*3]=planet.position.x+Math.cos(orbitAngles[i])*r;p[i*3+2]=planet.position.z+Math.sin(orbitAngles[i])*r;
-      if(wv)p[i*3+1]=baseY[i]+ptr.wave*Math.sin(r*.55-t*3.4)*.9;
-    }
-    if(!wv&&waving){for(let i=0;i<nDraw;i++)p[i*3+1]=baseY[i]}waving=wv;
-    particleSystem.geometry.attributes.position.needsUpdate=true;
-    planet.rotation.y+=.002*f;dust.rotation.y+=.0003*f;
-    if(signals)signals.userData.mats.forEach(s=>{s.mat.uniforms.uT.value=(s.mat.uniforms.uT.value+s.spd*dt)%1});
-    particleSystem.rotation.x=THREE.MathUtils.degToRad(12)+ptr.y*.06;particleSystem.rotation.z=THREE.MathUtils.degToRad(8)+ptr.x*.05;
-    const la=t*.18;rimLight.position.set(planet.position.x+Math.cos(la)*8,3+Math.sin(la*.7)*2,Math.sin(la)*8-2);rimLight.intensity=2+Math.sin(t*.6)*.5+ptr.x*.4;
-    glow.material.opacity=.48+Math.sin(t*.8)*.08;
-    if(!zoomT){camera.position.set(camBase.x+ptr.x*2.4,camBase.y-ptr.y*1.4,camBase.z);camera.lookAt(camLook)}
+    dragY+=ptr.spin*40*f;ptr.spin*=Math.pow(.9,f);dragY*=Math.pow(.99,f);ptr.wave*=Math.pow(.965,f);
+    spin.rotation.y=baseRotY+Math.sin(t*.12)*.4+dragY;
+    globe.rotation.x=tilt+ptr.y*.1;globe.rotation.y=ptr.x*.14;
+    arcs.forEach(a=>{a.mat.uniforms.uT.value=(a.mat.uniforms.uT.value+a.spd*dt*(1+ptr.wave*3))%1.3});
+    hub.material.opacity=.7+Math.sin(t*2.2)*.3;
+    orbit.userData.sats.forEach(s=>{const a=t*.22+s.userData.a;s.position.set(Math.cos(a)*1.34,0,Math.sin(a)*1.34)});
+    stars.rotation.y+=.00015*f;
   }
-  if(zoomT){const k=Math.min(1,(performance.now()-zoomT)/950),e=k*k*(3-2*k);camera.position.lerpVectors(zoomFrom,zoomTo,e);camera.lookAt(planet.position);}
+  if(zoomT){const k=Math.min(1,(performance.now()-zoomT)/950),e=k*k*(3-2*k);camera.position.z=zoomFrom*(1-.55*e)}
   renderer.render(scene,camera);
 }
-let zoomFrom,zoomTo;
-function loginZoom(){if(!loginOn)return;zoomFrom=camera.position.clone();zoomTo=planet.position.clone().add(new THREE.Vector3(-2,4,11));zoomT=performance.now()}
+function loginZoom(){if(!loginOn)return;zoomFrom=camera.position.z;zoomT=performance.now()}
 function stopLogin(){if(!loginOn)return;loginOn=false;cancelAnimationFrame(loginRaf);try{scene.traverse(o=>{o.geometry&&o.geometry.dispose();if(o.material){o.material.map&&o.material.map.dispose();o.material.dispose()}});renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove()}catch(e){}}
 RM.addEventListener&&RM.addEventListener('change',()=>{needRender=true});
-addEventListener('resize',()=>{if(!loginOn)return;camera.aspect=innerWidth/innerHeight;updateCameraPosition();camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+addEventListener('resize',()=>{if(!loginOn)return;renderer.setSize(innerWidth,innerHeight);layoutGlobe()});
 
 /* ============ MOTOR 3D COMPARTILHADO DO APP ============
    Um único contexto WebGL desenha todas as visualizações (globo, veículo, velocímetro, esfera, anatomia)
@@ -1311,32 +1291,32 @@ function mini3d(el,setup){const v=G3.add(el,{pos:[0,1.6,7]});if(!v)return null;v
 function mountGlobe(){
   const el=document.getElementById('globe');if(!el)return;
   const small=el.clientWidth<200;
-  mini3d(el,(s,cam)=>{cam.position.set(0,0,small?9.4:7.4);cam.lookAt(0,0,0);
-    const n=LOWPOWER||small?800:1700,pos=new Float32Array(n*3),col=new Float32Array(n*3),R=2.05,ga=Math.PI*(3-Math.sqrt(5));
-    for(let i=0;i<n;i++){const y=1-(i/(n-1))*2,r=Math.sqrt(1-y*y),th=ga*i,j=1+(Math.random()-.5)*.03;pos[i*3]=Math.cos(th)*r*R*j;pos[i*3+1]=y*R*j;pos[i*3+2]=Math.sin(th)*r*R*j;
-      const band=Math.abs(Math.sin(y*6.2))<.22,b=.55+Math.random()*.45;if(band){col[i*3]=.9*b;col[i*3+1]=.71*b;col[i*3+2]=.33*b}else{const w=.5+Math.random()*.4;col[i*3]=w;col[i*3+1]=w;col[i*3+2]=w}}
-    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));
-    const mat=new THREE.PointsMaterial({size:small?.07:.075,map:createParticleTexture(),vertexColors:true,transparent:true,opacity:small?.85:.95,depthWrite:false,blending:small?THREE.NormalBlending:THREE.AdditiveBlending}); // tela pequena: mistura normal evita a borda estourada
-    const grp=new THREE.Group(),pts=new THREE.Points(g,mat);grp.add(pts);grp.rotation.z=.32;s.add(grp);
+  mini3d(el,(s,cam)=>{cam.position.set(0,0,small?10.8:9);cam.lookAt(0,0,0);
+    /* mesma Terra digital do login: pontos só em terra firme, América do Sul de frente, contorno dourado */
+    const R=2.05,ps=small?1.5:1.8,mat=new THREE.PointsMaterial({size:ps,sizeAttenuation:false,map:dotTexture(),vertexColors:true,transparent:true,depthWrite:false});
+    const grp=new THREE.Group(),pts=new THREE.Points(landDots(LOWPOWER||small?9000:15000,R*1.002,true),mat);
+    grp.add(new THREE.Mesh(new THREE.SphereGeometry(R*.99,48,32),new THREE.MeshBasicMaterial({color:0x000000})));grp.add(pts); // preto puro: este renderizador converte para sRGB, o que clarearia um quase-preto
+    const rim=new THREE.Mesh(new THREE.SphereGeometry(R*1.004,48,32),rimMat(0xffcf73,3,1.1));
+    const ca=ll2v(-16,-57,1),by=-Math.atan2(ca.x,ca.z),tl=Math.atan2(ca.y,Math.hypot(ca.x,ca.z));grp.rotation.set(tl,by,0);s.add(grp);s.add(rim);
     /* órbita: anel fino de pontos + três satélites */
     const on=LOWPOWER?160:320,op=new Float32Array(on*3);for(let i=0;i<on;i++){const a=i/on*Math.PI*2;op[i*3]=Math.cos(a)*2.9;op[i*3+1]=0;op[i*3+2]=Math.sin(a)*2.9}
     const og=new THREE.BufferGeometry();og.setAttribute('position',new THREE.BufferAttribute(op,3));
     const orbit=new THREE.Group();orbit.add(new THREE.Points(og,new THREE.PointsMaterial({size:.05,map:createParticleTexture(),color:0x8c7a52,transparent:true,opacity:.75,depthWrite:false,blending:THREE.AdditiveBlending})));orbit.rotation.x=1.18;orbit.rotation.z=-.25;s.add(orbit);
     const sats=[0,2.1,4.2].map(a=>{const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:createParticleTexture(),color:0xf6dc9a,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(.32,.32,1);sp.userData.a=a;orbit.add(sp);return sp});
     const core=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture(),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.5}));core.scale.set(6.2,6.2,1);s.add(core);
-    const st={drag:false,lx:0,ly:0,vx:0,vy:0,hx:0,hy:0,tx:0,ty:0,pulse:0,moved:0};
+    const st={drag:false,lx:0,ly:0,vx:0,vy:0,hx:0,hy:0,tx:0,ty:0,pulse:0,moved:0,off:0};
     el.style.touchAction='pan-y';
     el.onpointerdown=e=>{st.drag=true;st.moved=0;st.lx=e.clientX;st.ly=e.clientY;st.vx=st.vy=0;el.style.cursor='grabbing';try{el.setPointerCapture(e.pointerId)}catch(x){}};
     el.onpointerup=e=>{if(st.drag&&st.moved<6)st.pulse=1;st.drag=false;el.style.cursor='grab'};
     el.onpointercancel=()=>{st.drag=false;el.style.cursor='grab'};
     el.onpointermove=e=>{if(!st.drag){if(e.pointerType==='mouse'){const b=el.getBoundingClientRect();st.tx=((e.clientX-b.left)/b.width-.5)*.7;st.ty=((e.clientY-b.top)/b.height-.5)*.5}return}
-      const dx=e.clientX-st.lx,dy=e.clientY-st.ly;st.moved+=Math.abs(dx)+Math.abs(dy);st.vx=dx*.01;st.vy=dy*.006;grp.rotation.y+=st.vx;grp.rotation.x=clamp(grp.rotation.x+st.vy,-.9,.9);st.lx=e.clientX;st.ly=e.clientY};
+      const dx=e.clientX-st.lx,dy=e.clientY-st.ly;st.moved+=Math.abs(dx)+Math.abs(dy);st.vx=dx*.01;st.vy=dy*.006;st.off+=st.vx;grp.rotation.y=by+st.off;grp.rotation.x=clamp(grp.rotation.x+st.vy,-.9,.9);st.lx=e.clientX;st.ly=e.clientY};
     el.onpointerleave=()=>{st.tx=st.ty=0};
     return(t,dt,mot)=>{const f=Math.max(.2,dt*60);
-      if(!st.drag){grp.rotation.y+=st.vx;st.vx*=Math.pow(.93,f);if(mot)grp.rotation.y+=.0035*f;grp.rotation.x+=(0-grp.rotation.x)*.02*f}
+      if(!st.drag){st.off+=st.vx;st.vx*=Math.pow(.93,f);st.off*=Math.pow(.985,f);grp.rotation.y=by+st.off+(mot?Math.sin(t*.15)*.45:0);grp.rotation.x+=(tl-grp.rotation.x)*.02*f} // oscila em torno da América do Sul e volta a ela depois de arrastar
       st.hx+=(st.tx-st.hx)*.08*f;st.hy+=(st.ty-st.hy)*.08*f;grp.position.x=st.hx*.35;s.rotation.y=st.hx;s.rotation.x=st.hy;
       if(mot){orbit.rotation.y=t*.12;sats.forEach((sp,i)=>{const a=sp.userData.a+t*(.5+i*.12);sp.position.set(Math.cos(a)*2.9,0,Math.sin(a)*2.9)})}
-      st.pulse*=Math.pow(.92,f);const k=1+st.pulse*.08;grp.scale.set(k,k,k);mat.size=(small?.07:.075)+st.pulse*.04;core.material.opacity=(small?.1:.42)+(mot?Math.sin(t*1.3)*.06:0)+st.pulse*.3}})
+      st.pulse*=Math.pow(.92,f);const k=1+st.pulse*.08;grp.scale.set(k,k,k);mat.size=ps+st.pulse*.8;core.material.opacity=(small?.08:.28)+(mot?Math.sin(t*1.3)*.06:0)+st.pulse*.3}})
 }
 </script>
 <script>
@@ -1502,6 +1482,16 @@ function workedDays(f,t){const s=new Set();db.tx.forEach(x=>{if(x.type==='in'&&i
    limite de despesas compara com as despesas lançadas. Os indicadores nunca se misturam. */
 function goalPct(real,target){if(!(target>0))return{has:false,pct:null,bar:0,over:false};const raw=real/target*100,pct=Math.floor(raw*100+1e-9)/100;return{has:true,pct,bar:clamp(raw,0,100),over:raw>100,hit:raw>=100}}
 const pctTxt=p=>num(p,p%1?2:0)+'%';
+/* Cor do resultado financeiro (lucro operacional ou resultado completo): a MESMA regra em Uber, 99, Início e Relatórios.
+   Equilíbrio = |resultado| ≤ tolerância; tolerância = 3% do faturamento do período, nunca menos de R$ 5,00 nem mais de R$ 20,00.
+   Ex.: R$ 1,00 com R$ 150 faturados → equilíbrio (dourado); R$ 230 com R$ 350 → lucro (verde); −R$ 30 com R$ 100 → prejuízo (vermelho).
+   O teto de R$ 20 impede que um prejuízo expressivo vire "neutro" em dias de faturamento alto. Só muda a cor; nenhum valor é alterado. */
+const RESULT_EVEN={pct:.03,min:5,max:20};
+function resTone(v,inc){const tol=Math.min(RESULT_EVEN.max,Math.max(RESULT_EVEN.min,(+inc||0)*RESULT_EVEN.pct)),x=r2(+v||0);return Math.abs(x)<=tol?'even':x>0?'pos':'neg'}
+const resCls=(v,inc)=>'res-'+resTone(v,inc),RES_LBL={pos:'Lucro',neg:'Prejuízo',even:'Equilíbrio'};
+/* tamanho da fonte (unidades do SVG de 120) para o percentual caber no miolo do anel: ~72 de largura útil.
+   Dígitos em negrito ocupam ~0,62 em; "107,03%" fica em 16, "1000,00%" em 14, "86%" no máximo de 22. */
+const ringFs=t=>Math.min(22,Math.floor(112/Math.max(4,String(t).length)));
 const GOALM={fat:'Faturamento',lucro:'Lucro operacional',desp:'Limite de despesas',res:'Economia / reserva',obr:'Pagamento de obrigação',pers:'Personalizada'};
 const GPER={dia:'por dia',semana:'por semana'};
 const goalRange=(per,d)=>{d=d||TODAY();return per==='semana'?[wkStart(d),d]:[d,d]};
@@ -1803,7 +1793,7 @@ hoje(){
    <div class="rs">
     <div class="rs-main"><small>Faturamento ${hper==='d'?'de hoje':'no período'} · Uber + 99</small><b>${brl(cs.inc)}</b><div class="rs-split"><span><span class="idn uber" aria-hidden="true"></span>Uber ${brl(u.inc)}</span><span><span class="idn n99" aria-hidden="true"></span>99 ${brl(n.inc)}</span></div></div>
     <div><small>Despesas lançadas</small><b>${brl(cs.expTot)}</b><small style="margin:6px 0 0">combustível, manutenção, outros e passes</small></div>
-    <div><small>Lucro operacional</small><b class="${cs.op>0?'pos':cs.op<0?'neg':''}">${brl(cs.op)}</b><small style="margin:6px 0 0">faturamento − despesas registradas (${fuelTerm().toLowerCase()}, passes e outros) · ${fuelTerm().toLowerCase()} ${emTag(cs.emode)}</small>${estLine(cs)}</div>
+    <div><small>Lucro operacional</small><b class="${resCls(cs.op,cs.inc)}">${brl(cs.op)}</b><small style="margin:6px 0 0">faturamento − despesas registradas (${fuelTerm().toLowerCase()}, passes e outros) · ${fuelTerm().toLowerCase()} ${emTag(cs.emode)}</small>${estLine(cs)}</div>
     <div class="gl"><small>Meta de faturamento de hoje</small>${gp.has?`<b>${pctTxt(gp.pct)}${gp.over?' <span class="pill">superada</span>':''}</b><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(gp.bar)}" aria-label="Atingimento da meta de faturamento"><i style="width:${gp.bar}%;background:${gColor(gp.pct/100)}"></i></div><small style="margin:6px 0 0">Realizado ${brl(ct.inc)} de ${brl(g)} · ${gp.hit?(gp.over?'superou em '+brl(r2(ct.inc-g)):'meta alcançada'):'faltam '+brl(r2(g-ct.inc))}</small>`:`<b>—</b><small style="margin:6px 0 0"><button type="button" class="lnk" data-go="metas">Definir meta de faturamento</button></small>`}
      ${lp&&lp.has?`<small style="margin:10px 0 0;color:var(--tx2)">Meta de lucro: ${pctTxt(lp.pct)} · ${brl(ct.op)} de ${brl(+lg.target)}</small>`:''}</div>
    </div>
@@ -1831,14 +1821,14 @@ return `<div class="daynav"><button type="button" class="nb" data-pday="-1" aria
 <div class="s12"><div class="kpis">
  ${kpi('Faturamento bruto',brl(s.inc),cx(s.inc,p.inc,{good:1})+(s.promo>0?' · '+brl(s.promo)+' de promoções':''),'hl')}
  ${kpi('Custos operacionais',brl(s.opCost),fuelTerm().toLowerCase()+' '+emTag(s.emode)+'<br>'+cx(s.opCost,p.opCost,{good:-1}))}
- ${kpi('Lucro operacional',`<span class="${s.op>=0?'pos':'neg'}">${brl(s.op)}</span>`,cx(s.op,p.op,{good:1}),'hl')}
+ ${kpi('Lucro operacional',`<span class="${resCls(s.op,s.inc)}">${brl(s.op)}</span>`,cx(s.op,p.op,{good:1}),'hl')}
  ${s.estFuel>0?kpi(fuelTerm()+' estimado',brl(s.estFuel),estBasis(s)+' · fora do lucro; registre o abastecimento'):''}
- ${kpi('Resultado completo',`<span class="${s.full>=0?'pos':'neg'}">${brl(s.full)}</span>`,'com manutenção e custos fixos')}
+ ${kpi('Resultado completo',`<span class="${resCls(s.full,s.inc)}">${brl(s.full)}</span>`,'com manutenção e custos fixos')}
  ${kpi('Tempo online',s.min>0?hm(s.min):'—',s.min>0?cx(s.min,p.min>0?p.min:0,{fmt:hm}):'informe as horas na jornada')}
  ${kpi('Viagens',s.n!=null?s.n:'—',s.n!=null?cx(s.n,p.n,{fmt:x=>String(x)}):'opcional')}
  ${kpi('Quilômetros',s.kmKnown?num(s.km,1)+' km':'—',s.kmKnown?cx(s.km,p.kmKnown?p.km:null,{fmt:x=>num(x,1)+' km'}):'não informado')}
  ${kpi('Bruto por hora',s.hr>0?brl(s.inc/s.hr):'—')}
- ${kpi('Líquido por hora',s.hr>0?brl(s.op/s.hr):'—','lucro operacional ÷ horas')}
+ ${kpi('Líquido por hora',s.hr>0?`<span class="${resCls(s.op,s.inc)}">${brl(s.op/s.hr)}</span>`:'—','lucro operacional ÷ horas')}
  ${kpi('Bruto por km',s.km>0?brl(s.inc/s.km):'—',s.km>0?'':'precisa de km')}
  ${kpi('Consumo de '+(k.share===1?'energia':'combustível'),cons,cons==='—'&&s.eReal>0?'abastecimento registrado sem litros/kWh':'')}
 </div></div>
@@ -1853,7 +1843,10 @@ return `<div class="daynav"><button type="button" class="nb" data-pday="-1" aria
 <div class="scope" style="margin-top:8px"><b>Como é rateado:</b> ${brl(selectedPass(a).price)} com ${selectedPass(a).days} dia(s) de validade. O custo operacional divide o pacote entre os dias <b>com atividade</b> no ${A.n} dentro da validade: trabalhando todos os dias, ${brl(selectedPass(a).price/selectedPass(a).days)}/dia; dia sem registro não recebe custo.</div>
 <p class="note" style="margin-top:0">O pacote selecionado será usado no próximo lançamento automático. Pacotes já lançados preservam o preço e a validade registrados.</p></div>
 <div class="c s12 vsum"><span class="vico">${CAR_ICON}</span><div class="vname"><b>${db.vehicle?esc(vehName(db.vehicle)):'Nenhum veículo cadastrado'}</b><small>Veículo, quilometragem e manutenções ficam na aba Manutenção.</small></div><button type="button" class="btn ghost sm" data-go="manutencao">Abrir Manutenção</button></div>
-<div class="c s12"><h3>Histórico ${A.n}</h3><div class="list">${hist.length?hist.map(txRow).join(''):empt('Nenhum lançamento ainda.')}</div></div></div>`}
+<div class="c s12"><h3>Resultado por dia · ${A.n}</h3>${(()=>{const ds=[...new Set(db.tx.filter(x=>x.type==='in'&&appOf(x)===a).map(x=>x.d).concat(db.jr.filter(j=>j.app===a&&hasAct(j)).map(j=>j.d)))].filter(x=>x<=TODAY()).sort().reverse().slice(0,7);
+   return ds.length?`<div class="list resd">${ds.map(dd=>{const r=AS(a,dd,dd),t=resTone(r.op,r.inc);return`<div class="it"><div class="g">${fmtD(dd)}<small>Faturamento ${brl(r.inc)} · custos ${brl(r.opCost)}</small></div><b class="res-${t}">${brl(r.op)}</b><span class="tag rt-${t}">${RES_LBL[t]}</span></div>`}).join('')}</div>`:empt('Nenhum dia registrado ainda.')})()}
+   <p class="note">Lucro operacional de cada dia. Verde = lucro; vermelho = prejuízo; dourado = perto do equilíbrio (até 3% do faturamento do dia, entre R$ 5 e R$ 20).</p></div>
+  <div class="c s12"><h3>Histórico ${A.n}</h3><div class="list">${hist.length?hist.map(txRow).join(''):empt('Nenhum lançamento ainda.')}</div></div></div>`}
 </script>
 <script>
 let pper='30';const chat=[];
@@ -1907,8 +1900,8 @@ financas(){
   <div class="grid">${cmpCard}
   <div class="c s3 k2"><h3>Faturamento registrado</h3><div class="big">${brl(cs.inc)}</div><div class="sub">Uber + 99 no período${cs.promo>0?' · dos quais '+brl(cs.promo)+' em promoções':''}</div></div>
   <div class="c s3 k2"><h3>Gastos registrados</h3><div class="big">${brl(cs.expTot)}</div><div class="sub">combustível, manutenção, outros e passes</div></div>
-  <div class="c s3 k2"><h3>Lucro operacional</h3><div class="big ${cs.op>=0?'pos':'neg'}">${brl(cs.op)}</div><div class="sub">só despesas registradas ${emTag(cs.emode)}</div>${estLine(cs)}</div>
-  <div class="c s3 k2"><h3>Resultado completo</h3><div class="big ${cs.full>=0?'pos':'neg'}">${brl(cs.full)}</div><div class="sub">com manutenção e custos fixos · <button type="button" class="lnk" data-own>configurar custos fixos</button></div></div>
+  <div class="c s3 k2"><h3>Lucro operacional</h3><div class="big ${resCls(cs.op,cs.inc)}">${brl(cs.op)}</div><div class="sub">só despesas registradas ${emTag(cs.emode)}</div>${estLine(cs)}</div>
+  <div class="c s3 k2"><h3>Resultado completo</h3><div class="big ${resCls(cs.full,cs.inc)}">${brl(cs.full)}</div><div class="sub">com manutenção e custos fixos · <button type="button" class="lnk" data-own>configurar custos fixos</button></div></div>
   <div class="c s12"><div class="stats">
    <div><small>Dias trabalhados</small><b>${N}</b></div><div><small>Faturamento nos dias trabalhados</small><b>${brl(cs.wdInc)}</b></div>
    <div><small>Média por dia trabalhado</small><b>${N?brl(cs.wdInc/N):'—'}</b></div><div><small>Lucro operacional médio por dia trabalhado</small><b>${N?brl(cs.op/N):'—'}</b></div>
@@ -2717,9 +2710,9 @@ const LP={on:false,tm:[],scene:'',lock:'',idx:0,st:null,io:null,rv:null,
       this.put(`<div class="dm-top"><b>Registrar gasto</b><span>Hoje</span></div><div class="dm-seg"><span class="${cat==='Combustível'?'on':''}">Combustível</span><span>Manutenção</span><span class="${cat!=='Combustível'?'on':''}">Outros</span></div><div class="dm-l" style="margin-top:4px">Valor · ${cat}</div><div class="dm-field" id="dmf"><i class="cur"></i></div><div class="dm-c"><div class="dm-l">Lucro operacional agora</div><div class="dm-v s">${brl(before)}</div></div><div class="dm-btn" id="dmb">Salvar gasto</div>`);
       this.type('#dmf',num(v,2),()=>{const b=$('#dmb');if(b)b.classList.add('press');this.later(()=>{s.exp=r2(s.exp+v);s.hist.unshift({t:cat,d:'agora',v:-v,nw:1});this.dash({k:'exp',v});if(!this.lock)this.next(3800)},450)});return}
     if(sc==='meta'){const g0=goalPct(r2(this.inc()-s.hist.filter(h=>h.nw&&h.v>0).reduce((a,h)=>a+h.v,0)),s.goal),g=goalPct(this.inc(),s.goal),C_=2*Math.PI*52;
-      this.put(`<div class="dm-top"><b>Metas</b><span>Hoje</span></div><div class="dm-c hl"><div class="dm-l">Meta de faturamento do dia</div><div class="dm-ring"><svg viewBox="0 0 120 120"><circle class="t" cx="60" cy="60" r="52"/><circle class="p" id="dmr" cx="60" cy="60" r="52" stroke-dasharray="${C_}" stroke-dashoffset="${C_*(1-g0.bar/100)}"/></svg></div><div class="dm-ringv"><b id="dmp">${pctTxt(g0.pct)}</b><span>${brl(this.inc())} de ${brl(s.goal)}</span></div></div>
+      this.put(`<div class="dm-top"><b>Metas</b><span>Hoje</span></div><div class="dm-c hl"><div class="dm-l">Meta de faturamento do dia</div><div class="dm-ring"><svg viewBox="0 0 120 120" role="img" aria-label="${pctTxt(g.pct)} da meta"><circle class="t" cx="60" cy="60" r="52"/><circle class="p" id="dmr" cx="60" cy="60" r="52" transform="rotate(-90 60 60)" stroke-dasharray="${C_}" stroke-dashoffset="${C_*(1-g0.bar/100)}"/><text class="dm-rt" id="dmp" x="60" y="56" text-anchor="middle" dominant-baseline="central" font-size="${ringFs(pctTxt(g0.pct))}">${pctTxt(g0.pct)}</text><text class="dm-rs" x="60" y="77" text-anchor="middle" font-size="8.5">da meta</text></svg></div><div class="dm-ringv"><span>${brl(this.inc())} de ${brl(s.goal)}</span></div></div>
        <div class="dm-c"><div class="dm-l">Cálculo</div><div style="font-size:10.5px;color:var(--tx2)">${brl(this.inc())} ÷ ${brl(s.goal)} × 100 = ${pctTxt(g.pct)}</div></div><div class="dm-c"><div class="dm-l">${g.hit?'Meta alcançada':'Falta'}</div><div class="dm-v s">${g.hit?'+'+brl(r2(this.inc()-s.goal)):brl(r2(s.goal-this.inc()))}</div></div>`);
-      this.later(()=>{const r=$('#dmr'),p=$('#dmp');if(r)r.style.strokeDashoffset=C_*(1-g.bar/100);if(p)p.textContent=pctTxt(g.pct);s.hist.forEach(h=>delete h.nw)},500);this.next(4600);return}
+      this.later(()=>{const r=$('#dmr'),p=$('#dmp');if(r)r.style.strokeDashoffset=C_*(1-g.bar/100);if(p){const tx=pctTxt(g.pct);p.textContent=tx;p.setAttribute('font-size',ringFs(tx))}s.hist.forEach(h=>delete h.nw)},500);this.next(4600);return}
     if(sc==='hist'){this.put(`<div class="dm-top"><b>Histórico</b><span>Este mês</span></div><div class="dm-c" style="padding:4px 10px">${s.hist.slice(0,6).map((h,i)=>`<div class="dm-it ${i===0?'new':''}"><div>${h.t}<small>${h.d==='agora'?'Hoje · agora':'Hoje · '+h.d}</small></div><b class="${h.v>0?'dm-pos':'dm-neg'}">${h.v>0?'+':'−'}${brl(Math.abs(h.v))}</b></div>`).join('')}</div><div class="dm-c"><div class="dm-l">Receitas − despesas</div><div class="dm-v s">${brl(this.op())}</div></div>`);this.next(4200);return}
     if(sc==='rank'){const rows=[['Motorista #A7F2',312.4],['Noturno do ABC',268.9],['Rota Leste',231],['Motorista #19C4',190.7],['Você',this.op(),1]].sort((a,b)=>b[1]-a[1]);let pos=0;rows.forEach((r,i)=>{r.p=i&&rows[i-1][1]===r[1]?rows[i-1].p:i+1});
       this.put(`<div class="dm-top"><b>Ranking</b><span class="dm-tag">exemplo</span></div><div class="dm-seg"><span class="on">Hoje</span><span>7 dias</span><span>Mês</span></div><div class="dm-l">Lucro operacional · hoje</div><div class="dm-c" style="padding:4px 6px">${rows.map(r=>`<div class="dm-rk ${r[2]?'me':''}"><b>${r.p}º</b><span>${r[0]}</span><span>${brl(r[1])}</span></div>`).join('')}</div><div class="dm-l" style="text-align:center">Só posição, apelido e valor do critério</div>`);this.next(4400);return}}

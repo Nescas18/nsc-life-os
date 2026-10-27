@@ -205,6 +205,7 @@ await test("11. Editar e excluir lançamento (com passe automático)", async (ke
   await o.page.waitForTimeout(150);
   await o.page.click(`[data-edit="${id}"]`);
   await o.page.waitForSelector("#modal.on #mbox form[data-form=edtx]");
+  await o.page.waitForTimeout(100); // o modal foca o primeiro campo após 30 ms; preencher antes disso manda o texto para o campo errado
   await o.page.fill('#mbox form[data-form=edtx] input[name=v]', "250,00");
   await o.page.click('#mbox form[data-form=edtx] button.btn');
   s = await cs(o.page, T); eq("faturamento após editar", s.inc, 250); eq("lucro após editar", s.op, 221);
@@ -515,6 +516,51 @@ await test("Histórico compacto: explicação recolhida, dias sem registro com c
   const after = await o.page.evaluate((d) => ({ off: isOff(d), still: [...document.querySelectorAll(".pendc [data-pendrec]")].some((b) => b.dataset.pendrec === d) }), first);
   eq("marcado como não trabalhado", after.off, true); eq("sai do aviso", after.still, false);
   return r.rows.length + " dia(s) pendente(s): " + r.rows.join(", ");
+});
+
+// ---------- Cores do resultado financeiro (mesma regra em Uber, 99, Início e Relatórios) ----------
+await test("Cores: regra central — 350−120 lucro, 100−130 prejuízo, 150−149 equilíbrio; prejuízo grande nunca vira neutro", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  const r = await o.page.evaluate(() => ({ a: resTone(230, 350), b: resTone(-30, 100), c: resTone(1, 150), z: resTone(0, 0), big: resTone(-25, 2000), small: resTone(6, 100), edge: resTone(-5, 100) }));
+  eq("lucro 230", r.a, "pos"); eq("prejuízo −30", r.b, "neg"); eq("equilíbrio 1", r.c, "even"); eq("zero", r.z, "even");
+  eq("−25 com faturamento alto continua prejuízo (teto R$ 20)", r.big, "neg"); eq("R$ 6 em R$ 100 já é lucro", r.small, "pos"); eq("−R$ 5 em R$ 100 é equilíbrio", r.edge, "even");
+});
+for (const [app, nm] of [["uber", "Uber"], ["n99", "99"]]) {
+  await test(`Cores na aba ${nm}: card de lucro, resultado completo e lista de dias usam a mesma regra`, async (keep) => {
+    const o = await open(); keep(o.ctx);
+    const D1 = "2026-10-24", D2 = "2026-10-25";
+    await setDb(o.page, { cfg: { pass: OFF }, tx: [
+      tx({ d: T, type: "in", app, v: 350 }), tx({ d: T, type: "other", app, v: 120 }),
+      tx({ d: D1, type: "in", app, v: 100 }), tx({ d: D1, type: "other", app, v: 130 }),
+      tx({ d: D2, type: "in", app, v: 150 }), tx({ d: D2, type: "other", app, v: 149 })] });
+    await o.page.evaluate((a) => { tab = a; pday = null; render(); }, app);
+    const r = await o.page.evaluate(() => {
+      const kp = [...document.querySelectorAll("#view .kpi")].find((k) => /Lucro operacional/.test(k.querySelector("h5").textContent));
+      const rows = [...document.querySelectorAll("#view .resd .it")].map((it) => ({ d: it.querySelector(".g").firstChild.textContent.trim(), cls: it.querySelector("b").className, v: it.querySelector("b").textContent, tag: it.querySelector(".tag").textContent, col: getComputedStyle(it.querySelector("b")).color }));
+      return { kpi: kp.querySelector(".v span").className, kpiCol: getComputedStyle(kp.querySelector(".v span")).color, rows };
+    });
+    eq("card de lucro de hoje", r.kpi, "res-pos");
+    if (r.kpiCol !== "rgb(95, 196, 142)") throw new Error("lucro do card não está verde: " + r.kpiCol);
+    const by = Object.fromEntries(r.rows.map((x) => [x.d, x]));
+    eq("hoje: lucro", by["26/10/2026"].cls, "res-pos"); eq("rótulo", by["26/10/2026"].tag, "Lucro");
+    eq("24/10: prejuízo", by["24/10/2026"].cls, "res-neg"); eq("rótulo", by["24/10/2026"].tag, "Prejuízo");
+    eq("25/10: equilíbrio", by["25/10/2026"].cls, "res-even"); eq("rótulo", by["25/10/2026"].tag, "Equilíbrio");
+    if (by["24/10/2026"].col !== "rgb(239, 111, 102)") throw new Error("prejuízo não está vermelho: " + by["24/10/2026"].col);
+    // valores intactos: só a cor muda
+    eq("valor exibido do prejuízo", by["24/10/2026"].v.replace(/\s/g, " "), "-R$ 30,00");
+    const c = await cs(o.page, "2026-10-24"); eq("lucro operacional de 24/10 no motor", c.op, -30);
+    return r.rows.map((x) => `${x.d} ${x.v} ${x.tag}`).join(" · ");
+  });
+}
+await test("Cores: Início e Relatórios seguem a mesma regra do resultado", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 150 }), tx({ d: T, type: "other", app: "uber", v: 149 })] });
+  await o.page.evaluate(() => { tab = "hoje"; hper = "d"; render(); });
+  const h = await o.page.evaluate(() => [...document.querySelectorAll("#view b")].filter((b) => /res-/.test(b.className)).map((b) => b.className));
+  if (!h.includes("res-even")) throw new Error("Início não usa a regra: " + h);
+  await o.page.evaluate(() => { tab = "financas"; fper = "d"; render(); });
+  const f = await o.page.evaluate(() => [...document.querySelectorAll("#view .big")].map((b) => b.className));
+  if (!f.some((c) => /res-even/.test(c))) throw new Error("Relatórios não usa a regra: " + f);
 });
 
 await browser.close();
