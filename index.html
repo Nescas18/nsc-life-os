@@ -114,35 +114,35 @@ form.shake{animation:shake .38s}
 .cardh{display:flex;align-items:center;gap:4px;margin-bottom:12px}.cardh h3{margin:0}
 .lblrow{display:flex;align-items:center;gap:2px;margin-bottom:7px}.lblrow label{margin:0!important}
 /* ============ MASCOTE ============
-   A imagem oficial é estática: a profundidade vem de perspectiva 3D (inclinação que acompanha o cursor), brilho que
-   se desloca, sombra e flutuação. A piscada é uma "pálpebra" dourada sobre a posição exata dos olhos da imagem. */
-#bot{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + var(--sab));z-index:17;--sz:84px;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none;max-width:calc(100vw - 24px)}
+   Só a cabeça (recorte com transparência real da imagem oficial). A camada inteira ignora o ponteiro: a cabeça
+   flutua sobre a interface sem bloquear cliques, toques nem rolagem. Ela só aceita clique quando está parada e longe
+   dos controles (para abrir uma dica). Posição calculada por Bot.mv (atraso, inércia, distância de segurança). */
+#bot{position:fixed;left:0;top:0;width:0;height:0;z-index:17;pointer-events:none;--hw:66px;--hh:76px}
 #bot[hidden],#modal.on~#bot,#app.navx~#bot,body.boot #bot{display:none}
-.bot-head{pointer-events:auto;position:relative;width:var(--sz);height:var(--sz);padding:0;border:none;background:none;cursor:pointer;border-radius:50%;perspective:420px;-webkit-tap-highlight-color:transparent;flex:0 0 auto;transition:width .3s var(--ease),height .3s var(--ease),opacity .3s}
+.bot-head{position:absolute;left:0;top:0;width:var(--hw);height:var(--hh);padding:0;border:none;background:none;cursor:pointer;pointer-events:none;perspective:380px;-webkit-tap-highlight-color:transparent;transform:translate3d(-200px,-200px,0);will-change:transform;border-radius:40%}
+.bot-head.can{pointer-events:auto}
+@media(hover:none) and (pointer:coarse){.bot-head.can{pointer-events:none}} /* tela de toque: arrastar o dedo começando na cabeça rola a página; o toque nela é reconhecido por Bot.hitHead */
 .bot-head:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
 .bot-float{display:block;width:100%;height:100%;animation:botfloat 5.5s ease-in-out infinite}
-.bot-tilt{display:block;position:relative;width:100%;height:100%;border-radius:50%;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .55s cubic-bezier(.2,.7,.2,1);box-shadow:0 14px 26px rgba(0,0,0,.55),0 0 0 1px rgba(226,178,80,.35),0 0 24px rgba(226,178,80,.16)}
-.bot-tilt img{width:100%;height:100%;border-radius:50%;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
-.bot-shine{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at var(--sx,34%) var(--sy,26%),rgba(255,238,190,.34),rgba(255,238,190,0) 46%);mix-blend-mode:screen;pointer-events:none;transition:background-position .5s}
-.bot-lid{position:absolute;top:45.6%;width:6.2%;height:7.8%;border-radius:50%;background:linear-gradient(180deg,#b48e44,#e6cd80);transform:scaleY(0);transform-origin:50% 0;pointer-events:none}
-.bot-lid.l{left:55.1%}.bot-lid.r{left:66.5%}
-#bot.blink .bot-lid{animation:botblink .2s ease-in-out}
-.bot-dot{position:absolute;top:3%;right:3%;width:22%;height:22%;max-width:14px;max-height:14px;border-radius:50%;background:var(--gold-hi);box-shadow:0 0 0 2px #0a0906;display:none}
-#bot.alert .bot-dot{display:block}
-#bot.alert .bot-head::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--gold);animation:botping 1.9s ease-out infinite;pointer-events:none}
-#bot.enter .bot-head{animation:botin .75s cubic-bezier(.2,.9,.25,1.25) both}
+.bot-tilt{display:block;position:relative;width:100%;height:100%;transform:rotateZ(var(--rz,0deg)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .35s cubic-bezier(.2,.7,.2,1);filter:drop-shadow(0 10px 14px rgba(0,0,0,.6)) drop-shadow(0 0 10px rgba(226,178,80,.18))}
+.bot-tilt img{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.bot-tilt img.cl{opacity:0}
+#bot.blink .bot-tilt img.cl{opacity:1} /* piscada: troca para a mesma cabeça com os olhos fechados, por ~120 ms */
+.bot-shine{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at var(--sx,34%) var(--sy,24%),rgba(255,238,190,.38),rgba(255,238,190,0) 50%);mix-blend-mode:screen;-webkit-mask:url(/cabeca-open-160.webp) center/100% 100% no-repeat;mask:url(/cabeca-open-160.webp) center/100% 100% no-repeat}
+.bot-dot{position:absolute;top:2%;right:0;width:13px;height:13px;border-radius:50%;background:var(--gold-hi);box-shadow:0 0 0 2px #0a0906;display:none}
+#bot.alert .bot-dot{display:block;animation:botping 1.9s ease-out infinite}
+#bot.enter .bot-float{animation:botin .75s cubic-bezier(.2,.9,.25,1.25) both}
 #bot.talk .bot-tilt{animation:bottalk .45s ease-in-out 2}
 #bot.happy .bot-float{animation:bothop .75s cubic-bezier(.3,1.6,.5,1)}
-#bot.min .bot-head{--sz:44px;opacity:.85}#bot.min .bot-float{animation:none}
+#bot.min{--hw:40px;--hh:46px}#bot.min .bot-float{animation:none}#bot.min .bot-tilt{opacity:.85}
 @keyframes botfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes botblink{50%{transform:scaleY(1)}}
-@keyframes botping{0%{opacity:.9;transform:scale(.94)}100%{opacity:0;transform:scale(1.28)}}
+@keyframes botping{0%{box-shadow:0 0 0 2px #0a0906,0 0 0 0 rgba(226,178,80,.6)}100%{box-shadow:0 0 0 2px #0a0906,0 0 0 10px rgba(226,178,80,0)}}
 @keyframes botin{from{opacity:0;transform:translateY(26px) scale(.55) rotate(-14deg)}}
-@keyframes bottalk{50%{transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(1.06) translateY(-2px)}}
+@keyframes bottalk{50%{transform:rotateZ(var(--rz,0deg)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(1.06) translateY(-2px)}}
 @keyframes bothop{40%{transform:translateY(-14px) rotate(-6deg)}70%{transform:translateY(0) rotate(3deg)}}
-/* balão de fala */
-.bot-bub{pointer-events:auto;position:relative;width:max-content;max-width:min(330px,calc(100vw - 32px));padding:12px 14px 10px;border-radius:14px 14px 4px 14px;background:#16130c;border:1px solid var(--gold-line);box-shadow:0 16px 40px rgba(0,0,0,.55);color:var(--tx);font-size:.86rem;line-height:1.45;animation:bubin .22s var(--ease)}
-.bot-bub[hidden]{display:none}.bot-bub{max-height:min(62vh,520px);overflow-y:auto;overscroll-behavior:contain}
+/* balão de fala: posicionado separadamente (Bot.placeBubble), é a única parte que recebe cliques */
+.bot-bub{position:absolute;left:0;top:0;pointer-events:auto;width:max-content;max-width:min(330px,calc(100vw - 24px));max-height:min(62vh,520px);overflow-y:auto;overscroll-behavior:contain;padding:12px 14px 10px;border-radius:14px;background:#16130c;border:1px solid var(--gold-line);box-shadow:0 16px 40px rgba(0,0,0,.55);color:var(--tx);font-size:.86rem;line-height:1.45;animation:bubin .22s var(--ease)}
+.bot-bub[hidden]{display:none}
 .bot-bub .bot-msg{margin:0 26px 0 0}.bot-bub .bot-msg b{color:var(--gold-hi)}
 .bot-x{position:absolute;top:3px;right:3px;width:34px;height:34px;border:none;background:none;color:var(--mut);cursor:pointer;border-radius:8px;font-size:.9rem}.bot-x:hover{color:var(--tx)}
 .bot-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.bot-acts button{min-height:34px;padding:6px 12px;border-radius:18px;border:1px solid var(--gold-line);background:rgba(226,178,80,.1);color:var(--gold-hi);font-size:.78rem;font-weight:600;cursor:pointer}.bot-acts button.sec{background:none;color:var(--tx2);border-color:var(--line2)}
@@ -151,12 +151,8 @@ form.shake{animation:shake .38s}
 .bot-ck .ic{flex:0 0 18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:.7rem;border:1px solid var(--line2);color:var(--mut)}.bot-ck .ok .ic{background:var(--ok);border-color:var(--ok);color:#06140c}.bot-ck .auto .ic{border-style:dashed}
 .bot-ck small{display:block;color:var(--mut);font-size:.72rem}.bot-ck .lv{font-size:.64rem;letter-spacing:.04em;text-transform:uppercase;color:var(--gold);margin-left:4px}
 .bot-ck li>div{flex:1;min-width:0}.bot-ck li button{flex:0 0 auto;min-height:30px;padding:4px 10px;border-radius:14px;border:1px solid var(--gold-line);background:none;color:var(--gold-hi);font-size:.72rem;cursor:pointer}
-@keyframes bubin{from{opacity:0;transform:translateY(6px) scale(.97)}to{opacity:1;transform:none}}
-#app main{padding-bottom:calc(110px + var(--sab))}
-@media(max-width:900px){#bot{--sz:58px;right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(12px + var(--sab))}#bot.min .bot-head{--sz:38px}.bot-bub{max-width:calc(100vw - 24px);font-size:.84rem}#app main{padding-bottom:calc(84px + var(--sab))}}
-/* teclado aberto no celular: só o balão, no topo da área visível, para não cobrir o campo nem o teclado */
-#bot.kb{bottom:auto;top:var(--bot-top,8px)}#bot.kb .bot-head{display:none}
-@media(prefers-reduced-motion:reduce){.bot-float,#bot.enter .bot-head,#bot.talk .bot-tilt,#bot.happy .bot-float,#bot.blink .bot-lid,.bot-bub{animation:none!important}.bot-tilt{transition:none}#bot.alert .bot-head::after{animation:none;opacity:.7}}
+@media(max-width:900px){#bot{--hw:47px;--hh:54px}#bot.min{--hw:34px;--hh:40px}.bot-bub{font-size:.84rem}}
+@media(prefers-reduced-motion:reduce){.bot-float,#bot.enter .bot-float,#bot.talk .bot-tilt,#bot.happy .bot-float,.bot-bub,#bot.alert .bot-dot{animation:none!important}.bot-tilt{transition:none}}
 .auth-done{text-align:center;animation:fadeIn .4s ease}
 .auth-done-ico{width:56px;height:56px;margin:4px auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;color:#120e05;background:linear-gradient(180deg,var(--gold-hi),var(--gold));box-shadow:0 8px 22px rgba(226,178,80,.25)}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -1757,9 +1753,10 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
   markSeen(id){const s=this.st(),m=s.seen||{};m[id]=Date.now();const ks=Object.keys(m);if(ks.length>150)ks.sort((a,b)=>m[a]-m[b]).slice(0,ks.length-150).forEach(k=>delete m[k]);this.put({seen:m})},
   $(q){return this.el.querySelector(q)},
   mount(){if(this.el)return;const el=this.el=$('#bot');if(!el)return;
+    const pic=(k)=>`<picture><source type="image/webp" srcset="/cabeca-${k}-160.webp 138w, /cabeca-${k}-256.webp 220w" sizes="(max-width:900px) 47px, 66px"><img class="${k==='open'?'op':'cl'}" src="/cabeca-${k}-256.png" alt="" decoding="async" draggable="false"></picture>`;
     el.innerHTML=`<div class="bot-bub" role="status" aria-live="polite" hidden><button type="button" class="bot-x" aria-label="Dispensar mensagem">✕</button><p class="bot-msg"></p><div class="bot-extra"></div><div class="bot-acts"></div><div class="bot-foot"><button type="button" data-bot="mute"></button><button type="button" data-bot="min">Minimizar</button></div></div>`+
-     `<button type="button" class="bot-head" aria-label="Assistente do NESC: pedir uma dica" aria-expanded="false"><span class="bot-float"><span class="bot-tilt"><picture><source type="image/webp" srcset="/mascote-160.webp 160w, /mascote-256.webp 256w, /mascote-512.webp 512w" sizes="(max-width:900px) 58px, 84px"><img src="/mascote-256.png" alt="" width="84" height="84" decoding="async" draggable="false"></picture><span class="bot-lid l"></span><span class="bot-lid r"></span><span class="bot-shine"></span></span></span><span class="bot-dot" aria-hidden="true"></span></button>`;
-    const bub=this.$('.bot-bub');
+     `<button type="button" class="bot-head" aria-label="Assistente do NESC: pedir uma dica" aria-expanded="false"><span class="bot-float"><span class="bot-tilt">${pic('open')}${pic('closed')}<span class="bot-shine"></span></span></span><span class="bot-dot" aria-hidden="true"></span></button>`;
+    const bub=this.$('.bot-bub'),m=this.mv;
     el.addEventListener('click',e=>{const T=e.target;
       if(T.closest('.bot-head')){this.manual();return}
       if(T.closest('.bot-x')){this.hide();return}
@@ -1770,21 +1767,102 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
       if(T.closest('[data-go],[data-addrec],[data-onboard]'))setTimeout(()=>this.hide(),0)}); // ações do app seguem pelo tratamento normal
     bub.addEventListener('mouseenter',()=>clearTimeout(this.hideT));bub.addEventListener('mouseleave',()=>{if(this.cur&&!this.cur.keep){clearTimeout(this.hideT);this.hideT=setTimeout(()=>this.hide(),4000)}});
     bub.addEventListener('focusin',()=>clearTimeout(this.hideT));
-    document.addEventListener('pointerdown',e=>{if(this.cur&&!e.target.closest('#bot'))this.hide()},true); // tocar fora recolhe o balão: ele nunca fica preso sobre botões ou campos
-    /* inclinação: segue o cursor com limite e suavidade; um quadro por movimento, só variáveis CSS */
-    let raf=0,px=0,py=0;addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||RM.matches)return;px=e.clientX;py=e.clientY;if(!raf)raf=requestAnimationFrame(()=>{raf=0;this.look(px,py)})},{passive:true});
-    addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'||RM.matches||!this.el||this.el.hidden)return;this.look(e.clientX,e.clientY);clearTimeout(this.lookT);this.lookT=setTimeout(()=>this.look(null),1400)},{passive:true});
-    setInterval(()=>{if(document.hidden||RM.matches||!this.el||this.el.hidden||Math.random()>.22)return;this.el.classList.remove('blink');void this.el.offsetWidth;this.el.classList.add('blink')},1500);
+    document.addEventListener('pointerdown',e=>{if(this.cur&&!e.target.closest('#bot')&&!(e.pointerType!=='mouse'&&this.hitHead(e.clientX,e.clientY)))this.hide()},true); // tocar fora recolhe o balão: ele nunca fica preso sobre botões ou campos
+    /* computador: o alvo é recalculado no máximo a cada ~140 ms; a inclinação usa um quadro por movimento */
+    let raf=0;addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!this.el||this.el.hidden)return;m.px=e.clientX;m.py=e.clientY;m.lastIn=Date.now();
+      if(!raf&&!RM.matches)raf=requestAnimationFrame(()=>{raf=0;this.look(m.px,m.py)});
+      if(!this.canFollow())return;const r=this.$('.bot-head').getBoundingClientRect();
+      // chegando perto da cabeça parada (para tocar nela), ela espera em vez de fugir
+      if(!m.raf&&m.px>r.left-28&&m.px<r.right+28&&m.py>r.top-28&&m.py<r.bottom+28){m.engaged=true;return}
+      if(m.engaged){if(Math.hypot(m.px-(r.left+r.width/2),m.py-(r.top+r.height/2))<Math.max(r.width,r.height)*1.9)return;m.engaged=false}
+      const now=performance.now();clearTimeout(m.tT);if(now-m.lastT<140){m.tT=setTimeout(()=>this.retarget(m.px,m.py),150);return}m.lastT=now;this.retarget(m.px,m.py)},{passive:true});
+    /* celular: reage ao toque (sem touchmove e sem preventDefault: a rolagem continua livre) */
+    addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'||!this.el||this.el.hidden||(e.target.closest&&e.target.closest('#bot')))return;
+      if(this.hitHead(e.clientX,e.clientY)){m.tap={id:e.pointerId,x:e.clientX,y:e.clientY,t:Date.now()};return}m.px=e.clientX;m.py=e.clientY;m.lastIn=Date.now();
+      if(!RM.matches){this.look(m.px,m.py);clearTimeout(this.lookT);this.lookT=setTimeout(()=>this.look(null),1400)}if(this.canFollow())setTimeout(()=>this.retarget(m.px,m.py,true),80)},{passive:true});
+    // toque curto na cabeça (sem arrastar) = pedir dica; se o dedo arrastar, o navegador rola a página e cancela o toque
+    addEventListener('pointerup',e=>{const t=m.tap;m.tap=null;if(t&&t.id===e.pointerId&&Math.hypot(e.clientX-t.x,e.clientY-t.y)<12&&Date.now()-t.t<700&&this.hitHead(e.clientX,e.clientY))this.manual()},{passive:true});
+    addEventListener('pointercancel',()=>{m.tap=null},{passive:true});
+    // roda do mouse sobre a cabeça parada: repassa para o conteúdo que está embaixo (a rolagem do app fica no <main>)
+    this.$('.bot-head').addEventListener('wheel',e=>{let n=document.elementsFromPoint(e.clientX,e.clientY).find(n=>!n.closest('#bot'));
+      while(n&&n!==document.body&&!(n.scrollHeight>n.clientHeight+1&&/auto|scroll/.test(getComputedStyle(n).overflowY)))n=n.parentElement;
+      const k=e.deltaMode===1?16:e.deltaMode===2?innerHeight:1;(n&&n!==document.body?n:document.scrollingElement).scrollBy(e.deltaX*k,e.deltaY*k)},{passive:true});
+    addEventListener('scroll',()=>{clearTimeout(this.scT);this.scT=setTimeout(()=>this.recheck(),200)},{passive:true,capture:true}); // durante a rolagem fica quieta; depois só sai se ficou sobre algo
+    addEventListener('resize',()=>{this.sa=null;clearTimeout(this.rzT);this.rzT=setTimeout(()=>this.recheck(true),120)});
+    const vv=window.visualViewport;if(vv)vv.addEventListener('resize',()=>{clearTimeout(this.rzT);this.rzT=setTimeout(()=>this.recheck(true),120)}); // teclado virtual
+    /* sem interação por alguns segundos: volta a um canto livre e fica flutuando */
+    setInterval(()=>{if(!this.el||this.el.hidden||this.cur||m.engaged||m.atRest||Date.now()-m.lastIn<7000)return;m.atRest=true;const r=this.rest();this.go(r.x,r.y)},1000);
+    /* piscada: intervalos variáveis (2,5–7 s), às vezes dupla; troca curta para a mesma cabeça de olhos fechados */
+    const blink=()=>{this.bT=setTimeout(()=>{if(!document.hidden&&!RM.matches&&this.el&&!this.el.hidden){this.blink();if(Math.random()<.18)setTimeout(()=>this.blink(),260)}blink()},2500+Math.random()*4500)};blink();
     document.addEventListener('focusin',e=>{const t=e.target;if(t.closest&&t.closest('#form-register')&&t.name)this.field(t.name)});
-    document.addEventListener('focusout',e=>{const t=e.target;if(t.id==='re-email'&&t.value.trim()&&!EMAIL_RE.test(t.value.trim().toLowerCase()))this.say({id:'a:emailbad',cd:30000,form:true,force:true,mood:'alert',text:'Confere se seu e-mail está certinho antes de continuar, tipo <b>nome@gmail.com</b>.'});clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),700)});
-    const vv=window.visualViewport;if(vv){const kb=()=>{const on=innerWidth<=900&&vv.height<innerHeight-140;el.classList.toggle('kb',on);if(on)el.style.setProperty('--bot-top',Math.round(vv.offsetTop+8)+'px')};vv.addEventListener('resize',kb);vv.addEventListener('scroll',kb)}
+    document.addEventListener('focusout',e=>{const t=e.target;if(t.id==='re-email'&&t.value.trim()&&!EMAIL_RE.test(t.value.trim().toLowerCase()))this.say({id:'a:emailbad',cd:30000,form:true,force:true,mood:'alert',text:'Confere se seu e-mail está certinho antes de continuar, tipo <b>nome@gmail.com</b>.'});clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),700);setTimeout(()=>this.recheck(),60)});
     this.syncFoot()},
+  /* o toque caiu na cabeça? (só quando ela está parada e visível; em movimento o toque segue para a interface) */
+  hitHead(x,y){const h=this.el&&!this.el.hidden&&this.$('.bot-head');if(!h||this.mv.raf||!h.classList.contains('can'))return false;const r=h.getBoundingClientRect();return x>r.left+4&&x<r.right-4&&y>r.top+4&&y<r.bottom-4},
+  blink(){const el=this.el;if(!el)return;el.classList.add('blink');clearTimeout(this.blT);this.blT=setTimeout(()=>el.classList.remove('blink'),120)},
+  /* ---------- movimento: mola com atraso e inércia até uma posição segura ---------- */
+  mv:{x:-1,y:-1,vx:0,vy:0,tx:0,ty:0,raf:0,t0:0,px:null,py:null,lastIn:0,lastT:0,engaged:false,atRest:true},
+  INTER:'a,button,input,select,textarea,label,summary,[role=button],[data-go],.btn,.seg,.chips2,.it,.nav,.lp-btn,.itip',
+  TEXT:'.big,.kpi .v,.stats b,.rs b,h1,h2,.gpct,.pendn,.lp-hero h1',
+  canFollow(){return!!this.el&&!this.el.hidden&&!RM.matches&&!this.st().min&&!this.cur},
+  dims(){const h=this.el&&this.$('.bot-head');return{w:(h&&h.offsetWidth)||66,h:(h&&h.offsetHeight)||76}},
+  safe(){if(this.sa)return this.sa;const d=document.createElement('div');d.style.cssText='position:fixed;visibility:hidden;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(d);const c=getComputedStyle(d),r={t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0};d.remove();return this.sa=r},
+  /* área livre: dentro da tela visível, abaixo de barras fixas do topo e acima do teclado virtual */
+  bounds(){const sa=this.safe(),vv=window.visualViewport,W=document.documentElement.clientWidth;let top=sa.t+6;
+    for(const q of['#lp-top','#app.on aside']){const n=$(q);if(n&&n.offsetParent!==null){const r=n.getBoundingClientRect();if(r.top<=1&&r.height<140&&r.width>W*.6)top=Math.max(top,r.bottom+6)}}
+    return{l:sa.l+6,t:top,r:W-sa.r-6,b:(vv?vv.offsetTop+vv.height:innerHeight)-sa.b-6}},
+  /* custo de colocar a cabeça em (x,y): fora da tela, sobre controles, sobre números/títulos, sobre o campo em edição ou sobre o ponteiro */
+  cost(x,y,w,h){const b=this.bounds();let c=0;if(x<b.l-1||y<b.t-1||x+w>b.r+1||y+h>b.b+1)c+=50;
+    for(const[fx,fy]of[[.5,.5],[.18,.18],[.82,.18],[.18,.82],[.82,.82],[.5,.1],[.5,.9],[.1,.5],[.9,.5]]){const e=document.elementsFromPoint(x+w*fx,y+h*fy).find(n=>!n.closest('#bot'));if(!e)continue;if(e.closest(this.INTER))c+=6;else if(e.closest(this.TEXT))c+=1.5}
+    const a=document.activeElement;if(a&&a.matches&&a.matches('input,textarea,select')){const r=a.getBoundingClientRect();if(x<r.right+14&&x+w>r.left-14&&y<r.bottom+14&&y+h>r.top-14)c+=40}
+    const m=this.mv;if(m.px!=null&&m.px>x-16&&m.px<x+w+16&&m.py>y-16&&m.py<y+h+16)c+=40;return c},
+  /* alvo de acompanhamento: perto do ponteiro/toque, nunca em cima dele, escolhendo o lugar mais livre ao redor */
+  retarget(px,py,touch){if(!this.canFollow())return;const{w,h}=this.dims(),m=this.mv,b=this.bounds(),D=touch?Math.max(92,h*1.9):Math.max(78,h*1.2);
+    const angs=touch?[-90,-130,-50,180,0,-160,-20,130,50,90]:[-40,-140,-15,-165,0,180,40,140,-90,90];let best=null;
+    for(const a of angs){const r=a*Math.PI/180;for(const k of[1,1.6]){const x=Math.min(b.r-w,Math.max(b.l,px+Math.cos(r)*D*k-w/2)),y=Math.min(b.b-h,Math.max(b.t,py+Math.sin(r)*D*k-h/2));
+      const sc=this.cost(x,y,w,h)+Math.hypot(x+w/2-px,y+h/2-py)/D*1.6+(m.x>=0?Math.hypot(x-m.x,y-m.y)/500:0);if(!best||sc<best.s)best={x,y,s:sc}}}
+    if(best.s>=6){const cur=m.x>=0?this.cost(m.x,m.y,w,h):99;best=cur<6?{x:m.x,y:m.y}:this.rest()} // nada livre por perto: fica onde está (se seguro) ou vai ao canto livre
+    m.atRest=false;this.go(best.x,best.y)},
+  rest(){const{w,h}=this.dims(),b=this.bounds();let best=null;
+    for(const[x,y]of[[b.r-w-6,b.b-h-6],[b.l+6,b.b-h-6],[b.r-w-6,(b.t+b.b-h)/2],[b.r-w-6,b.t+6],[b.l+6,b.t+6]]){const s=this.cost(x,y,w,h);if(!best||s<best.s)best={x,y,s}}return best},
+  go(x,y){const m=this.mv,hd=this.$('.bot-head');if(Math.abs(m.tx-x)<.5&&Math.abs(m.ty-y)<.5&&(m.raf||(Math.abs(m.x-x)<.5&&Math.abs(m.y-y)<.5)))return;m.tx=x;m.ty=y;
+    if(RM.matches||this.st().min||m.x<0){cancelAnimationFrame(m.raf);m.raf=0;m.x=x;m.y=y;m.vx=m.vy=0;this.paint();this.settle();return} // movimento reduzido/minimizado: sem animação
+    hd.classList.remove('can');if(!m.raf){m.t0=0;m.raf=requestAnimationFrame(t=>this.step(t))}},
+  /* mola quase criticamente amortecida: chega com atraso perceptível (~1 s), acelera e desacelera sem oscilar */
+  step(t){const m=this.mv;m.raf=0;const dt=m.t0?Math.min(.05,(t-m.t0)/1000):1/60;m.t0=t;const k=11,c=2*.92*Math.sqrt(k);
+    m.vx+=(k*(m.tx-m.x)-c*m.vx)*dt;m.vy+=(k*(m.ty-m.y)-c*m.vy)*dt;const sp=Math.hypot(m.vx,m.vy);if(sp>900){m.vx*=900/sp;m.vy*=900/sp}
+    m.x+=m.vx*dt;m.y+=m.vy*dt;this.paint();
+    if(Math.abs(m.tx-m.x)<.4&&Math.abs(m.ty-m.y)<.4&&sp<4){m.x=m.tx;m.y=m.ty;m.vx=m.vy=0;this.paint();this.settle();return}
+    m.raf=requestAnimationFrame(t=>this.step(t))},
+  paint(){const m=this.mv;this.$('.bot-head').style.transform=`translate3d(${m.x.toFixed(1)}px,${m.y.toFixed(1)}px,0)`;this.$('.bot-tilt').style.setProperty('--rz',Math.max(-12,Math.min(12,m.vx*.03)).toFixed(1)+'deg')},
+  /* parada: aceita clique só se não estiver sobre nenhum controle */
+  settle(){const m=this.mv,{w,h}=this.dims();this.$('.bot-head').classList.toggle('can',this.cost(m.x,m.y,w,h)<6||this.st().min)},
+  /* depois de rolar, redimensionar ou abrir o teclado: só se mexe se ficou fora da área livre ou sobre algo */
+  recheck(force){if(!this.el||this.el.hidden)return;const m=this.mv,{w,h}=this.dims(),b=this.bounds();
+    if(m.x<0){const r=this.rest();m.x=r.x;m.y=r.y;m.tx=r.x;m.ty=r.y;this.paint();this.settle();return}
+    const bad=m.x<b.l-1||m.y<b.t-1||m.x+w>b.r+1||m.y+h>b.b+1||this.cost(m.x,m.y,w,h)>=6;
+    if(bad||(force&&this.st().min)){if(this.cur||!this.canFollow()){const r=this.rest();this.go(r.x,r.y)}else{const c=this.rest();if(m.px!=null&&Date.now()-m.lastIn<7000)this.retarget(m.px,m.py,innerWidth<=900);else this.go(c.x,c.y)}}
+    if(this.cur)setTimeout(()=>this.placeBubble(),this.mv.raf?700:0)},
   look(x,y){const h=this.$('.bot-head'),t=this.$('.bot-tilt'),sh=this.$('.bot-shine');if(!h||!t)return;let dx=0,dy=0;
-    if(x!=null){const r=h.getBoundingClientRect();if(!r.width)return;dx=Math.max(-1,Math.min(1,(x-(r.left+r.width/2))/600));dy=Math.max(-1,Math.min(1,(y-(r.top+r.height/2))/500))}
-    t.style.setProperty('--ry',(dx*16).toFixed(1)+'deg');t.style.setProperty('--rx',(dy*13).toFixed(1)+'deg');sh.style.setProperty('--sx',(34+dx*16).toFixed(0)+'%');sh.style.setProperty('--sy',(26+dy*14).toFixed(0)+'%')},
+    if(x!=null){const r=h.getBoundingClientRect();if(!r.width)return;dx=Math.max(-1,Math.min(1,(x-(r.left+r.width/2))/500));dy=Math.max(-1,Math.min(1,(y-(r.top+r.height/2))/420))}
+    t.style.setProperty('--ry',(dx*18).toFixed(1)+'deg');t.style.setProperty('--rx',(-dy*0+dy*12).toFixed(1)+'deg');sh.style.setProperty('--sx',(34+dx*18).toFixed(0)+'%');sh.style.setProperty('--sy',(24+dy*14).toFixed(0)+'%')},
+  /* balão: ao lado da cabeça, no lado com menos controles por baixo, sempre dentro da área visível */
+  placeBubble(){const bb=this.$('.bot-bub');if(!bb||bb.hidden)return;const m=this.mv,{w,h}=this.dims(),B=this.bounds(),bw=bb.offsetWidth,bh=bb.offsetHeight;let best=null;
+    const R=[...document.querySelectorAll(this.INTER)].filter(n=>!n.closest('#bot')).map(n=>n.getBoundingClientRect()).filter(r=>r.width&&r.height&&r.bottom>0&&r.top<innerHeight&&r.right>0&&r.left<innerWidth); // controles visíveis
+    const cand=[];for(const dx of[0,.5,1])cand.push([m.x+(w-bw)*dx,m.y-bh-10],[m.x+(w-bw)*dx,m.y+h+10]);
+    for(const dy of[0,.5,1])cand.push([m.x-bw-10,m.y+(h-bh)*dy],[m.x+w+10,m.y+(h-bh)*dy]);
+    for(let y=B.t;y<=B.b-bh;y+=28)for(const x of[B.l,(B.l+B.r-bw)/2,B.r-bw])cand.push([x,y]); // perto da cabeça não cabe: procura uma faixa livre na tela
+    for(let[x,y]of cand){
+      x=Math.max(B.l,Math.min(B.r-bw,x));y=Math.max(B.t,Math.min(B.b-bh,y));const ov=x<m.x+w&&x+bw>m.x&&y<m.y+h&&y+bh>m.y;let s=ov?30:0;
+      for(const r of R)if(x<r.right+4&&x+bw>r.left-4&&y<r.bottom+4&&y+bh>r.top-4)s+=3;
+      s+=Math.hypot(x+bw/2-(m.x+w/2),y+bh/2-(m.y+h/2))/400; // empate: o mais perto da cabeça
+      const a=document.activeElement;if(a&&a.matches&&a.matches('input,textarea,select')){const r=a.getBoundingClientRect();if(x<r.right+8&&x+bw>r.left-8&&y<r.bottom+8&&y+bh>r.top-8)s+=60}
+      if(!best||s<best.s)best={x,y,s}}
+    bb.style.left=Math.round(best.x)+'px';bb.style.top=Math.round(best.y)+'px'},
   syncFoot(){const b=this.el&&this.$('[data-bot=mute]');if(b)b.textContent=this.st().muted?'Reativar dicas':'Silenciar dicas'},
   enterArea(kind){this.mount();if(!this.el)return;const first=this.el.hidden;this.area=kind;this.el.hidden=false;this.el.classList.toggle('min',!!this.st().min);this.syncFoot();
-    if(first&&!RM.matches){this.el.classList.add('enter');setTimeout(()=>this.el.classList.remove('enter'),900)}},
+    if(first&&!RM.matches){this.el.classList.add('enter');setTimeout(()=>this.el.classList.remove('enter'),900)}
+    requestAnimationFrame(()=>this.recheck(true))},
   mood(k){if(!this.el)return;this.el.classList.remove('talk','happy');void this.el.offsetWidth;this.el.classList.add(k)},
   typing(){const a=document.activeElement;return!!(a&&a.matches&&a.matches('input:not([type=checkbox]):not([type=radio]):not([type=button]),textarea,select')&&!a.closest('#bot'))},
   pick(a,b){return!a||(b.pri||0)>=(a.pri||0)?b:a},
@@ -1800,6 +1878,7 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
   show(m){const el=this.el;if(!el)return;this.cur=m;this.$('.bot-msg').innerHTML=m.text;this.$('.bot-extra').innerHTML=m.extra||'';
     const acts=this.$('.bot-acts');acts.innerHTML=(m.acts||[]).map((a,i)=>`<button type="button" data-bota="${i}" class="${a[2]||''}">${esc(a[0])}</button>`).join('');acts.hidden=!(m.acts||[]).length;
     this.syncFoot();this.$('.bot-bub').hidden=false;this.$('.bot-head').setAttribute('aria-expanded','true');this.mood(m.mood||'talk');
+    const mv=this.mv;if(mv.raf){cancelAnimationFrame(mv.raf);mv.raf=0;mv.tx=mv.x;mv.ty=mv.y;mv.vx=mv.vy=0;this.settle()}this.placeBubble(); // fala: a cabeça para enquanto o balão está aberto
     clearTimeout(this.hideT);if(!m.keep||innerWidth<=900)this.hideT=setTimeout(()=>this.hide(),m.ms||(m.keep?22000:(m.acts||[]).length||m.extra?16000:9000));
     if(m.id)this.markSeen(m.id);this.last=Date.now()},
   hide(){if(!this.el)return;clearTimeout(this.hideT);this.cur=null;this.$('.bot-bub').hidden=true;this.$('.bot-head').setAttribute('aria-expanded','false');clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),1500)},
