@@ -1768,18 +1768,10 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
     bub.addEventListener('mouseenter',()=>clearTimeout(this.hideT));bub.addEventListener('mouseleave',()=>{if(this.cur&&!this.cur.keep){clearTimeout(this.hideT);this.hideT=setTimeout(()=>this.hide(),4000)}});
     bub.addEventListener('focusin',()=>clearTimeout(this.hideT));
     document.addEventListener('pointerdown',e=>{if(this.cur&&!e.target.closest('#bot')&&!(e.pointerType!=='mouse'&&this.hitHead(e.clientX,e.clientY)))this.hide()},true); // tocar fora recolhe o balão: ele nunca fica preso sobre botões ou campos
-    /* computador: o alvo é recalculado no máximo a cada ~140 ms; a inclinação usa um quadro por movimento */
-    let raf=0;addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!this.el||this.el.hidden)return;m.px=e.clientX;m.py=e.clientY;m.lastIn=Date.now();
-      if(!raf&&!RM.matches)raf=requestAnimationFrame(()=>{raf=0;this.look(m.px,m.py)});
-      if(!this.canFollow())return;const r=this.$('.bot-head').getBoundingClientRect();
-      // chegando perto da cabeça parada (para tocar nela), ela espera em vez de fugir
-      if(!m.raf&&m.px>r.left-28&&m.px<r.right+28&&m.py>r.top-28&&m.py<r.bottom+28){m.engaged=true;return}
-      if(m.engaged){if(Math.hypot(m.px-(r.left+r.width/2),m.py-(r.top+r.height/2))<Math.max(r.width,r.height)*1.9)return;m.engaged=false}
-      const now=performance.now();clearTimeout(m.tT);if(now-m.lastT<140){m.tT=setTimeout(()=>this.retarget(m.px,m.py),150);return}m.lastT=now;this.retarget(m.px,m.py)},{passive:true});
-    /* celular: reage ao toque (sem touchmove e sem preventDefault: a rolagem continua livre) */
+    /* O personagem é autônomo: nem o mouse nem o toque movem a cabeça. No toque, só registramos um toque curto
+       sobre a cabeça parada para abrir a dica; qualquer arrasto segue para a página (rolagem livre). */
     addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'||!this.el||this.el.hidden||(e.target.closest&&e.target.closest('#bot')))return;
-      if(this.hitHead(e.clientX,e.clientY)){m.tap={id:e.pointerId,x:e.clientX,y:e.clientY,t:Date.now()};return}m.px=e.clientX;m.py=e.clientY;m.lastIn=Date.now();
-      if(!RM.matches){this.look(m.px,m.py);clearTimeout(this.lookT);this.lookT=setTimeout(()=>this.look(null),1400)}if(this.canFollow())setTimeout(()=>this.retarget(m.px,m.py,true),80)},{passive:true});
+      if(this.hitHead(e.clientX,e.clientY))m.tap={id:e.pointerId,x:e.clientX,y:e.clientY,t:Date.now()}},{passive:true});
     // toque curto na cabeça (sem arrastar) = pedir dica; se o dedo arrastar, o navegador rola a página e cancela o toque
     addEventListener('pointerup',e=>{const t=m.tap;m.tap=null;if(t&&t.id===e.pointerId&&Math.hypot(e.clientX-t.x,e.clientY-t.y)<12&&Date.now()-t.t<700&&this.hitHead(e.clientX,e.clientY))this.manual()},{passive:true});
     addEventListener('pointercancel',()=>{m.tap=null},{passive:true});
@@ -1790,10 +1782,10 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
     addEventListener('scroll',()=>{clearTimeout(this.scT);this.scT=setTimeout(()=>this.recheck(),200)},{passive:true,capture:true}); // durante a rolagem fica quieta; depois só sai se ficou sobre algo
     addEventListener('resize',()=>{this.sa=null;clearTimeout(this.rzT);this.rzT=setTimeout(()=>this.recheck(true),120)});
     const vv=window.visualViewport;if(vv)vv.addEventListener('resize',()=>{clearTimeout(this.rzT);this.rzT=setTimeout(()=>this.recheck(true),120)}); // teclado virtual
-    /* sem interação por alguns segundos: volta a um canto livre e fica flutuando */
-    setInterval(()=>{if(!this.el||this.el.hidden||this.cur||m.engaged||m.atRest||Date.now()-m.lastIn<7000)return;m.atRest=true;const r=this.rest();this.go(r.x,r.y)},1000);
-    /* piscada: intervalos variáveis (2,5–7 s), às vezes dupla; troca curta para a mesma cabeça de olhos fechados */
-    const blink=()=>{this.bT=setTimeout(()=>{if(!document.hidden&&!RM.matches&&this.el&&!this.el.hidden){this.blink();if(Math.random()<.18)setTimeout(()=>this.blink(),260)}blink()},2500+Math.random()*4500)};blink();
+    /* movimentação autônoma: inicia o ciclo de passeio (descanso + deslocamento lento) */
+    this.cycle();
+    /* piscada: intervalos variáveis (~3–6 s), às vezes dupla; troca curta para a mesma cabeça de olhos fechados */
+    const blink=()=>{this.bT=setTimeout(()=>{if(!document.hidden&&!RM.matches&&this.el&&!this.el.hidden){this.blink();if(Math.random()<.15)setTimeout(()=>this.blink(),240)}blink()},3000+Math.random()*3000)};blink();
     document.addEventListener('focusin',e=>{const t=e.target;if(t.closest&&t.closest('#form-register')&&t.name)this.field(t.name)});
     document.addEventListener('focusout',e=>{const t=e.target;if(t.id==='re-email'&&t.value.trim()&&!EMAIL_RE.test(t.value.trim().toLowerCase()))this.say({id:'a:emailbad',cd:30000,form:true,force:true,mood:'alert',text:'Confere se seu e-mail está certinho antes de continuar, tipo <b>nome@gmail.com</b>.'});clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),700);setTimeout(()=>this.recheck(),60)});
     this.syncFoot()},
@@ -1801,7 +1793,7 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
   hitHead(x,y){const h=this.el&&!this.el.hidden&&this.$('.bot-head');if(!h||this.mv.raf||!h.classList.contains('can'))return false;const r=h.getBoundingClientRect();return x>r.left+4&&x<r.right-4&&y>r.top+4&&y<r.bottom-4},
   blink(){const el=this.el;if(!el)return;el.classList.add('blink');clearTimeout(this.blT);this.blT=setTimeout(()=>el.classList.remove('blink'),120)},
   /* ---------- movimento: mola com atraso e inércia até uma posição segura ---------- */
-  mv:{x:-1,y:-1,vx:0,vy:0,tx:0,ty:0,raf:0,t0:0,px:null,py:null,lastIn:0,lastT:0,engaged:false,atRest:true},
+  mv:{x:-1,y:-1,vx:0,tx:0,ty:0,sx:0,sy:0,raf:0,t0:0,dur:2000,atRest:true,tap:null},
   INTER:'a,button,input,select,textarea,label,summary,[role=button],[data-go],.btn,.seg,.chips2,.it,.nav,.lp-btn,.itip',
   TEXT:'.big,.kpi .v,.stats b,.rs b,h1,h2,.gpct,.pendn,.lp-hero h1',
   canFollow(){return!!this.el&&!this.el.hidden&&!RM.matches&&!this.st().min&&!this.cur},
@@ -1811,41 +1803,41 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
   bounds(){const sa=this.safe(),vv=window.visualViewport,W=document.documentElement.clientWidth;let top=sa.t+6;
     for(const q of['#lp-top','#app.on aside']){const n=$(q);if(n&&n.offsetParent!==null){const r=n.getBoundingClientRect();if(r.top<=1&&r.height<140&&r.width>W*.6)top=Math.max(top,r.bottom+6)}}
     return{l:sa.l+6,t:top,r:W-sa.r-6,b:(vv?vv.offsetTop+vv.height:innerHeight)-sa.b-6}},
-  /* custo de colocar a cabeça em (x,y): fora da tela, sobre controles, sobre números/títulos, sobre o campo em edição ou sobre o ponteiro */
+  /* custo de colocar a cabeça em (x,y): fora da tela, sobre controles, sobre números/títulos ou sobre o campo em edição */
   cost(x,y,w,h){const b=this.bounds();let c=0;if(x<b.l-1||y<b.t-1||x+w>b.r+1||y+h>b.b+1)c+=50;
     for(const[fx,fy]of[[.5,.5],[.18,.18],[.82,.18],[.18,.82],[.82,.82],[.5,.1],[.5,.9],[.1,.5],[.9,.5]]){const e=document.elementsFromPoint(x+w*fx,y+h*fy).find(n=>!n.closest('#bot'));if(!e)continue;if(e.closest(this.INTER))c+=6;else if(e.closest(this.TEXT))c+=1.5}
     const a=document.activeElement;if(a&&a.matches&&a.matches('input,textarea,select')){const r=a.getBoundingClientRect();if(x<r.right+14&&x+w>r.left-14&&y<r.bottom+14&&y+h>r.top-14)c+=40}
-    const m=this.mv;if(m.px!=null&&m.px>x-16&&m.px<x+w+16&&m.py>y-16&&m.py<y+h+16)c+=40;return c},
-  /* alvo de acompanhamento: perto do ponteiro/toque, nunca em cima dele, escolhendo o lugar mais livre ao redor */
-  retarget(px,py,touch){if(!this.canFollow())return;const{w,h}=this.dims(),m=this.mv,b=this.bounds(),D=touch?Math.max(92,h*1.9):Math.max(78,h*1.2);
-    const angs=touch?[-90,-130,-50,180,0,-160,-20,130,50,90]:[-40,-140,-15,-165,0,180,40,140,-90,90];let best=null;
-    for(const a of angs){const r=a*Math.PI/180;for(const k of[1,1.6]){const x=Math.min(b.r-w,Math.max(b.l,px+Math.cos(r)*D*k-w/2)),y=Math.min(b.b-h,Math.max(b.t,py+Math.sin(r)*D*k-h/2));
-      const sc=this.cost(x,y,w,h)+Math.hypot(x+w/2-px,y+h/2-py)/D*1.6+(m.x>=0?Math.hypot(x-m.x,y-m.y)/500:0);if(!best||sc<best.s)best={x,y,s:sc}}}
-    if(best.s>=6){const cur=m.x>=0?this.cost(m.x,m.y,w,h):99;best=cur<6?{x:m.x,y:m.y}:this.rest()} // nada livre por perto: fica onde está (se seguro) ou vai ao canto livre
-    m.atRest=false;this.go(best.x,best.y)},
+    return c},
+  /* ciclo autônomo: descansa alguns segundos (flutuando e piscando) e depois passeia devagar até um novo ponto livre */
+  cycle(){clearTimeout(this.wT);const gap=3000+Math.random()*4000;
+    this.wT=setTimeout(()=>{if(this.canFollow()&&!this.mv.raf){const s=this.roam();if(s){this.mv.atRest=false;this.go(s.x,s.y)}}this.cycle()},gap)},
+  /* escolhe um ponto livre aleatório na área segura, com deslocamento nem curto nem exagerado (menor no celular) */
+  roam(){const{w,h}=this.dims(),b=this.bounds(),m=this.mv,W=b.r-b.l-w,H=b.b-b.t-h;if(W<=4||H<=4)return null;
+    const mob=innerWidth<=900,maxD=Math.min(b.r-b.l,b.b-b.t)*(mob?.4:.55),minD=Math.max(h*1.1,mob?56:88);let best=null;
+    for(let i=0;i<26;i++){const x=b.l+Math.random()*W,y=b.t+Math.random()*H,c=this.cost(x,y,w,h);if(c>=6)continue;
+      const d=m.x>=0?Math.hypot(x-m.x,y-m.y):minD;let sc=c+Math.random()*.6;if(d<minD)sc+=2;if(d>maxD)sc+=1.5;
+      if(!best||sc<best.s)best={x,y,s:sc}}
+    return best||this.rest()},
   rest(){const{w,h}=this.dims(),b=this.bounds();let best=null;
     for(const[x,y]of[[b.r-w-6,b.b-h-6],[b.l+6,b.b-h-6],[b.r-w-6,(b.t+b.b-h)/2],[b.r-w-6,b.t+6],[b.l+6,b.t+6]]){const s=this.cost(x,y,w,h);if(!best||s<best.s)best={x,y,s}}return best},
-  go(x,y){const m=this.mv,hd=this.$('.bot-head');if(Math.abs(m.tx-x)<.5&&Math.abs(m.ty-y)<.5&&(m.raf||(Math.abs(m.x-x)<.5&&Math.abs(m.y-y)<.5)))return;m.tx=x;m.ty=y;
-    if(RM.matches||this.st().min||m.x<0){cancelAnimationFrame(m.raf);m.raf=0;m.x=x;m.y=y;m.vx=m.vy=0;this.paint();this.settle();return} // movimento reduzido/minimizado: sem animação
-    hd.classList.remove('can');if(!m.raf){m.t0=0;m.raf=requestAnimationFrame(t=>this.step(t))}},
-  /* mola quase criticamente amortecida: chega com atraso perceptível (~1 s), acelera e desacelera sem oscilar */
-  step(t){const m=this.mv;m.raf=0;const dt=m.t0?Math.min(.05,(t-m.t0)/1000):1/60;m.t0=t;const k=11,c=2*.92*Math.sqrt(k);
-    m.vx+=(k*(m.tx-m.x)-c*m.vx)*dt;m.vy+=(k*(m.ty-m.y)-c*m.vy)*dt;const sp=Math.hypot(m.vx,m.vy);if(sp>900){m.vx*=900/sp;m.vy*=900/sp}
-    m.x+=m.vx*dt;m.y+=m.vy*dt;this.paint();
-    if(Math.abs(m.tx-m.x)<.4&&Math.abs(m.ty-m.y)<.4&&sp<4){m.x=m.tx;m.y=m.ty;m.vx=m.vy=0;this.paint();this.settle();return}
+  go(x,y){const m=this.mv,hd=this.$('.bot-head');const cx=m.raf?m.tx:m.x,cy=m.raf?m.ty:m.y;if(Math.abs(cx-x)<.5&&Math.abs(cy-y)<.5)return;
+    if(RM.matches||this.st().min||m.x<0){cancelAnimationFrame(m.raf);m.raf=0;m.x=x;m.y=y;m.tx=x;m.ty=y;m.vx=0;this.paint();this.settle();return} // movimento reduzido/minimizado: sem animação
+    m.sx=m.x;m.sy=m.y;m.tx=x;m.ty=y;m.t0=0;const dist=Math.hypot(x-m.x,y-m.y);m.dur=Math.max(1500,Math.min(3000,1100+dist*2.2)); // 1,5–3 s, proporcional à distância
+    hd.classList.remove('can');if(!m.raf)m.raf=requestAnimationFrame(t=>this.step(t))},
+  /* interpolação com aceleração e desaceleração suaves (easeInOutCubic) até o ponto escolhido */
+  step(t){const m=this.mv;if(!m.t0)m.t0=t;const p=Math.min(1,(t-m.t0)/m.dur),e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+    const nx=m.sx+(m.tx-m.sx)*e,ny=m.sy+(m.ty-m.sy)*e;m.vx=nx-m.x;m.x=nx;m.y=ny;this.paint();
+    if(p>=1){m.raf=0;m.x=m.tx;m.y=m.ty;m.vx=0;this.paint();this.settle();return}
     m.raf=requestAnimationFrame(t=>this.step(t))},
-  paint(){const m=this.mv;this.$('.bot-head').style.transform=`translate3d(${m.x.toFixed(1)}px,${m.y.toFixed(1)}px,0)`;this.$('.bot-tilt').style.setProperty('--rz',Math.max(-12,Math.min(12,m.vx*.03)).toFixed(1)+'deg')},
+  paint(){const m=this.mv;this.$('.bot-head').style.transform=`translate3d(${m.x.toFixed(1)}px,${m.y.toFixed(1)}px,0)`;this.$('.bot-tilt').style.setProperty('--rz',Math.max(-8,Math.min(8,m.vx*2)).toFixed(1)+'deg')},
   /* parada: aceita clique só se não estiver sobre nenhum controle */
   settle(){const m=this.mv,{w,h}=this.dims();this.$('.bot-head').classList.toggle('can',this.cost(m.x,m.y,w,h)<6||this.st().min)},
   /* depois de rolar, redimensionar ou abrir o teclado: só se mexe se ficou fora da área livre ou sobre algo */
   recheck(force){if(!this.el||this.el.hidden)return;const m=this.mv,{w,h}=this.dims(),b=this.bounds();
     if(m.x<0){const r=this.rest();m.x=r.x;m.y=r.y;m.tx=r.x;m.ty=r.y;this.paint();this.settle();return}
     const bad=m.x<b.l-1||m.y<b.t-1||m.x+w>b.r+1||m.y+h>b.b+1||this.cost(m.x,m.y,w,h)>=6;
-    if(bad||(force&&this.st().min)){if(this.cur||!this.canFollow()){const r=this.rest();this.go(r.x,r.y)}else{const c=this.rest();if(m.px!=null&&Date.now()-m.lastIn<7000)this.retarget(m.px,m.py,innerWidth<=900);else this.go(c.x,c.y)}}
+    if(bad){const s=this.canFollow()?this.roam():this.rest();if(s)this.go(s.x,s.y)}
     if(this.cur)setTimeout(()=>this.placeBubble(),this.mv.raf?700:0)},
-  look(x,y){const h=this.$('.bot-head'),t=this.$('.bot-tilt'),sh=this.$('.bot-shine');if(!h||!t)return;let dx=0,dy=0;
-    if(x!=null){const r=h.getBoundingClientRect();if(!r.width)return;dx=Math.max(-1,Math.min(1,(x-(r.left+r.width/2))/500));dy=Math.max(-1,Math.min(1,(y-(r.top+r.height/2))/420))}
-    t.style.setProperty('--ry',(dx*18).toFixed(1)+'deg');t.style.setProperty('--rx',(-dy*0+dy*12).toFixed(1)+'deg');sh.style.setProperty('--sx',(34+dx*18).toFixed(0)+'%');sh.style.setProperty('--sy',(24+dy*14).toFixed(0)+'%')},
   /* balão: ao lado da cabeça, no lado com menos controles por baixo, sempre dentro da área visível */
   placeBubble(){const bb=this.$('.bot-bub');if(!bb||bb.hidden)return;const m=this.mv,{w,h}=this.dims(),B=this.bounds(),bw=bb.offsetWidth,bh=bb.offsetHeight;let best=null;
     const R=[...document.querySelectorAll(this.INTER)].filter(n=>!n.closest('#bot')).map(n=>n.getBoundingClientRect()).filter(r=>r.width&&r.height&&r.bottom>0&&r.top<innerHeight&&r.right>0&&r.left<innerWidth); // controles visíveis
@@ -1862,7 +1854,7 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
   syncFoot(){const b=this.el&&this.$('[data-bot=mute]');if(b)b.textContent=this.st().muted?'Reativar dicas':'Silenciar dicas'},
   enterArea(kind){this.mount();if(!this.el)return;const first=this.el.hidden;this.area=kind;this.el.hidden=false;this.el.classList.toggle('min',!!this.st().min);this.syncFoot();
     if(first&&!RM.matches){this.el.classList.add('enter');setTimeout(()=>this.el.classList.remove('enter'),900)}
-    requestAnimationFrame(()=>this.recheck(true))},
+    requestAnimationFrame(()=>{this.recheck(true);this.cycle()})},
   mood(k){if(!this.el)return;this.el.classList.remove('talk','happy');void this.el.offsetWidth;this.el.classList.add(k)},
   typing(){const a=document.activeElement;return!!(a&&a.matches&&a.matches('input:not([type=checkbox]):not([type=radio]):not([type=button]),textarea,select')&&!a.closest('#bot'))},
   pick(a,b){return!a||(b.pri||0)>=(a.pri||0)?b:a},
@@ -1878,7 +1870,7 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
   show(m){const el=this.el;if(!el)return;this.cur=m;this.$('.bot-msg').innerHTML=m.text;this.$('.bot-extra').innerHTML=m.extra||'';
     const acts=this.$('.bot-acts');acts.innerHTML=(m.acts||[]).map((a,i)=>`<button type="button" data-bota="${i}" class="${a[2]||''}">${esc(a[0])}</button>`).join('');acts.hidden=!(m.acts||[]).length;
     this.syncFoot();this.$('.bot-bub').hidden=false;this.$('.bot-head').setAttribute('aria-expanded','true');this.mood(m.mood||'talk');
-    const mv=this.mv;if(mv.raf){cancelAnimationFrame(mv.raf);mv.raf=0;mv.tx=mv.x;mv.ty=mv.y;mv.vx=mv.vy=0;this.settle()}this.placeBubble(); // fala: a cabeça para enquanto o balão está aberto
+    const mv=this.mv;if(mv.raf){cancelAnimationFrame(mv.raf);mv.raf=0;mv.tx=mv.x;mv.ty=mv.y;mv.vx=0;this.settle()}this.placeBubble(); // fala: a cabeça para enquanto o balão está aberto
     clearTimeout(this.hideT);if(!m.keep||innerWidth<=900)this.hideT=setTimeout(()=>this.hide(),m.ms||(m.keep?22000:(m.acts||[]).length||m.extra?16000:9000));
     if(m.id)this.markSeen(m.id);this.last=Date.now()},
   hide(){if(!this.el)return;clearTimeout(this.hideT);this.cur=null;this.$('.bot-bub').hidden=true;this.$('.bot-head').setAttribute('aria-expanded','false');clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),1500)},

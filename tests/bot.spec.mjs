@@ -134,7 +134,7 @@ await test("9. Uber sem registros: orientação para começar, sem presumir que 
   const ctx = keep(await ctxOf()); const { page } = await open(ctx, { user: U1, seed: { cfg: { pass: OFF }, tx: [tx(T, "in", "n99", 100)], vehicle: { brand: "X", model: "Y", custom: true } } });
   await page.waitForTimeout(300); await fast(page); await page.evaluate(() => Bot.hide());
   await page.evaluate(() => { tab = "uber"; render(); });
-  const ok9 = await page.waitForFunction(() => /Ainda não tem lançamentos da Uber/.test(window.__said.join(" ")), null, { timeout: 3000 }).then(() => true, () => false);
+  const ok9 = await page.waitForFunction(() => /Ainda não tem lançamentos da Uber/.test(window.__said.join(" ") + " " + ((Bot.queue && Bot.queue.text) || "") + " " + ((Bot.cur && Bot.cur.text) || "")), null, { timeout: 4000 }).then(() => true, () => false);
   if (!ok9) throw new Error("uber: " + JSON.stringify(await page.evaluate(() => ({ said: window.__said, cur: Bot.cur && Bot.cur.text, q: Bot.queue && Bot.queue.text, area: Bot.area, tabSeen: Bot.tabSeen, last: Date.now() - Bot.last, ae: document.activeElement && document.activeElement.tagName + "#" + document.activeElement.id }))));
 });
 await test("10/11. Lançamento salvo: confirmação só depois da gravação (local imediato; nuvem só após o envio)", async (keep) => {
@@ -233,9 +233,9 @@ await test("20. Usuários diferentes não compartilham preferências, pendência
   assert(r.keys.includes("nesc_bot_" + U1.email), "chave por conta ausente: " + r.keys);
 });
 
-/* ---------- cabeça flutuante: 12 critérios de aceite ---------- */
+/* ---------- cabeça flutuante autônoma: 13 critérios de aceite ---------- */
 const QUIET = { cfg: { pass: OFF }, tx: [tx(T, "in", "uber", 100)], vehicle: { brand: "X", model: "Y", custom: true } };
-async function quiet(ctx, opts = {}) { // app aberto, dicas silenciadas e balão fechado: a cabeça fica livre para acompanhar
+async function quiet(ctx, opts = {}) { // app aberto, dicas silenciadas e balão fechado: a cabeça fica livre para passear
   const o = await open(ctx, { user: U1, seed: QUIET, ...opts });
   await o.page.evaluate(() => { Bot.put({ muted: true }); Bot.hide(); });
   await o.page.waitForTimeout(700); await o.page.evaluate(() => Bot.hide());
@@ -244,12 +244,27 @@ async function quiet(ctx, opts = {}) { // app aberto, dicas silenciadas e balão
 }
 const head = (page) => page.evaluate(() => { const e = document.querySelector("#bot .bot-head"), r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height, r: r.right, b: r.bottom, cx: r.left + r.width / 2, cy: r.top + r.height / 2, can: e.classList.contains("can"), pe: getComputedStyle(e).pointerEvents }; });
 const settled = (page) => page.waitForFunction(() => !Bot.mv.raf, null, { timeout: 6000 });
+/* congela o passeio autônomo (sem novos deslocamentos espontâneos) para medir reação a mouse/toque de forma isolada */
+const freeze = (page) => page.evaluate(() => { clearTimeout(Bot.wT); Bot.cycle = () => {}; cancelAnimationFrame(Bot.mv.raf); Bot.mv.raf = 0; Bot.mv.tx = Bot.mv.x; Bot.mv.ty = Bot.mv.y; });
 /* controles reais (botões, links, campos) que a cabeça cobre de verdade (margem de 12% da caixa, onde a imagem é transparente) */
 const overControls = (page) => page.evaluate(() => { const h = document.querySelector("#bot .bot-head").getBoundingClientRect(), mx = h.width * .12, my = h.height * .12;
   return [...document.querySelectorAll("a,button,input,select,textarea,[role=button]")].filter((n) => !n.closest("#bot")).map((n) => [n, n.getBoundingClientRect()])
     .filter(([, r]) => r.width && r.height && r.left < h.right - mx && r.right > h.left + mx && r.top < h.bottom - my && r.bottom > h.top + my)
     .filter(([n, r]) => { const e = document.elementFromPoint((Math.max(r.left, h.left) + Math.min(r.right, h.right)) / 2, (Math.max(r.top, h.top) + Math.min(r.bottom, h.bottom)) / 2); return e && n.contains(e); }) // só o que está visível ali (ignora menu recolhido)
     .map(([n]) => (n.textContent || n.placeholder || n.tagName).trim().slice(0, 30)); });
+/* observa o passeio por `ms`: posições de descanso (quando parado), se esteve em movimento e se fez pausas com raf parado */
+async function watch(page, ms) {
+  await page.evaluate((ms) => { window.__w = { rests: [], frames: 0, moving: 0, gaps: 0, onsets: 0, inside: true }; const b = Bot.bounds(), { w, h } = Bot.dims();
+    let wasMoving = false, restStart = performance.now();
+    const f = () => { const m = Bot.mv; window.__w.frames++;
+      if (m.x < b.l - 1 || m.y < b.t - 1 || m.x + w > b.r + 1 || m.y + h > b.b + 1) window.__w.inside = false;
+      if (m.raf) { window.__w.moving++; if (!wasMoving) { window.__w.onsets = (window.__w.onsets || 0) + 1; if (performance.now() - restStart > 2000) window.__w.gaps++; } wasMoving = true; }
+      else { if (wasMoving) { restStart = performance.now(); const key = Math.round(m.x) + "," + Math.round(m.y); if (!window.__w.rests.includes(key)) window.__w.rests.push(key); } wasMoving = false; }
+      if (performance.now() - window.__w.t0 < ms) requestAnimationFrame(f); };
+    window.__w.t0 = performance.now(); const key = Math.round(Bot.mv.x) + "," + Math.round(Bot.mv.y); window.__w.rests.push(key); requestAnimationFrame(f); }, ms);
+  await page.waitForTimeout(ms + 100);
+  return page.evaluate(() => window.__w);
+}
 const inHead = (h, x, y, pad = 0) => x > h.x - pad && x < h.r + pad && y > h.y - pad && y < h.b + pad;
 
 await test("A1/A2. Sem medalhão: só a cabeça recortada (cantos transparentes, proporção da cabeça) e a piscada usa a mesma silhueta", async (keep) => {
@@ -272,156 +287,158 @@ await test("A1/A2. Sem medalhão: só a cabeça recortada (cantos transparentes,
   }
   assert(r.open.w === r.closed.w && r.open.h === r.closed.h, "olhos fechados com tamanho diferente: deformaria na piscada");
 });
-await test("A3. Computador: acompanha o cursor com atraso e inércia, sem saltos, sem alcançar o cursor e para quando chega", async (keep) => {
+await test("A3. Computador: a cabeça não segue o cursor (mover o mouse não a desloca nem a inclina)", async (keep) => {
   const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  const h0 = await head(page);
-  await page.evaluate(() => { window.__tr = []; const f = () => { window.__tr.push([Bot.mv.x, Bot.mv.y]); if (window.__tr.length < 150) requestAnimationFrame(f); }; requestAnimationFrame(f); });
-  await page.mouse.move(640, 430, { steps: 6 });
-  await page.waitForTimeout(110);
-  const h1 = await head(page);
-  await settled(page); const h2 = await head(page);
-  const tr = await page.evaluate(() => window.__tr);
-  const total = Math.hypot(h2.cx - h0.cx, h2.cy - h0.cy), early = Math.hypot(h1.cx - h0.cx, h1.cy - h0.cy);
-  assert(total > 250, "não acompanhou o cursor: " + JSON.stringify([h0, h2]));
-  assert(early < total * .5, `chegou rápido demais (sem atraso): ${early.toFixed(0)} de ${total.toFixed(0)} px em ~110 ms`);
-  let maxStep = 0; for (let i = 1; i < tr.length; i++) maxStep = Math.max(maxStep, Math.hypot(tr[i][0] - tr[i - 1][0], tr[i][1] - tr[i - 1][1]));
-  assert(maxStep < 50, "salto entre quadros: " + maxStep.toFixed(1) + " px");
-  assert(!inHead(h2, 640, 430, 12), "a cabeça ficou em cima do cursor: " + JSON.stringify(h2));
-  assert(Math.hypot(h2.cx - 640, h2.cy - 430) < 260, "ficou longe demais do cursor: " + JSON.stringify(h2));
-  assert(h2.can && h2.pe === "auto", "parada e em lugar livre, deveria aceitar clique");
-  // chegar com o mouse na cabeça parada: ela espera (não foge) e a roda do mouse continua rolando o conteúdo
-  await page.mouse.move(h2.cx, h2.cy, { steps: 4 }); await page.waitForTimeout(400);
-  const h3 = await head(page); assert(Math.hypot(h3.x - h2.x, h3.y - h2.y) < 1, "fugiu do mouse que veio tocar nela");
-  const s0 = await page.evaluate(() => document.querySelector("#app main").scrollTop);
-  await page.mouse.wheel(0, 300); await page.waitForTimeout(300);
-  assert((await page.evaluate(() => document.querySelector("#app main").scrollTop)) > s0 + 100, "a roda do mouse sobre a cabeça não rolou a página");
+  await freeze(page); await page.waitForTimeout(100);
+  const h0 = await head(page), rz0 = await page.evaluate(() => document.querySelector("#bot .bot-tilt").style.getPropertyValue("--rz"));
+  for (let i = 0; i < 24; i++) { await page.mouse.move(120 + i * 45, 120 + (i % 7) * 95); await page.waitForTimeout(20); }
+  await page.mouse.move(Math.round(h0.cx), Math.round(h0.cy)); await page.waitForTimeout(200); // até por cima dela
+  const h1 = await head(page), rz1 = await page.evaluate(() => document.querySelector("#bot .bot-tilt").style.getPropertyValue("--rz"));
+  assert(Math.hypot(h1.x - h0.x, h1.y - h0.y) < 1, "a cabeça seguiu o cursor: " + JSON.stringify([h0, h1]));
+  assert(!(await page.evaluate(() => !!Bot.mv.raf)), "um movimento começou por causa do mouse");
+  assert(rz1 === rz0, "a cabeça se inclinou seguindo o cursor: " + rz0 + " → " + rz1);
+  assert(!(await page.evaluate(() => document.querySelector("#bot .bot-tilt").style.getPropertyValue("--ry"))), "inclinação 3D pelo cursor ainda presente");
 });
-await test("A4. Não fica preso no canto: segue o cursor pela tela e, ocioso, volta a um lugar livre", async (keep) => {
-  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  const spots = [];
-  for (const [x, y] of [[420, 260], [900, 300], [700, 760]]) { await page.mouse.move(x, y, { steps: 5 }); await settled(page); spots.push(await head(page)); }
-  const xs = spots.map((s) => Math.round(s.x)), ys = spots.map((s) => Math.round(s.y));
-  assert(new Set(xs).size === 3 && Math.max(...ys) - Math.min(...ys) > 150, "não percorreu a tela: " + JSON.stringify([xs, ys]));
-  await page.evaluate(() => { Bot.mv.lastIn = Date.now() - 9000; });
-  await page.waitForFunction(() => Bot.mv.atRest, null, { timeout: 3000 }); await settled(page);
-  const r = await page.evaluate(() => { const { w, h } = Bot.dims(), b = Bot.bounds(), m = Bot.mv; return { cost: Bot.cost(m.x, m.y, w, h), inside: m.x >= b.l && m.y >= b.t && m.x + w <= b.r && m.y + h <= b.b }; });
-  assert(r.inside && r.cost < 6, "lugar de descanso inválido: " + JSON.stringify(r));
-});
-await test("A5. Mantém distância dos controles: passar o mouse em botões, campos e abas não coloca a cabeça sobre eles", async (keep) => {
-  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  const targets = await page.evaluate(() => [...document.querySelectorAll("#app main button, #app main input, #app aside button, #app main a")].filter((n) => { const r = n.getBoundingClientRect(); return r.width > 20 && r.height > 14 && r.top > 0 && r.bottom < innerHeight; }).slice(0, 8).map((n) => { const r = n.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2, (n.textContent || n.placeholder || "").trim().slice(0, 20)]; }));
-  assert(targets.length >= 5, "poucos controles para testar: " + targets.length);
-  for (const [x, y, name] of targets) {
-    await page.mouse.move(x, y, { steps: 4 }); await settled(page);
-    const h = await head(page), over = await overControls(page);
-    assert(!over.length, `com o mouse em "${name}" a cabeça cobriu: ${over.join(", ")}`);
-    assert(!inHead(h, x, y, 12), `cabeça em cima do cursor em "${name}"`);
-  }
-});
-await test("A6. Cliques e digitação funcionam mesmo com a cabeça em movimento por cima (a camada não captura o ponteiro)", async (keep) => {
-  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  const lay = await page.evaluate(() => getComputedStyle(document.getElementById("bot")).pointerEvents);
-  assert(lay === "none", "a camada do mascote captura o ponteiro: " + lay);
-  const inp = await page.evaluate(() => { const i = [...document.querySelectorAll("#app main input")].find((n) => n.getBoundingClientRect().width > 100); i.id = i.id || "__alvo"; const r = i.getBoundingClientRect(); return { id: i.id, x: r.left + 30, y: r.top + r.height / 2 }; });
-  // força a cabeça a atravessar o campo (como no meio de um movimento) e clica exatamente embaixo dela
-  await page.evaluate(({ x, y }) => { const m = Bot.mv, { w, h } = Bot.dims(); m.x = x - w / 2; m.y = y - h / 2; Bot.paint(); Bot.go(x - w / 2 + 400, y - h / 2); }, inp);
-  const st = await page.evaluate(({ x, y }) => ({ moving: !!Bot.mv.raf, under: document.elementFromPoint(x, y).closest("#bot") ? "bot" : document.elementFromPoint(x, y).tagName, pe: getComputedStyle(document.querySelector("#bot .bot-head")).pointerEvents }), inp);
-  assert(st.moving && st.under !== "bot" && st.pe === "none", "em movimento a cabeça deveria deixar o clique passar: " + JSON.stringify(st));
-  await page.mouse.click(inp.x, inp.y); await page.keyboard.type("Uber 99");
-  assert((await page.evaluate((id) => document.activeElement.id === id && document.activeElement.value, inp.id)) === "Uber 99", "digitação no campo sob a cabeça falhou");
-  await page.keyboard.press("Escape"); await settled(page);
-  const btn = await page.evaluate(() => { const b = [...document.querySelectorAll("#app main button")].find((n) => /Adicionar registro/.test(n.textContent) && n.getBoundingClientRect().width); const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
-  await page.evaluate(({ x, y }) => { const m = Bot.mv, { w, h } = Bot.dims(); m.x = x - w / 2; m.y = y - h / 2; Bot.paint(); Bot.go(m.x - 300, m.y + 200); }, btn);
-  await page.mouse.click(btn.x, btn.y);
-  assert(await page.evaluate(() => document.getElementById("modal").classList.contains("on")), "o botão sob a cabeça não respondeu ao clique");
-});
-await test("A7. Celular: reage ao toque com atraso, para perto (não em cima) do ponto tocado e não impede a rolagem", async (keep) => {
+await test("A4. Celular: a cabeça não segue cada toque (tocar na tela não a desloca nem inicia movimento)", async (keep) => {
   const ctx = keep(await ctxOf({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })); const { page } = await quiet(ctx);
+  await freeze(page); await page.waitForTimeout(100);
   const h0 = await head(page);
-  const pt = await page.evaluate(() => { const e = [...document.querySelectorAll("#app main h1, #app main h2, #app main p")].find((n) => { const r = n.getBoundingClientRect(); return r.width > 80 && r.top > 120 && r.bottom < 500 && !n.closest("a,button"); }); const r = e.getBoundingClientRect(); return { x: Math.round(r.left + 40), y: Math.round(r.top + r.height / 2) }; });
-  await page.touchscreen.tap(pt.x, pt.y); await page.waitForTimeout(120);
+  for (const [x, y] of [[60, 300], [330, 500], [200, 700], [60, 760]]) { await page.touchscreen.tap(x, y); await page.waitForTimeout(150); }
   const h1 = await head(page);
-  assert(Math.hypot(h1.x - h0.x, h1.y - h0.y) < 25, "pulou para o toque sem atraso");
-  await settled(page); const h2 = await head(page);
-  const d0 = Math.hypot(h0.cx - pt.x, h0.cy - pt.y), d2 = Math.hypot(h2.cx - pt.x, h2.cy - pt.y);
-  assert(d2 < d0 - 40, `não se aproximou do toque: ${d0.toFixed(0)} → ${d2.toFixed(0)}`);
-  assert(!inHead(h2, pt.x, pt.y, 30), "parou em cima do ponto tocado");
-  assert(!(await overControls(page)).length, "parou sobre um controle: " + (await overControls(page)));
-  // arrastar o dedo começando em cima da cabeça rola a página normalmente
-  const cdp = await ctx.newCDPSession(page);
-  const top = () => page.evaluate(() => scrollY + (document.querySelector("#app main") || {}).scrollTop);
-  await page.evaluate(() => { const m = document.querySelector("#app main"); m.scrollTop = 400; }); await page.waitForTimeout(400); await settled(page);
-  const h3 = await head(page), x = Math.round(h3.cx), y = Math.round(h3.cy), dir = y < 422 ? 1 : -1, s0 = await top(); // dedo para baixo ou para cima, conforme o espaço
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
-  for (let i = 1; i <= 12; i++) { await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y: y + dir * i * 25 }] }); await page.waitForTimeout(16); }
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-  await page.waitForTimeout(300);
-  const s1 = await top();
-  await page.waitForTimeout(300); await settled(page);
-  const h4 = await head(page); await page.touchscreen.tap(Math.round(h4.cx), Math.round(h4.cy)); await page.waitForTimeout(200);
-  assert(await bubble(page), "tocar na cabeça parada deveria abrir uma dica");
-  assert(Math.abs(s1 - s0) > 100, `a rolagem iniciada sobre a cabeça foi bloqueada: ${s0} → ${s1} ` + JSON.stringify([x, y, dir, await page.evaluate(([x, y]) => document.elementsFromPoint(x, y).slice(0, 4).map((e) => e.tagName + "." + e.className), [x, y])]));
+  assert(Math.hypot(h1.x - h0.x, h1.y - h0.y) < 1, "a cabeça se moveu em direção aos toques: " + JSON.stringify([h0, h1]));
+  assert(!(await page.evaluate(() => !!Bot.mv.raf)), "um toque iniciou um movimento");
 });
-await test("A8. Celular: com campo em edição e teclado aberto, nem a cabeça nem o balão cobrem o campo", async (keep) => {
-  const ctx = keep(await ctxOf({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })); const { page } = await open(ctx, { hash: "#criar-conta" });
-  await page.waitForTimeout(300);
-  for (const id of ["re-email", "re-pass"]) {
-    await page.tap("#" + id); await page.waitForTimeout(150);
-    await page.setViewportSize({ width: 390, height: 430 }); // teclado virtual ocupando metade da tela
-    await page.evaluate(() => document.activeElement.scrollIntoView({ block: "center" }));
-    await page.waitForTimeout(500); await settled(page); await page.waitForTimeout(100);
-    const r = await page.evaluate(() => { const f = document.activeElement.getBoundingClientRect(), h = document.querySelector("#bot .bot-head").getBoundingClientRect(), bb = document.querySelector("#bot .bot-bub"), b = bb.hidden ? null : bb.getBoundingClientRect();
-      const hit = (a) => a && a.left < f.right && a.right > f.left && a.top < f.bottom && a.bottom > f.top;
-      return { id: document.activeElement.id, head: hit(h), bub: hit(b), inView: h.top >= 0 && h.bottom <= innerHeight && h.right <= innerWidth && h.left >= 0, bubIn: !b || (b.top >= 0 && b.bottom <= innerHeight) }; });
-    assert(r.id === id && !r.head && !r.bub && r.inView && r.bubIn, `${id}: ` + JSON.stringify(r));
-    await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(200);
-  }
-});
-await test("A9. Piscadas naturais: intervalos variáveis, troca curta para olhos fechados, sem deformar a cabeça", async (keep) => {
+await test("A5. Movimentação autônoma: escolhe sozinha várias posições diferentes, com o mouse parado", async (keep) => {
   const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  await page.evaluate(() => { window.__bl = []; const el = document.getElementById("bot"), hd = el.querySelector(".bot-head"); new MutationObserver(() => { if (el.classList.contains("blink")) window.__bl.push({ t: performance.now(), w: hd.offsetWidth, h: hd.offsetHeight, op: getComputedStyle(el.querySelector("img.cl")).opacity }); }).observe(el, { attributes: true, attributeFilter: ["class"] }); });
-  await page.waitForTimeout(7600);
-  const r = await page.evaluate(() => ({ bl: window.__bl.filter((b, i, a) => !i || b.t - a[i - 1].t > 50), w: document.querySelector("#bot .bot-head").offsetWidth, h: document.querySelector("#bot .bot-head").offsetHeight, now: document.getElementById("bot").classList.contains("blink") }));
-  assert(r.bl.length >= 1, "não piscou em 7,6 s");
+  const w = await watch(page, 18000); // não toca em nada durante a observação
+  assert(w.moving > 0 && w.onsets >= 2, "não passeou sozinha o suficiente: " + w.onsets + " deslocamentos");
+  assert(w.rests.length >= 2, "poucas posições autônomas distintas: " + w.rests.length + " (" + w.rests.join(" ") + ")");
+  const xs = w.rests.map((k) => +k.split(",")[0]), ys = w.rests.map((k) => +k.split(",")[1]);
+  assert(Math.max(...xs) - Math.min(...xs) > 100 || Math.max(...ys) - Math.min(...ys) > 100, "passeio concentrado num ponto só: " + w.rests.join(" "));
+});
+await test("A6. Deslocamento lento e suave: dura ~1,5–3 s, com aceleração/desaceleração e sem saltos", async (keep) => {
+  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
+  await freeze(page);
+  const tr = await page.evaluate(() => new Promise((ok) => { const m = Bot.mv, b = Bot.bounds(), { w, h } = Bot.dims();
+    const far = Math.hypot(m.x - (b.l + 20), m.y - (b.b - h - 20)) > Math.hypot(m.x - (b.r - w - 20), m.y - (b.t + 20)) ? [b.l + 20, b.b - h - 20] : [b.r - w - 20, b.t + 20];
+    const pts = []; const t0 = performance.now(); Bot.go(far[0], far[1]);
+    const f = () => { pts.push([performance.now() - t0, Bot.mv.x, Bot.mv.y]); if (Bot.mv.raf) requestAnimationFrame(f); else ok({ pts, dur: performance.now() - t0 }); }; requestAnimationFrame(f); }));
+  assert(tr.dur >= 1400 && tr.dur <= 3200, "duração fora de 1,5–3 s: " + Math.round(tr.dur) + " ms");
+  let maxStep = 0; for (let i = 1; i < tr.pts.length; i++) maxStep = Math.max(maxStep, Math.hypot(tr.pts[i][1] - tr.pts[i - 1][1], tr.pts[i][2] - tr.pts[i - 1][2]));
+  assert(maxStep < 40, "salto entre quadros (não é suave): " + maxStep.toFixed(1) + " px");
+  // easeInOut: o deslocamento no 1º quinto do tempo é bem menor que no quinto central (acelera no meio)
+  const at = (f) => { const tt = tr.dur * f; let p = tr.pts[0]; for (const q of tr.pts) { if (q[0] <= tt) p = q; else break; } return p; };
+  const d = (a, b) => Math.hypot(a[1] - b[1], a[2] - b[2]);
+  const start = d(at(0), at(.2)), mid = d(at(.4), at(.6));
+  assert(mid > start * 1.4, `sem aceleração/desaceleração (início ${start.toFixed(0)} vs meio ${mid.toFixed(0)})`);
+});
+await test("A7. Pausas perceptíveis entre os deslocamentos (a maior parte do tempo fica relativamente parada)", async (keep) => {
+  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
+  const w = await watch(page, 16000);
+  assert(w.gaps >= 1, "não houve pausa perceptível (>2 s parada) entre movimentos");
+  assert(w.moving / w.frames < 0.6, "passou a maior parte do tempo em movimento: " + (100 * w.moving / w.frames).toFixed(0) + "%");
+});
+await test("A8. Piscadas naturais durante o repouso: curtas, intervalos variáveis, sem deformar a cabeça", async (keep) => {
+  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
+  await page.evaluate(() => { window.__bl = []; const el = document.getElementById("bot"), hd = el.querySelector(".bot-head"); new MutationObserver(() => { if (el.classList.contains("blink")) window.__bl.push({ t: performance.now(), w: hd.offsetWidth, h: hd.offsetHeight }); }).observe(el, { attributes: true, attributeFilter: ["class"] }); });
+  await page.waitForTimeout(8000);
+  const r = await page.evaluate(() => ({ bl: window.__bl.filter((b, i, a) => !i || b.t - a[i - 1].t > 50), w: document.querySelector("#bot .bot-head").offsetWidth, h: document.querySelector("#bot .bot-head").offsetHeight }));
+  assert(r.bl.length >= 1, "não piscou em 8 s");
   assert(r.bl.every((b) => b.w === r.w && b.h === r.h), "a cabeça mudou de tamanho ao piscar");
   await page.evaluate(() => Bot.blink());
   assert(await page.evaluate(() => getComputedStyle(document.querySelector("#bot img.cl")).opacity === "1"), "olhos fechados não apareceram");
-  const t0 = Date.now(); await page.waitForFunction(() => !document.getElementById("bot").classList.contains("blink") && getComputedStyle(document.querySelector("#bot img.cl")).opacity === "0", null, { timeout: 1000, polling: 10 }).catch(() => { throw new Error("a piscada não terminou"); });
+  const t0 = Date.now(); await page.waitForFunction(() => !document.getElementById("bot").classList.contains("blink"), null, { timeout: 1000, polling: 10 }).catch(() => { throw new Error("a piscada não terminou"); });
   assert(Date.now() - t0 < 400, "olhos fechados por tempo demais: " + (Date.now() - t0) + " ms");
-  const gaps = await page.evaluate(() => { const g = []; const o = Bot.blink.bind(Bot); return new Promise((ok) => { let last = 0; Bot.blink = () => { const t = performance.now(); if (last) g.push(Math.round(t - last)); last = t; o(); if (g.length >= 2) { Bot.blink = o; ok(g); } }; setTimeout(() => { Bot.blink = o; ok(g); }, 15000); }); });
-  assert(gaps.length >= 1 && gaps.every((g) => g > 200 && g < 7600), "intervalos fora da faixa natural: " + gaps);
+  const gaps = await page.evaluate(() => new Promise((ok) => { const g = []; const o = Bot.blink.bind(Bot); let last = 0; Bot.blink = () => { const t = performance.now(); if (last) g.push(Math.round(t - last)); last = t; o(); if (g.length >= 4) { Bot.blink = o; ok(g); } }; setTimeout(() => { Bot.blink = o; ok(g); }, 16000); }));
+  const nat = gaps.filter((g) => g >= 300); // ignora a segunda piscada de uma dupla (~240 ms)
+  assert(nat.length >= 1 && nat.every((g) => g < 8000), "intervalos fora da faixa natural: " + gaps);
+  assert(new Set(nat.map((g) => Math.round(g / 500))).size > 1 || nat.length < 2, "intervalos sem variação natural: " + nat);
 });
-await test("A10. Tamanhos de tela: dentro da área visível, sem rolagem horizontal e com tamanho proporcional", async (keep) => {
+await test("A9. Não fica preso no canto nem sai da tela, em vários tamanhos", async (keep) => {
   for (const [w, hgt, mob] of [[320, 568, true], [768, 1024, true], [1024, 700, false], [1920, 1080, false]]) {
     const ctx = keep(await ctxOf({ viewport: { width: w, height: hgt }, isMobile: mob, hasTouch: mob })); const { page } = await quiet(ctx);
-    if (!mob) { await page.mouse.move(w / 2, hgt / 2, { steps: 4 }); await settled(page); }
-    else { await page.touchscreen.tap(Math.round(w / 2), 200); await page.waitForTimeout(150); await settled(page); }
-    const r = await page.evaluate(() => { const h = document.querySelector("#bot .bot-head").getBoundingClientRect(); return { hw: h.width, l: h.left, t: h.top, r: h.right, b: h.bottom, vw: innerWidth, vh: innerHeight, sw: document.documentElement.scrollWidth }; });
-    assert(r.l >= 0 && r.t >= 0 && r.r <= r.vw && r.b <= r.vh, `${w}x${hgt}: fora da tela ` + JSON.stringify(r));
-    assert(r.sw <= r.vw, `${w}x${hgt}: rolagem horizontal`);
-    assert(w <= 900 ? r.hw < 52 : r.hw > 60, `${w}x${hgt}: tamanho ${r.hw}`);
+    const ob = await watch(page, 12000);
+    assert(ob.inside, `${w}x${hgt}: saiu da área visível`);
+    assert((await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)), `${w}x${hgt}: rolagem horizontal`);
+    const corners = ob.rests.filter((k) => { const [x, y] = k.split(",").map(Number); return (x < 40 || x > w - 110) && (y < 40 || y > hgt - 120); });
+    assert(!(ob.rests.length >= 3 && corners.length === ob.rests.length), `${w}x${hgt}: ficou preso em cantos: ` + ob.rests.join(" "));
+    const r = await page.evaluate(() => { const h = document.querySelector("#bot .bot-head").getBoundingClientRect(); return [h.left >= 0, h.top >= 0, h.right <= innerWidth, h.bottom <= innerHeight, h.width]; });
+    assert(r[0] && r[1] && r[2] && r[3], `${w}x${hgt}: cabeça cortada na borda`);
+    assert(w <= 900 ? r[4] < 52 : r[4] > 60, `${w}x${hgt}: tamanho ${r[4]}`);
   }
 });
-await test("A11. Desempenho: mover o mouse não renderiza o app, o alvo é recalculado com limite e a animação para quando chega", async (keep) => {
+await test("A10. Evita botões, formulários e áreas importantes ao descansar", async (keep) => {
   const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  await page.evaluate(() => { window.__n = { render: 0, retarget: 0 }; const r = window.render; window.render = function () { __n.render++; return r.apply(this, arguments); }; const t = Bot.retarget.bind(Bot); Bot.retarget = (...a) => { __n.retarget++; return t(...a); }; });
-  for (let i = 0; i < 60; i++) { await page.mouse.move(300 + i * 12, 200 + (i % 10) * 30); await page.waitForTimeout(20); }
-  await settled(page);
-  const n = await page.evaluate(() => window.__n);
-  assert(n.render === 0, "o app foi renderizado durante o movimento do mouse: " + n.render);
-  assert(n.retarget >= 2 && n.retarget <= 16, "recalculo do alvo sem limite: " + n.retarget + " para 60 movimentos");
-  await page.waitForTimeout(500);
-  assert(await page.evaluate(() => !Bot.mv.raf), "a animação continuou depois de chegar");
+  let checks = 0;
+  for (let i = 0; i < 20; i++) { // amostra várias posições de descanso ao longo do passeio
+    await page.waitForTimeout(900);
+    if (await page.evaluate(() => !Bot.mv.raf && !Bot.cur)) { const over = await overControls(page); assert(!over.length, "descansou sobre um controle: " + over.join(", ")); checks++; }
+  }
+  assert(checks >= 3, "poucas paradas observadas para validar: " + checks);
+  // com um campo em foco (formulário), não para sobre ele
+  const ctx2 = keep(await ctxOf({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })); const { page: p2 } = await open(ctx2, { hash: "#criar-conta" });
+  await p2.waitForTimeout(300); await p2.tap("#re-email"); await p2.waitForTimeout(300);
+  for (let i = 0; i < 8; i++) { await p2.waitForTimeout(700); const bad = await p2.evaluate(() => { const f = document.activeElement, fr = f && f.getBoundingClientRect(), h = document.querySelector("#bot .bot-head").getBoundingClientRect(); return f && f.id === "re-email" && fr.left < h.right && fr.right > h.left && fr.top < h.bottom && fr.bottom > h.top; }); assert(!bad, "cobriu o campo em edição"); }
 });
-await test("A12. Minimizar e silenciar: minimizada não persegue o cursor e silenciada não abre balão sozinha", async (keep) => {
+await test("A11. Não bloqueia a interface: cliques, digitação, toque e rolagem passam pela cabeça", async (keep) => {
+  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
+  assert((await page.evaluate(() => getComputedStyle(document.getElementById("bot")).pointerEvents)) === "none", "a camada do mascote captura o ponteiro");
+  await freeze(page);
+  // clique num botão com a cabeça por cima dele
+  // coloca a cabeça EM MOVIMENTO por cima do botão (caso real: ela passeia por cima) — em movimento não intercepta
+  const btn = await page.evaluate(() => { const b = [...document.querySelectorAll("#app main button")].find((n) => /Adicionar registro/.test(n.textContent) && n.getBoundingClientRect().width); const r = b.getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) }; });
+  await page.evaluate(({ x, y }) => { const m = Bot.mv, { w, h } = Bot.dims(); m.x = x - w / 2; m.y = y - h / 2; m.tx = m.x; m.ty = m.y; Bot.paint(); Bot.go(x - w / 2 - 400, y - h / 2); }, btn);
+  assert(await page.evaluate(() => !!Bot.mv.raf && getComputedStyle(document.querySelector("#bot .bot-head")).pointerEvents === "none"), "em movimento a cabeça deveria deixar o clique passar");
+  await page.mouse.click(btn.x, btn.y);
+  assert(await page.evaluate(() => document.getElementById("modal").classList.contains("on")), "o botão sob a cabeça não respondeu ao clique");
+  await page.evaluate(() => closeModal()); await page.waitForTimeout(200);
+  // digitação num campo sob a cabeça em movimento
+  const inp = await page.evaluate(() => { const i = [...document.querySelectorAll("#app main input")].find((n) => n.getBoundingClientRect().width > 100); i.id = i.id || "__alvo"; const r = i.getBoundingClientRect(); return { id: i.id, x: Math.round(r.left + 30), y: Math.round(r.top + r.height / 2) }; });
+  await page.evaluate(({ x, y }) => { const m = Bot.mv, { w, h } = Bot.dims(); m.x = x - w / 2; m.y = y - h / 2; m.tx = m.x; m.ty = m.y; Bot.paint(); Bot.go(x - w / 2 + 400, y - h / 2); }, inp);
+  await page.mouse.click(inp.x, inp.y); await page.keyboard.type("Uber 99");
+  assert((await page.evaluate((id) => document.activeElement.id === id && document.activeElement.value, inp.id)) === "Uber 99", "digitação no campo sob a cabeça falhou");
+  // roda do mouse sobre a cabeça parada rola o conteúdo
+  await page.evaluate(() => document.activeElement.blur()); await settled(page);
+  const s0 = await page.evaluate(() => document.querySelector("#app main").scrollTop);
+  const h = await head(page); await page.mouse.move(h.cx, h.cy); await page.mouse.wheel(0, 300); await page.waitForTimeout(300);
+  assert((await page.evaluate(() => document.querySelector("#app main").scrollTop)) > s0 + 100, "a roda do mouse sobre a cabeça não rolou a página");
+});
+await test("A11b. Celular: arrastar o dedo começando na cabeça rola a página; um toque curto nela abre a dica", async (keep) => {
+  const ctx = keep(await ctxOf({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })); const { page } = await quiet(ctx);
+  const cdp = await ctx.newCDPSession(page);
+  await page.evaluate(() => { const m = document.querySelector("#app main"); m.scrollTop = 400; }); await page.waitForTimeout(400); await settled(page);
+  const h = await head(page), x = Math.round(h.cx), y = Math.round(h.cy), dir = y < 422 ? 1 : -1;
+  const s0 = await page.evaluate(() => document.querySelector("#app main").scrollTop);
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
+  for (let i = 1; i <= 12; i++) { await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y: y + dir * i * 25 }] }); await page.waitForTimeout(16); }
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] }); await page.waitForTimeout(300);
+  assert(Math.abs((await page.evaluate(() => document.querySelector("#app main").scrollTop)) - s0) > 100, "a rolagem iniciada sobre a cabeça foi bloqueada");
+  await page.waitForTimeout(300); await settled(page);
+  const h2 = await head(page); await page.touchscreen.tap(Math.round(h2.cx), Math.round(h2.cy)); await page.waitForTimeout(200);
+  assert(await bubble(page), "tocar na cabeça parada deveria abrir uma dica");
+});
+await test("A12. Desempenho e movimento reduzido: o mouse não renderiza o app nem move a cabeça; a animação para no repouso; RM desativa o passeio", async (keep) => {
+  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
+  await page.evaluate(() => { window.__r = 0; const r = window.render; window.render = function () { __r++; return r.apply(this, arguments); }; });
+  const h0 = await head(page);
+  for (let i = 0; i < 50; i++) { await page.mouse.move(250 + i * 14, 180 + (i % 9) * 40); await page.waitForTimeout(16); }
+  assert((await page.evaluate(() => window.__r)) === 0, "o app foi renderizado ao mover o mouse: " + (await page.evaluate(() => window.__r)));
+  // a animação não roda o tempo todo: em algum momento do repouso raf fica parado
+  let idle = false; for (let i = 0; i < 20; i++) { if (await page.evaluate(() => !Bot.mv.raf)) { idle = true; break; } await page.waitForTimeout(400); }
+  assert(idle, "a animação nunca parou (rAF girando sem parar)");
+  // movimento reduzido: sem passeio autônomo
+  const ctx2 = keep(await ctxOf({ reducedMotion: "reduce" })); const { page: p2 } = await quiet(ctx2);
+  const a = await head(p2); const w = await watch(p2, 6000);
+  assert(w.moving === 0, "passou a passear mesmo com movimento reduzido");
+  assert((await p2.evaluate(() => getComputedStyle(document.querySelector("#bot .bot-float")).animationName)) === "none", "flutuação ativa com movimento reduzido");
+});
+await test("A13. Minimizar não passeia e silenciar não abre balão sozinho (controles preservados)", async (keep) => {
   const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
   await page.evaluate(() => Bot.show({ text: "teste" })); await page.click('#bot [data-bot="min"]');
   await page.waitForTimeout(300); await settled(page);
-  const h0 = await head(page);
-  await page.mouse.move(500, 300, { steps: 5 }); await page.waitForTimeout(900);
-  const h1 = await head(page);
-  assert(Math.hypot(h1.x - h0.x, h1.y - h0.y) < 1, "minimizada continuou seguindo o cursor");
-  assert(h1.w < 50 && h1.can, "minimizada deveria ficar pequena e clicável: " + JSON.stringify(h1));
+  const h0 = await head(page); const w = await watch(page, 5000);
+  assert(w.moving === 0, "minimizada continuou passeando");
+  assert(h0.w < 50 && h0.can, "minimizada deveria ficar pequena e clicável: " + JSON.stringify(h0));
   await page.evaluate(() => { window.__said = []; tab = "despesas"; render(); }); await page.waitForTimeout(1200);
   assert(!(await bubble(page)), "silenciada abriu balão sozinha");
 });
