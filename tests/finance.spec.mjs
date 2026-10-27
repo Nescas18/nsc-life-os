@@ -505,8 +505,12 @@ await test("Histórico compacto: explicação recolhida, dias sem registro com c
   // relógio em 26/10 (segunda). Seg–sex habituais; registros em 19 e 20/10; 22/10 marcado como não trabalhado → pendentes 21 e 23/10 (24–25 fim de semana, 26 é hoje)
   await setDb(o.page, { cfg: { pass: OFF, workDays: [1, 2, 3, 4, 5] }, tx: [tx({ d: "2026-10-19", type: "in", app: "uber", v: 100 }), tx({ d: "2026-10-20", type: "in", app: "uber", v: 100 })], off: { "2026-10-22": { v: true, at: 1 } } });
   await o.page.evaluate(() => { tab = "historico"; hf.per = "m"; render(); });
-  const r = await o.page.evaluate(() => ({ open: document.querySelector(".hexp").open, n: document.querySelector(".pendn")?.textContent, rows: [...document.querySelectorAll(".pendc .pendr")].map((x) => x.querySelector("[data-pendrec]").dataset.pendrec), visible: [...document.querySelectorAll(".pendc > .pendl .pendr")].length }));
-  eq("explicação começa recolhida", r.open, false);
+  const r = await o.page.evaluate(() => ({ open: !!document.getElementById("tipbox")?.isConnected || /somam os lançamentos/.test(document.querySelector("#view").innerText), n: document.querySelector(".pendn")?.textContent, rows: [...document.querySelectorAll(".pendc .pendr")].map((x) => x.querySelector("[data-pendrec]").dataset.pendrec), visible: [...document.querySelectorAll(".pendc > .pendl .pendr")].length }));
+  eq("explicação só aparece quando pedida", r.open, false);
+  await o.page.click("#view .cardh .itip");
+  const tipTxt = await o.page.evaluate(() => document.getElementById("tipbox")?.innerText || "");
+  if (!/Passes entram pelo valor pago/.test(tipTxt) || !/ficam fora desses totais/.test(tipTxt)) throw new Error("explicação do resumo: " + tipTxt);
+  await o.page.keyboard.press("Escape");
   if (r.rows.includes("2026-10-22")) throw new Error("dia marcado como não trabalhado apareceu: " + r.rows);
   if (r.rows.some((d) => d >= T)) throw new Error("hoje/futuro tratado como esquecido: " + r.rows);
   eq("pendentes esperados", r.rows.slice().sort().join(","), "2026-10-21,2026-10-23");

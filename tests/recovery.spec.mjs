@@ -127,6 +127,7 @@ await test("Textos e botões do fluxo seguem exatamente a especificação", asyn
 await test("Cadastro envia a data de nascimento como metadado e com retorno ao endereço público; data futura é barrada", async () => {
   const o = await page();
   await o.pg.click("#btn-tab-register");
+  await o.pg.waitForTimeout(100); // a aba foca o primeiro campo após 30 ms; preencher antes disso disputa o foco
   await o.pg.fill("#re-name", "Ana Teste");
   await o.pg.fill("#re-email", "ana@teste.local");
   await o.pg.fill("#re-pass", "SenhaForte2026");

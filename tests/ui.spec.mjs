@@ -257,6 +257,58 @@ if (THREE_JS) {
   });
 }
 
+await test("Jornada: Data, Horas/Minutos e Viagens sem sobreposição em 5 larguras; 6 h 30 min salva 390", async (keep) => {
+  const out = [];
+  for (const [w, h] of [[1440, 900], [1024, 800], [820, 1100], [390, 844], [320, 700]]) {
+    const ctx = await ctxFor(keep, { viewport: { width: w, height: h }, isMobile: w < 700, hasTouch: w < 700 });
+    const { page } = await loggedPage(ctx);
+    await page.evaluate(() => { tab = "uber"; lm = "jr"; render(); });
+    const r = await page.evaluate(() => {
+      const f = document.querySelector("#reg form[data-form=jr]"), row = f.querySelector(".jrtop"), R = (e) => e.getBoundingClientRect();
+      const els = [...row.querySelectorAll("input,.durrow span,label")].filter((e) => R(e).width > 0), hit = [];
+      for (let i = 0; i < els.length; i++) for (let j = i + 1; j < els.length; j++) { const a = R(els[i]), b = R(els[j]); if (a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1) hit.push((els[i].name || els[i].textContent.trim()) + "×" + (els[j].name || els[j].textContent.trim())); }
+      const out = [...row.children].flatMap((c) => [...c.querySelectorAll("input")].filter((x) => R(x).right > R(c).right + 1 || R(x).left < R(c).left - 1).map((x) => x.name));
+      return { hit, out, sw: document.documentElement.scrollWidth, vw: innerWidth };
+    });
+    assert(!r.hit.length, `${w}px: sobreposição ${r.hit.join(", ")}`);
+    assert(!r.out.length, `${w}px: campo fora da coluna ${r.out.join(", ")}`);
+    assert(r.sw <= r.vw, `${w}px: rolagem horizontal (${r.sw} > ${r.vw})`);
+    if (w === 320) {
+      await page.fill("#reg form[data-form=jr] input[name=hh]", "6");
+      await page.fill("#reg form[data-form=jr] input[name=mm]", "30");
+      await page.click("#reg form[data-form=jr] button.btn:not([type=button])");
+      const m = await page.evaluate(() => db.jr.filter((j) => j.app === "uber" && j.d === TODAY()).map((j) => j.min));
+      assert(m.length === 1 && m[0] === 390, "6 h 30 min deveria salvar 390 minutos: " + JSON.stringify(m));
+    }
+    out.push(w + "px ok");
+  }
+  return out.join(" · ");
+});
+
+await test("Ícones de informação: abrem por toque e clique, ficam dentro da tela e fecham com Esc, ✕ e toque fora", async (keep) => {
+  let n = 0;
+  for (const [w, h, mob] of [[320, 640, true], [1280, 860, false]]) {
+    const ctx = await ctxFor(keep, { viewport: { width: w, height: h }, isMobile: mob, hasTouch: mob });
+    const { page } = await loggedPage(ctx);
+    for (const t of ["historico", "uber", "financas", "produtividade", "despesas", "hoje"]) {
+      await page.evaluate((t) => { tab = t; render(); }, t);
+      const count = await page.locator("#view .itip:visible").count(); // ícones dentro de blocos recolhidos só contam quando abertos
+      for (let k = 0; k < count; k++) {
+        const b = page.locator("#view .itip:visible").nth(k); await b.scrollIntoViewIfNeeded();
+        if (mob) await b.tap(); else await b.click();
+        const r = await page.evaluate(() => { const el = document.getElementById("tipbox"); if (!el || !el.isConnected) return null; const R = el.getBoundingClientRect(); return { l: R.left, r: R.right, t: R.top, b: R.bottom, vw: document.documentElement.clientWidth, vh: innerHeight, txt: el.querySelector(".tipb").textContent.trim().length, exp: document.querySelector('.itip[aria-expanded="true"]') !== null }; });
+        assert(r && r.txt > 20 && r.exp, `${w}px ${t} #${k}: balão não abriu`);
+        assert(r.l >= 0 && r.r <= r.vw && r.t >= 0 && r.b <= r.vh, `${w}px ${t} #${k}: balão fora da tela ${JSON.stringify(r)}`);
+        if (k % 3 === 0) await page.keyboard.press("Escape"); else if (k % 3 === 1) await page.click("#tipbox .tipx"); else await page.mouse.click(4, Math.round(h * .6));
+        assert(await page.evaluate(() => !document.getElementById("tipbox")?.isConnected), `${w}px ${t} #${k}: não fechou`);
+        n++;
+      }
+    }
+  }
+  assert(n >= 10, "poucos ícones encontrados: " + n);
+  return n + " explicações verificadas";
+});
+
 await browser.close();
 server.close();
 let fail = 0;
