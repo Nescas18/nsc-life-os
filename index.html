@@ -114,34 +114,37 @@ form.shake{animation:shake .38s}
 .cardh{display:flex;align-items:center;gap:4px;margin-bottom:12px}.cardh h3{margin:0}
 .lblrow{display:flex;align-items:center;gap:2px;margin-bottom:7px}.lblrow label{margin:0!important}
 /* ============ MASCOTE ============
-   Só a cabeça (recorte com transparência real da imagem oficial). A camada inteira ignora o ponteiro: a cabeça
-   flutua sobre a interface sem bloquear cliques, toques nem rolagem. Ela só aceita clique quando está parada e longe
-   dos controles (para abrir uma dica). Posição calculada por Bot.mv (atraso, inércia, distância de segurança). */
-#bot{position:fixed;left:0;top:0;width:0;height:0;z-index:17;pointer-events:none;--hw:66px;--hh:76px}
+   Só a cabeça (recorte com transparência real da imagem oficial), ancorada num canto superior livre de cada aba ou
+   seção (Bot.dock). Ela fica DENTRO do conteúdo: rola junto, não muda larguras, não passa por cima da barra fixa nem da
+   área segura do iPhone e nunca cobre texto, números ou controles. Vida discreta: piscadas ocasionais e, de vez em
+   quando, um leve balanço da cabeça, sempre uma animação por vez. O balão continua numa camada fixa (#bot). */
+#bot{position:fixed;left:0;top:0;width:0;height:0;z-index:17;pointer-events:none}
 #bot[hidden],#modal.on~#bot,#app.navx~#bot,body.boot #bot{display:none}
-.bot-head{position:absolute;left:0;top:0;width:var(--hw);height:var(--hh);padding:0;border:none;background:none;cursor:pointer;pointer-events:none;perspective:380px;-webkit-tap-highlight-color:transparent;transform:translate3d(-200px,-200px,0);will-change:transform;border-radius:40%}
-.bot-head.can{pointer-events:auto}
-@media(hover:none) and (pointer:coarse){.bot-head.can{pointer-events:none}} /* tela de toque: arrastar o dedo começando na cabeça rola a página; o toque nela é reconhecido por Bot.hitHead */
+.bot-host{position:relative}
+.bot-head{position:absolute;left:0;top:0;width:54px;height:62px;padding:0;border:none;background:none;cursor:pointer;z-index:3;-webkit-tap-highlight-color:transparent;touch-action:manipulation;border-radius:40%}
+.bot-head[hidden],.bot-head.away{display:none}
+.bot-head[data-sz=sm]{width:44px;height:51px}
 .bot-head:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
-.bot-float{display:block;width:100%;height:100%;animation:botfloat 5.5s ease-in-out infinite}
-.bot-tilt{display:block;position:relative;width:100%;height:100%;transform:rotateZ(var(--rz,0deg)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .35s cubic-bezier(.2,.7,.2,1);filter:drop-shadow(0 10px 14px rgba(0,0,0,.6)) drop-shadow(0 0 10px rgba(226,178,80,.18))}
+.bot-float{display:block;width:100%;height:100%;transform-origin:50% 85%}
+.bot-tilt{display:block;position:relative;width:100%;height:100%;filter:drop-shadow(0 6px 10px rgba(0,0,0,.55)) drop-shadow(0 0 8px rgba(226,178,80,.16))}
 .bot-tilt img{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
 .bot-tilt img.cl{opacity:0}
-#bot.blink .bot-tilt img.cl{opacity:1} /* piscada: troca para a mesma cabeça com os olhos fechados, por ~120 ms */
-.bot-shine{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at var(--sx,34%) var(--sy,24%),rgba(255,238,190,.38),rgba(255,238,190,0) 50%);mix-blend-mode:screen;-webkit-mask:url(/cabeca-open-160.webp) center/100% 100% no-repeat;mask:url(/cabeca-open-160.webp) center/100% 100% no-repeat}
-.bot-dot{position:absolute;top:2%;right:0;width:13px;height:13px;border-radius:50%;background:var(--gold-hi);box-shadow:0 0 0 2px #0a0906;display:none}
-#bot.alert .bot-dot{display:block;animation:botping 1.9s ease-out infinite}
-#bot.enter .bot-float{animation:botin .75s cubic-bezier(.2,.9,.25,1.25) both}
-#bot.talk .bot-tilt{animation:bottalk .45s ease-in-out 2}
-#bot.happy .bot-float{animation:bothop .75s cubic-bezier(.3,1.6,.5,1)}
-#bot.min{--hw:40px;--hh:46px}#bot.min .bot-float{animation:none}#bot.min .bot-tilt{opacity:.85}
-@keyframes botfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes botping{0%{box-shadow:0 0 0 2px #0a0906,0 0 0 0 rgba(226,178,80,.6)}100%{box-shadow:0 0 0 2px #0a0906,0 0 0 10px rgba(226,178,80,0)}}
-@keyframes botin{from{opacity:0;transform:translateY(26px) scale(.55) rotate(-14deg)}}
-@keyframes bottalk{50%{transform:rotateZ(var(--rz,0deg)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(1.06) translateY(-2px)}}
-@keyframes bothop{40%{transform:translateY(-14px) rotate(-6deg)}70%{transform:translateY(0) rotate(3deg)}}
+.bot-head.blink .bot-tilt img.cl{opacity:1} /* piscada: troca para a mesma cabeça com os olhos fechados, por ~120 ms */
+.bot-shine{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 34% 24%,rgba(255,238,190,.34),rgba(255,238,190,0) 50%);mix-blend-mode:screen;-webkit-mask:url(/cabeca-open-160.webp) center/100% 100% no-repeat;mask:url(/cabeca-open-160.webp) center/100% 100% no-repeat}
+.bot-dot{position:absolute;top:0;right:-2px;width:11px;height:11px;border-radius:50%;background:var(--gold-hi);box-shadow:0 0 0 2px #0a0906;display:none}
+.bot-head.alert .bot-dot{display:block;animation:botping 1.9s ease-out 3}
+.bot-head.turn .bot-float{animation:botturn 1.4s cubic-bezier(.45,0,.3,1)}
+.bot-head.enter .bot-float{animation:botin .6s cubic-bezier(.2,.9,.25,1.2) both}
+.bot-head.talk .bot-tilt{animation:bottalk .45s ease-in-out 2}
+.bot-head.happy .bot-float{animation:bothop .7s cubic-bezier(.3,1.5,.5,1)}
+.bot-head.min{width:30px;height:35px}.bot-head.min .bot-tilt{opacity:.85}
+@keyframes botturn{0%,100%{transform:rotate(0)}35%{transform:rotate(-9deg)}70%{transform:rotate(5deg)}}
+@keyframes botping{0%{box-shadow:0 0 0 2px #0a0906,0 0 0 0 rgba(226,178,80,.6)}100%{box-shadow:0 0 0 2px #0a0906,0 0 0 9px rgba(226,178,80,0)}}
+@keyframes botin{from{opacity:0;transform:translateY(8px) scale(.7)}}
+@keyframes bottalk{50%{transform:scale(1.05) translateY(-1px)}}
+@keyframes bothop{40%{transform:translateY(-6px) rotate(-4deg)}70%{transform:translateY(0) rotate(2deg)}}
 /* balão de fala: posicionado separadamente (Bot.placeBubble), é a única parte que recebe cliques */
-.bot-bub{position:absolute;left:0;top:0;pointer-events:auto;width:max-content;max-width:min(330px,calc(100vw - 24px));max-height:min(62vh,520px);overflow-y:auto;overscroll-behavior:contain;padding:12px 14px 10px;border-radius:14px;background:#16130c;border:1px solid var(--gold-line);box-shadow:0 16px 40px rgba(0,0,0,.55);color:var(--tx);font-size:.86rem;line-height:1.45;animation:bubin .22s var(--ease)}
+.bot-bub{position:absolute;left:0;top:0;pointer-events:auto;width:max-content;max-width:min(272px,calc(100vw - 24px));max-height:min(62vh,520px);overflow-y:auto;overscroll-behavior:contain;padding:12px 14px 10px;border-radius:14px;background:#16130c;border:1px solid var(--gold-line);box-shadow:0 16px 40px rgba(0,0,0,.55);color:var(--tx);font-size:.86rem;line-height:1.45;animation:bubin .22s var(--ease)}
 .bot-bub[hidden]{display:none}
 .bot-bub .bot-msg{margin:0 26px 0 0}.bot-bub .bot-msg b{color:var(--gold-hi)}
 .bot-x{position:absolute;top:3px;right:3px;width:34px;height:34px;border:none;background:none;color:var(--mut);cursor:pointer;border-radius:8px;font-size:.9rem}.bot-x:hover{color:var(--tx)}
@@ -151,8 +154,8 @@ form.shake{animation:shake .38s}
 .bot-ck .ic{flex:0 0 18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:.7rem;border:1px solid var(--line2);color:var(--mut)}.bot-ck .ok .ic{background:var(--ok);border-color:var(--ok);color:#06140c}.bot-ck .auto .ic{border-style:dashed}
 .bot-ck small{display:block;color:var(--mut);font-size:.72rem}.bot-ck .lv{font-size:.64rem;letter-spacing:.04em;text-transform:uppercase;color:var(--gold);margin-left:4px}
 .bot-ck li>div{flex:1;min-width:0}.bot-ck li button{flex:0 0 auto;min-height:30px;padding:4px 10px;border-radius:14px;border:1px solid var(--gold-line);background:none;color:var(--gold-hi);font-size:.72rem;cursor:pointer}
-@media(max-width:900px){#bot{--hw:47px;--hh:54px}#bot.min{--hw:34px;--hh:40px}.bot-bub{font-size:.84rem}}
-@media(prefers-reduced-motion:reduce){.bot-float,#bot.enter .bot-float,#bot.talk .bot-tilt,#bot.happy .bot-float,.bot-bub,#bot.alert .bot-dot{animation:none!important}.bot-tilt{transition:none}}
+@media(max-width:900px){.bot-head{width:40px;height:46px}.bot-head[data-sz=sm]{width:32px;height:37px}.bot-head.min{width:28px;height:32px}.bot-bub{font-size:.84rem}}
+@media(prefers-reduced-motion:reduce){.bot-head .bot-float,.bot-head .bot-tilt,.bot-head .bot-dot,.bot-bub{animation:none!important}}
 .auth-done{text-align:center;animation:fadeIn .4s ease}
 .auth-done-ico{width:56px;height:56px;margin:4px auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;color:#120e05;background:linear-gradient(180deg,var(--gold-hi),var(--gold));box-shadow:0 8px 22px rgba(226,178,80,.25)}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -299,6 +302,34 @@ form[data-form=jr]{container-type:inline-size}
 .jrtop{display:grid;grid-template-columns:minmax(0,1fr);gap:0 12px;align-items:start}
 @container (min-width:440px){.jrtop{grid-template-columns:minmax(0,1fr) minmax(0,1.45fr)}.jrtop .jr-t{grid-column:1}}
 @container (min-width:700px){.jrtop{grid-template-columns:minmax(0,1fr) minmax(250px,1.4fr) minmax(0,1fr)}.jrtop .jr-t{grid-column:auto}}
+/* itens de lista com botões: quando falta largura, os botões descem para a linha de baixo (o texto nunca vira coluna estreita) */
+.it.wr{flex-wrap:wrap}.it.wr>.g{flex:1 1 200px;overflow-wrap:break-word}.it.wr>.row{flex:0 1 auto;flex-wrap:wrap;margin-left:auto}
+/* revisão de horas: um registro por vez, coluna única no celular; datas e durações nunca quebram no meio */
+.hrv{display:flex;flex-direction:column;gap:10px;border-color:var(--gold-line);background:linear-gradient(180deg,rgba(226,178,80,.08),rgba(226,178,80,.015))}
+.hrv-h{display:flex;align-items:baseline;justify-content:space-between;gap:6px 12px;flex-wrap:wrap}.hrv-h b{font-size:1rem}.hrv-n{font-size:.78rem;color:var(--mut);white-space:nowrap}
+.hrv-lead,.hrv-why,.hrv-more{margin:0;font-size:.82rem;line-height:1.45;color:var(--mut);overflow-wrap:break-word;word-break:normal}
+.hrv-it{display:flex;flex-direction:column;gap:10px;min-width:0;padding:12px;border:1px solid var(--line2);border-radius:12px;background:rgba(0,0,0,.25)}
+.hrv-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.hrv-d{white-space:nowrap;font-weight:600;font-variant-numeric:tabular-nums}
+.hrv-vals{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap}.hrv-vals>div{min-width:0}.hrv-vals small{display:block;font-size:.72rem;color:var(--mut)}
+.hrv-vals b{white-space:nowrap;font-size:1.05rem;font-variant-numeric:tabular-nums}.hrv-vals b.hl{color:var(--gold-hi)}.hrv-ar{color:var(--mut)}
+.hrv-acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:8px}.hrv-acts .btn{width:100%;min-height:44px;white-space:normal;line-height:1.25}
+.hrv.done{gap:2px}.hrv.done small{color:var(--mut);font-size:.8rem}
+/* Uber × 99: um cartão por aplicativo (lado a lado quando cabe, empilhados no celular); valores nunca cortados */
+.apc{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px}
+.apc-c{min-width:0;padding:12px 14px;border:1px solid var(--line2);border-radius:12px;background:rgba(255,255,255,.02)}
+.apc-c h4{display:flex;align-items:center;gap:8px;margin:0 0 4px;font-size:.98rem;font-weight:650}.apc-c.n99 h4{color:var(--n99)}
+.apc dl{margin:0}.apc dl>div{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 12px;padding:7px 0;border-top:1px solid var(--line)}.apc dl>div:first-child{border-top:none}
+.apc dt{min-width:0;color:var(--mut);font-size:.82rem}.apc dd{margin:0 0 0 auto;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}.apc dd .mutd{font-weight:400}
+/* por dia da semana: tabela no computador; no celular cada dia vira um cartão com rótulos */
+.dowt{width:100%;border-collapse:collapse;font-size:.86rem;font-variant-numeric:tabular-nums}
+.dowt th,.dowt td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.dowt thead th{color:var(--mut);font-weight:500;font-size:.76rem}.dowt thead th:first-child,.dowt th[scope=row]{text-align:left}
+.dowt th[scope=row]{font-weight:600}.dowt th[scope=row] small{display:block;font-weight:400;font-size:.7rem;color:var(--mut)}.dowt td.noh{text-align:center}
+@media(max-width:640px){.dowt thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+ .dowt,.dowt tbody{display:block}.dowt tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;padding:10px 12px;margin-bottom:8px;border:1px solid var(--line2);border-radius:12px;background:rgba(255,255,255,.02)}
+ .dowt th[scope=row]{grid-column:1/-1;display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:0 0 6px;border:none;border-bottom:1px solid var(--line);font-size:.92rem}.dowt th[scope=row] small{display:inline}
+ .dowt td,.dowt td.noh{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:0;border:none;text-align:left;font-weight:600}.dowt td.noh{grid-column:span 2}.dowt td.noh .mutd{font-weight:400}
+ .dowt td::before{content:attr(data-l);color:var(--mut);font-size:.74rem;font-weight:400}}
 .ptiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
 .pt{min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--card2,rgba(255,255,255,.02))}
 .pt small{display:block;color:var(--mut);font-size:.74rem;line-height:1.3;margin-bottom:5px}
@@ -380,6 +411,12 @@ form[data-etype="fuel"] [data-nofuel]{display:none}form[data-etype] [data-show]{
 .htab td[data-l=Data]{white-space:nowrap;color:var(--tx2)}
 .hm{display:none}
 .ctab{width:100%;border-collapse:collapse;font-size:.86rem;min-width:360px}.ctab th{text-align:left;font-weight:560;color:var(--mut);font-size:.74rem;padding:8px 10px;border-bottom:1px solid var(--line2)}.ctab td{padding:10px;border-bottom:1px solid var(--line)}.ctab .hv{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+/* celular: cada indicador vira um cartão com Atual, Anterior e Diferença lado a lado (nada some fora da tela) */
+@media(max-width:640px){.ctab{min-width:0}.ctab thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+ .ctab,.ctab tbody{display:block}.ctab tr{display:flex;flex-wrap:wrap;gap:6px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
+ .ctab td{padding:0;border:none}.ctab td:first-child{flex:1 0 100%;font-weight:600}
+ /* três por linha quando cabem; um valor muito longo desce para a linha de baixo em vez de estourar a célula */
+ .ctab td.hv{flex:1 1 28%;min-width:max-content;display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;font-size:.84rem}.ctab td.hv::before{content:attr(data-l);color:var(--mut);font-size:.72rem}}
 @media(max-width:760px){
 .htab thead{display:none}.htab,.htab tbody{display:block}
 .htab tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;padding:10px 2px;border-bottom:1px solid var(--line)}
@@ -1683,7 +1720,7 @@ function forecast(){const t=TODAY(),me=monthEnd(t),rem=dDiff(t,me),cash=cashNow(
    Faturamento, despesas e lucro operacional vêm de CS(f,t): a mesma conta do Início e de Relatórios.
    Lucro/h = lucro operacional dos dias COM horas informadas ÷ horas desses dias (dias sem horas não inflam a média).
    Horas de Uber e 99 no mesmo dia seguem driverMin (sem contar duas vezes quando você marca que trabalhou nos dois ao mesmo tempo). */
-const DOW=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const DOW=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];const DOWF=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
 function prodSum(f,t,apps){apps=apps||['uber','n99'];const both=apps.length>1,S=(a,b)=>both?CS(a,b):AS(apps[0],a,b),c=S(f,t),ds=new Set();
   db.tx.forEach(x=>{if(x.type==='in'&&apps.includes(appOf(x))&&inR(x.d,f,t))ds.add(x.d)});
   db.jr.forEach(j=>{if(apps.includes(j.app)&&inR(j.d,f,t)&&(hasAct(j)||jrMin(j)>0))ds.add(j.d)});
@@ -1700,6 +1737,10 @@ function prodSum(f,t,apps){apps=apps||['uber','n99'];const both=apps.length>1,S=
 function hrsSuspect(j){if(j.v!==2||j.hrsOk||j.src||(j.periods||[]).length)return null;const m=Math.round(+j.min||0),r=m%60;if(!(m>0)||!r)return null;
   const T=Math.round(r/0.6);if(T>59||T===r||T===50||T%5||Math.round(T*0.6)!==r)return null;return{was:m,to:Math.floor(m/60)*60+T}}
 const hrsReview=()=>db.jr.map(j=>({j,s:hrsSuspect(j)})).filter(x=>x.s).sort((a,b)=>b.j.d.localeCompare(a.j.d));
+let hrvDone=0; // momento em que a última jornada suspeita foi revisada (mostra "concluída" no lugar do painel, sem a página pular)
+/* refaz a tela sem a página pular: o elemento de referência volta para a mesma altura em que estava na tela */
+function keepView(sel,fn){const sc=$('main'),a=$(sel),y0=a?a.getBoundingClientRect().top:null;fn();const b=$(sel);if(!b||y0==null)return;
+  const d=b.getBoundingClientRect().top-y0;if(Math.abs(d)<.5)return;if(sc&&sc.scrollHeight>sc.clientHeight)sc.scrollTop+=d;else scrollBy(0,d)}
 function hrsFix(id,ok){const j=db.jr.find(x=>x.id===id),s=j&&hrsSuspect(j);if(!s)return;if(ok){j.minOrig=s.was;j.min=s.to}j.hrsOk=true;j.at=Date.now();Store.save()}
 </script>
 <script>
@@ -1742,10 +1783,10 @@ addEventListener('scroll',()=>{if(Tip.btn)Tip.peek?Tip.close(true):Tip.place()},
    Salvamentos só são confirmados depois da gravação real: no aparelho (modo local) ou na nuvem (Store.push ok).
    Preferências (silenciar/minimizar) e histórico de falas ficam no aparelho, separados por conta. O campo de senha
    nunca é lido. */
-const BOT_FEAT=['Registre os ganhos da Uber e da 99 em segundos, separados por aplicativo.','Combustível, passes e outros gastos entram na conta para mostrar o que realmente sobra.','Aqui, faturamento e lucro não são a mesma coisa. O NESC mostra os dois, lado a lado.','Crie metas de faturamento ou de lucro e acompanhe o progresso do dia.','Todo lançamento fica no histórico, com filtros por período e por aplicativo.','Cadastre o carro e acompanhe a manutenção pela quilometragem que você informar.'];
-const BOT_GREET=['Você dirige. Eu te ajudo a entender para onde seu dinheiro está indo.','Bora descobrir quanto realmente sobra depois dos gastos?','Já viu um app de gestão financeira assim, gratuito pra usar? Kkk. Vem conhecer o NESC.','Aqui, faturamento e lucro não são a mesma coisa. Vamos deixar isso claro?'];
-const BOT_SEC={'como-funciona':'Três passos: registra o ganho, lança os gastos e o NESC mostra o lucro real.','funcionalidades':'Tem Uber, 99, despesas, metas, histórico e manutenção no mesmo lugar.','ranking-lp':'O ranking é opcional e mostra só apelido, posição e valor. Seus lançamentos ficam privados.'};
-const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:null,autoN:0,tabSeen:'',area:'',lastForm:'',GAP:20000,
+const BOT_FEAT=['Registre os ganhos da Uber e da 99, separados.','Lance os gastos e veja o que realmente sobra.','Veja faturamento e lucro lado a lado.','Crie metas de faturamento ou de lucro.','Consulte tudo no histórico, com filtros.','Acompanhe a manutenção pelo km do carro.'];
+const BOT_GREET=['Veja para onde vai o seu dinheiro.','Descubra quanto sobra depois dos gastos.','Controle financeiro gratuito para motoristas.','Faturamento não é lucro. O NESC mostra os dois.'];
+const BOT_SEC={'como-funciona':'Registre o ganho, lance os gastos e veja o lucro.','funcionalidades':'Uber, 99, despesas, metas e manutenção juntos.','ranking-lp':'No ranking aparece só o seu apelido.'};
+const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:null,autoN:0,tabSeen:'',area:'',lastForm:'',GAP:45000,
   scope(){return'nesc_bot_'+(user&&user.email?user.email:'visitante')},
   st(){try{return JSON.parse(localStorage.getItem(this.scope())||'{}')||{}}catch(e){return{}}},
   put(p){const s=Object.assign(this.st(),p);try{localStorage.setItem(this.scope(),JSON.stringify(s))}catch(e){}return s},
@@ -1753,113 +1794,107 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
   markSeen(id){const s=this.st(),m=s.seen||{};m[id]=Date.now();const ks=Object.keys(m);if(ks.length>150)ks.sort((a,b)=>m[a]-m[b]).slice(0,ks.length-150).forEach(k=>delete m[k]);this.put({seen:m})},
   $(q){return this.el.querySelector(q)},
   mount(){if(this.el)return;const el=this.el=$('#bot');if(!el)return;
-    const pic=(k)=>`<picture><source type="image/webp" srcset="/cabeca-${k}-160.webp 138w, /cabeca-${k}-256.webp 220w" sizes="(max-width:900px) 47px, 66px"><img class="${k==='open'?'op':'cl'}" src="/cabeca-${k}-256.png" alt="" decoding="async" draggable="false"></picture>`;
-    el.innerHTML=`<div class="bot-bub" role="status" aria-live="polite" hidden><button type="button" class="bot-x" aria-label="Dispensar mensagem">✕</button><p class="bot-msg"></p><div class="bot-extra"></div><div class="bot-acts"></div><div class="bot-foot"><button type="button" data-bot="mute"></button><button type="button" data-bot="min">Minimizar</button></div></div>`+
-     `<button type="button" class="bot-head" aria-label="Assistente do NESC: pedir uma dica" aria-expanded="false"><span class="bot-float"><span class="bot-tilt">${pic('open')}${pic('closed')}<span class="bot-shine"></span></span></span><span class="bot-dot" aria-hidden="true"></span></button>`;
-    const bub=this.$('.bot-bub'),m=this.mv;
+    const pic=(k)=>`<picture><source type="image/webp" srcset="/cabeca-${k}-160.webp 138w, /cabeca-${k}-256.webp 220w" sizes="(max-width:900px) 40px, 54px"><img class="${k==='open'?'op':'cl'}" src="/cabeca-${k}-256.png" alt="" decoding="async" draggable="false"></picture>`;
+    el.innerHTML=`<div class="bot-bub" role="status" aria-live="polite" hidden><button type="button" class="bot-x" aria-label="Fechar dica">✕</button><p class="bot-msg"></p><div class="bot-extra"></div><div class="bot-acts"></div><div class="bot-foot"><button type="button" data-bot="mute"></button><button type="button" data-bot="min">Minimizar</button></div></div>`;
+    /* a cabeça vive dentro do conteúdo da aba (ver dock): rola junto e não intercepta a rolagem de ninguém */
+    const hd=this.hd=document.createElement('button');hd.type='button';hd.className='bot-head';hd.hidden=true;
+    hd.setAttribute('aria-label','Assistente do NESC: pedir uma dica');hd.setAttribute('aria-expanded','false');
+    hd.innerHTML=`<span class="bot-float"><span class="bot-tilt">${pic('open')}${pic('closed')}<span class="bot-shine"></span></span></span><span class="bot-dot" aria-hidden="true"></span>`;
+    hd.addEventListener('click',()=>this.manual());
+    const bub=this.$('.bot-bub');
     el.addEventListener('click',e=>{const T=e.target;
-      if(T.closest('.bot-head')){this.manual();return}
       if(T.closest('.bot-x')){this.hide();return}
-      const b=T.closest('[data-bot]');if(b){const k=b.dataset.bot;if(k==='min'){this.put({min:true});el.classList.add('min');this.hide();return}
-        const m=!this.st().muted;this.put({muted:m});this.syncFoot();this.show({text:m?'Pronto, dicas automáticas pausadas. Toque em mim quando quiser uma.':'Boa, dicas reativadas. Eu falo só quando ajudar.',ms:5000});return}
+      const b=T.closest('[data-bot]');if(b){const k=b.dataset.bot;if(k==='min'){this.put({min:true});this.hide();this.dock();return}
+        const m=!this.st().muted;this.put({muted:m});this.syncFoot();this.show({text:m?'Dicas pausadas. Toque em mim quando quiser uma.':'Dicas reativadas.',ms:4000});return}
       const sk=T.closest('[data-botskip]');if(sk){const s=this.st().skip||{};s[sk.dataset.botskip]=1;this.put({skip:s});this.$('.bot-extra').innerHTML=this.ckHTML();this.alertState();return}
       const a=T.closest('[data-bota]');if(a&&this.cur&&this.cur.acts){const f=this.cur.acts[+a.dataset.bota][1];this.hide();if(typeof f==='function')f();return}
       if(T.closest('[data-go],[data-addrec],[data-onboard]'))setTimeout(()=>this.hide(),0)}); // ações do app seguem pelo tratamento normal
     bub.addEventListener('mouseenter',()=>clearTimeout(this.hideT));bub.addEventListener('mouseleave',()=>{if(this.cur&&!this.cur.keep){clearTimeout(this.hideT);this.hideT=setTimeout(()=>this.hide(),4000)}});
     bub.addEventListener('focusin',()=>clearTimeout(this.hideT));
-    document.addEventListener('pointerdown',e=>{if(this.cur&&!e.target.closest('#bot')&&!(e.pointerType!=='mouse'&&this.hitHead(e.clientX,e.clientY)))this.hide()},true); // tocar fora recolhe o balão: ele nunca fica preso sobre botões ou campos
-    /* O personagem é autônomo: nem o mouse nem o toque movem a cabeça. No toque, só registramos um toque curto
-       sobre a cabeça parada para abrir a dica; qualquer arrasto segue para a página (rolagem livre). */
-    addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'||!this.el||this.el.hidden||(e.target.closest&&e.target.closest('#bot')))return;
-      if(this.hitHead(e.clientX,e.clientY))m.tap={id:e.pointerId,x:e.clientX,y:e.clientY,t:Date.now()}},{passive:true});
-    // toque curto na cabeça (sem arrastar) = pedir dica; se o dedo arrastar, o navegador rola a página e cancela o toque
-    addEventListener('pointerup',e=>{const t=m.tap;m.tap=null;if(t&&t.id===e.pointerId&&Math.hypot(e.clientX-t.x,e.clientY-t.y)<12&&Date.now()-t.t<700&&this.hitHead(e.clientX,e.clientY))this.manual()},{passive:true});
-    addEventListener('pointercancel',()=>{m.tap=null},{passive:true});
-    // roda do mouse sobre a cabeça parada: repassa para o conteúdo que está embaixo (a rolagem do app fica no <main>)
-    this.$('.bot-head').addEventListener('wheel',e=>{let n=document.elementsFromPoint(e.clientX,e.clientY).find(n=>!n.closest('#bot'));
-      while(n&&n!==document.body&&!(n.scrollHeight>n.clientHeight+1&&/auto|scroll/.test(getComputedStyle(n).overflowY)))n=n.parentElement;
-      const k=e.deltaMode===1?16:e.deltaMode===2?innerHeight:1;(n&&n!==document.body?n:document.scrollingElement).scrollBy(e.deltaX*k,e.deltaY*k)},{passive:true});
-    addEventListener('scroll',()=>{clearTimeout(this.scT);this.scT=setTimeout(()=>this.recheck(),200)},{passive:true,capture:true}); // durante a rolagem fica quieta; depois só sai se ficou sobre algo
-    addEventListener('resize',()=>{this.sa=null;clearTimeout(this.rzT);this.rzT=setTimeout(()=>this.recheck(true),120)});
-    const vv=window.visualViewport;if(vv)vv.addEventListener('resize',()=>{clearTimeout(this.rzT);this.rzT=setTimeout(()=>this.recheck(true),120)}); // teclado virtual
-    /* movimentação autônoma: inicia o ciclo de passeio (descanso + deslocamento lento) */
-    this.cycle();
-    /* piscada: intervalos variáveis (~3–6 s), às vezes dupla; troca curta para a mesma cabeça de olhos fechados */
-    const blink=()=>{this.bT=setTimeout(()=>{if(!document.hidden&&!RM.matches&&this.el&&!this.el.hidden){this.blink();if(Math.random()<.15)setTimeout(()=>this.blink(),240)}blink()},3000+Math.random()*3000)};blink();
+    document.addEventListener('pointerdown',e=>{if(this.cur&&!e.target.closest('#bot,.bot-head'))this.hide()},true); // tocar fora fecha o balão: ele nunca fica preso sobre botões ou campos
+    /* com o balão aberto ele acompanha a cabeça na rolagem; sem balão, a rolagem não executa nada aqui */
+    let sr=0;addEventListener('scroll',()=>{if(!this.cur||sr)return;sr=requestAnimationFrame(()=>{sr=0;this.placeBubble()})},{passive:true,capture:true});
+    let rz=0;const re=()=>{clearTimeout(rz);rz=setTimeout(()=>{this.sa=null;this.dock();this.placeBubble()},150)};
+    addEventListener('resize',re);if(window.visualViewport)visualViewport.addEventListener('resize',re);
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>this.dock()); // a largura dos títulos muda quando a fonte termina de carregar
+    this.idle();
     document.addEventListener('focusin',e=>{const t=e.target;if(t.closest&&t.closest('#form-register')&&t.name)this.field(t.name)});
-    document.addEventListener('focusout',e=>{const t=e.target;if(t.id==='re-email'&&t.value.trim()&&!EMAIL_RE.test(t.value.trim().toLowerCase()))this.say({id:'a:emailbad',cd:30000,form:true,force:true,mood:'alert',text:'Confere se seu e-mail está certinho antes de continuar, tipo <b>nome@gmail.com</b>.'});clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),700);setTimeout(()=>this.recheck(),60)});
+    document.addEventListener('focusout',e=>{const t=e.target;if(t.id==='re-email'&&t.value.trim()&&!EMAIL_RE.test(t.value.trim().toLowerCase()))this.say({id:'a:emailbad',cd:30000,form:true,force:true,mood:'alert',text:'Confira o e-mail, ex.: <b>nome@gmail.com</b>.'});clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),700)});
     this.syncFoot()},
-  /* o toque caiu na cabeça? (só quando ela está parada e visível; em movimento o toque segue para a interface) */
-  hitHead(x,y){const h=this.el&&!this.el.hidden&&this.$('.bot-head');if(!h||this.mv.raf||!h.classList.contains('can'))return false;const r=h.getBoundingClientRect();return x>r.left+4&&x<r.right-4&&y>r.top+4&&y<r.bottom-4},
-  blink(){const el=this.el;if(!el)return;el.classList.add('blink');clearTimeout(this.blT);this.blT=setTimeout(()=>el.classList.remove('blink'),120)},
-  /* ---------- movimento: mola com atraso e inércia até uma posição segura ---------- */
-  mv:{x:-1,y:-1,vx:0,tx:0,ty:0,sx:0,sy:0,raf:0,t0:0,dur:2000,atRest:true,tap:null},
+  /* ---------- vida: uma animação ocasional por vez ---------- */
+  /* a cada 3,5–7 s: quase sempre uma piscada (às vezes dupla); de vez em quando, um leve balanço. Nada roda junto com
+     fala, comemoração ou entrada; nada roda com a aba em segundo plano ou com "reduzir movimento" ativado. */
+  idle(){clearTimeout(this.iT);this.iT=setTimeout(()=>{const hd=this.hd;
+    if(hd&&!hd.hidden&&!hd.classList.contains('away')&&!document.hidden&&!RM.matches&&!this.busy()){
+      if(Date.now()-(this.turnAt||0)>16000&&Math.random()<.3)this.turn();
+      else{this.blink();if(Math.random()<.15)setTimeout(()=>{if(!this.busy())this.blink()},260)}}
+    this.idle()},3500+Math.random()*3500)},
+  busy(){const c=this.hd&&this.hd.classList;return!c||['talk','happy','enter','turn','blink'].some(k=>c.contains(k))},
+  blink(){const hd=this.hd;if(!hd)return;hd.classList.add('blink');clearTimeout(this.blT);this.blT=setTimeout(()=>hd.classList.remove('blink'),120)},
+  turn(){const hd=this.hd;if(!hd||RM.matches)return;this.turnAt=Date.now();hd.classList.add('turn');clearTimeout(this.tnT);this.tnT=setTimeout(()=>hd.classList.remove('turn'),1450)},
+  /* ---------- posição: um canto superior livre de cada aba ou seção ---------- */
   INTER:'a,button,input,select,textarea,label,summary,[role=button],[data-go],.btn,.seg,.chips2,.it,.nav,.lp-btn,.itip',
-  TEXT:'.big,.kpi .v,.stats b,.rs b,h1,h2,.gpct,.pendn,.lp-hero h1',
-  canFollow(){return!!this.el&&!this.el.hidden&&!RM.matches&&!this.st().min&&!this.cur},
-  dims(){const h=this.el&&this.$('.bot-head');return{w:(h&&h.offsetWidth)||66,h:(h&&h.offsetHeight)||76}},
+  /* ordem de tentativa por aba. beside = à esquerda do botão principal da aba (computador); edge = canto direito da
+     linha do título; top = canto superior direito do cabeçalho, levemente acima do título */
+  SPOT:{hoje:['beside','edge','top'],uber:['beside','edge','top'],n99:['beside','edge','top'],historico:['edge','top'],despesas:['beside','edge','top'],
+    manutencao:['beside','edge','top'],metas:['beside','edge','top'],financas:['beside','edge','top'],config:['edge','top'],produtividade:['edge','top'],
+    ia:['edge','top'],conquistas:['edge','top'],ranking:['edge','top'],landing:['edge'],auth:['edge','top']},
+  host(){if(this.area==='app')return{h:$('#view>.head'),line:'h1',btn:'.hact',key:typeof tab==='string'?tab:'hoje'};
+    if(this.area==='landing')return{h:$('#landing .lp-hero'),line:'.lp-free',key:'landing'};
+    if(this.area.startsWith('auth'))return{h:$('#auth .auth-wrap'),line:'.brand-row',key:'auth'};return{}},
+  /* encaixa a cabeça no cabeçalho da tela atual, num lugar onde não cubra nada; sem lugar livre, tenta um tamanho menor
+     e, em último caso, fica recolhida nesta tela (nunca por cima de informação) */
+  dock(){const hd=this.hd;if(!hd||!this.el)return;const{h,line,btn,key}=this.host();
+    if(!h||this.el.hidden||!h.getClientRects().length){hd.hidden=true;return}
+    if(hd.parentNode!==h)h.appendChild(hd);h.classList.add('bot-host');hd.hidden=false;
+    const min=!!this.st().min;hd.classList.toggle('min',min);hd.classList.remove('away');
+    for(const sz of min?['']:['','sm']){hd.dataset.sz=sz;const p=this.spot(h,line,btn,this.SPOT[key]||['edge','top']);
+      if(p){hd.style.left=p.x+'px';hd.style.top=p.y+'px';return}}
+    hd.classList.add('away')},
+  spot(h,lineSel,btnSel,order){const hd=this.hd,w=hd.offsetWidth,ht=hd.offsetHeight,H=h.getBoundingClientRect(),ln=h.querySelector(lineSel),bt=btnSel&&h.querySelector(btnSel);
+    const L=ln&&ln.getBoundingClientRect(),Bt=bt&&bt.getClientRects().length?bt.getBoundingClientRect():null;if(!w||!L)return null;
+    const obs=this.obstacles(h),vw=document.documentElement.clientWidth,P=6,PV=3,ys=[L.top+(L.height-ht)/2,L.bottom-ht,L.top],cand=[];
+    for(const k of order){if(k==='beside'&&Bt)[Bt.top+(Bt.height-ht)/2,...ys].forEach(y=>cand.push([Bt.left-12-w,y]));
+      else if(k==='edge')ys.forEach(y=>cand.push([H.right-w,y]));else if(k==='top')cand.push([H.right-w,H.top-ht*.25])}
+    for(const[x,y]of cand){if(x<H.left-.5||x+w>Math.min(H.right,vw-4)+.5||y<H.top-12||y+ht>H.bottom+2)continue;
+      if(obs.some(r=>x<r.right+P&&x+w>r.left-P&&y<r.bottom+PV&&y+ht>r.top-PV))continue;
+      return{x:Math.round(x-H.left-h.clientLeft),y:Math.round(y-H.top-h.clientTop)}}
+    return null},
+  /* o que não pode ficar coberto: cada linha de texto real (não a caixa inteira do bloco), ícones e controles */
+  obstacles(h){const out=[],hd=this.hd,r=document.createRange(),tw=document.createTreeWalker(h,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.nodeValue.trim()&&!hd.contains(n)?1:3});let n;
+    while((n=tw.nextNode())){r.selectNodeContents(n);for(const q of r.getClientRects())if(q.width&&q.height)out.push(q)}
+    h.querySelectorAll(this.INTER+',img,svg,.idn,.tag,i').forEach(e=>{if(hd.contains(e))return;const q=e.getBoundingClientRect();if(q.width&&q.height)out.push(q)});return out},
   safe(){if(this.sa)return this.sa;const d=document.createElement('div');d.style.cssText='position:fixed;visibility:hidden;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(d);const c=getComputedStyle(d),r={t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0};d.remove();return this.sa=r},
-  /* área livre: dentro da tela visível, abaixo de barras fixas do topo e acima do teclado virtual */
+  /* área visível para o balão: abaixo das barras fixas do topo, acima do teclado virtual, fora das áreas seguras */
   bounds(){const sa=this.safe(),vv=window.visualViewport,W=document.documentElement.clientWidth;let top=sa.t+6;
     for(const q of['#lp-top','#app.on aside']){const n=$(q);if(n&&n.offsetParent!==null){const r=n.getBoundingClientRect();if(r.top<=1&&r.height<140&&r.width>W*.6)top=Math.max(top,r.bottom+6)}}
     return{l:sa.l+6,t:top,r:W-sa.r-6,b:(vv?vv.offsetTop+vv.height:innerHeight)-sa.b-6}},
-  /* custo de colocar a cabeça em (x,y): fora da tela, sobre controles, sobre números/títulos ou sobre o campo em edição */
-  cost(x,y,w,h){const b=this.bounds();let c=0;if(x<b.l-1||y<b.t-1||x+w>b.r+1||y+h>b.b+1)c+=50;
-    for(const[fx,fy]of[[.5,.5],[.18,.18],[.82,.18],[.18,.82],[.82,.82],[.5,.1],[.5,.9],[.1,.5],[.9,.5]]){const e=document.elementsFromPoint(x+w*fx,y+h*fy).find(n=>!n.closest('#bot'));if(!e)continue;if(e.closest(this.INTER))c+=6;else if(e.closest(this.TEXT))c+=1.5}
-    const a=document.activeElement;if(a&&a.matches&&a.matches('input,textarea,select')){const r=a.getBoundingClientRect();if(x<r.right+14&&x+w>r.left-14&&y<r.bottom+14&&y+h>r.top-14)c+=40}
-    return c},
-  /* ciclo autônomo: descansa alguns segundos (flutuando e piscando) e depois passeia devagar até um novo ponto livre */
-  cycle(){clearTimeout(this.wT);const gap=3000+Math.random()*4000;
-    this.wT=setTimeout(()=>{if(this.canFollow()&&!this.mv.raf){const s=this.roam();if(s){this.mv.atRest=false;this.go(s.x,s.y)}}this.cycle()},gap)},
-  /* escolhe um ponto livre aleatório na área segura, com deslocamento nem curto nem exagerado (menor no celular) */
-  roam(){const{w,h}=this.dims(),b=this.bounds(),m=this.mv,W=b.r-b.l-w,H=b.b-b.t-h;if(W<=4||H<=4)return null;
-    const mob=innerWidth<=900,maxD=Math.min(b.r-b.l,b.b-b.t)*(mob?.4:.55),minD=Math.max(h*1.1,mob?56:88);let best=null;
-    for(let i=0;i<26;i++){const x=b.l+Math.random()*W,y=b.t+Math.random()*H,c=this.cost(x,y,w,h);if(c>=6)continue;
-      const d=m.x>=0?Math.hypot(x-m.x,y-m.y):minD;let sc=c+Math.random()*.6;if(d<minD)sc+=2;if(d>maxD)sc+=1.5;
-      if(!best||sc<best.s)best={x,y,s:sc}}
-    return best||this.rest()},
-  rest(){const{w,h}=this.dims(),b=this.bounds();let best=null;
-    for(const[x,y]of[[b.r-w-6,b.b-h-6],[b.l+6,b.b-h-6],[b.r-w-6,(b.t+b.b-h)/2],[b.r-w-6,b.t+6],[b.l+6,b.t+6]]){const s=this.cost(x,y,w,h);if(!best||s<best.s)best={x,y,s}}return best},
-  go(x,y){const m=this.mv,hd=this.$('.bot-head');const cx=m.raf?m.tx:m.x,cy=m.raf?m.ty:m.y;if(Math.abs(cx-x)<.5&&Math.abs(cy-y)<.5)return;
-    if(RM.matches||this.st().min||m.x<0){cancelAnimationFrame(m.raf);m.raf=0;m.x=x;m.y=y;m.tx=x;m.ty=y;m.vx=0;this.paint();this.settle();return} // movimento reduzido/minimizado: sem animação
-    m.sx=m.x;m.sy=m.y;m.tx=x;m.ty=y;m.t0=0;const dist=Math.hypot(x-m.x,y-m.y);m.dur=Math.max(1500,Math.min(3000,1100+dist*2.2)); // 1,5–3 s, proporcional à distância
-    hd.classList.remove('can');if(!m.raf)m.raf=requestAnimationFrame(t=>this.step(t))},
-  /* interpolação com aceleração e desaceleração suaves (easeInOutCubic) até o ponto escolhido */
-  step(t){const m=this.mv;if(!m.t0)m.t0=t;const p=Math.min(1,(t-m.t0)/m.dur),e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
-    const nx=m.sx+(m.tx-m.sx)*e,ny=m.sy+(m.ty-m.sy)*e;m.vx=nx-m.x;m.x=nx;m.y=ny;this.paint();
-    if(p>=1){m.raf=0;m.x=m.tx;m.y=m.ty;m.vx=0;this.paint();this.settle();return}
-    m.raf=requestAnimationFrame(t=>this.step(t))},
-  paint(){const m=this.mv;this.$('.bot-head').style.transform=`translate3d(${m.x.toFixed(1)}px,${m.y.toFixed(1)}px,0)`;this.$('.bot-tilt').style.setProperty('--rz',Math.max(-8,Math.min(8,m.vx*2)).toFixed(1)+'deg')},
-  /* parada: aceita clique só se não estiver sobre nenhum controle */
-  settle(){const m=this.mv,{w,h}=this.dims();this.$('.bot-head').classList.toggle('can',this.cost(m.x,m.y,w,h)<6||this.st().min)},
-  /* depois de rolar, redimensionar ou abrir o teclado: só se mexe se ficou fora da área livre ou sobre algo */
-  recheck(force){if(!this.el||this.el.hidden)return;const m=this.mv,{w,h}=this.dims(),b=this.bounds();
-    if(m.x<0){const r=this.rest();m.x=r.x;m.y=r.y;m.tx=r.x;m.ty=r.y;this.paint();this.settle();return}
-    const bad=m.x<b.l-1||m.y<b.t-1||m.x+w>b.r+1||m.y+h>b.b+1||this.cost(m.x,m.y,w,h)>=6;
-    if(bad){const s=this.canFollow()?this.roam():this.rest();if(s)this.go(s.x,s.y)}
-    if(this.cur)setTimeout(()=>this.placeBubble(),this.mv.raf?700:0)},
-  /* balão: ao lado da cabeça, no lado com menos controles por baixo, sempre dentro da área visível */
-  placeBubble(){const bb=this.$('.bot-bub');if(!bb||bb.hidden)return;const m=this.mv,{w,h}=this.dims(),B=this.bounds(),bw=bb.offsetWidth,bh=bb.offsetHeight;let best=null;
-    const R=[...document.querySelectorAll(this.INTER)].filter(n=>!n.closest('#bot')).map(n=>n.getBoundingClientRect()).filter(r=>r.width&&r.height&&r.bottom>0&&r.top<innerHeight&&r.right>0&&r.left<innerWidth); // controles visíveis
-    const cand=[];for(const dx of[0,.5,1])cand.push([m.x+(w-bw)*dx,m.y-bh-10],[m.x+(w-bw)*dx,m.y+h+10]);
-    for(const dy of[0,.5,1])cand.push([m.x-bw-10,m.y+(h-bh)*dy],[m.x+w+10,m.y+(h-bh)*dy]);
+  /* balão: perto da cabeça, no lugar com menos controles por baixo e longe do campo em edição, sempre dentro da tela */
+  placeBubble(){const bb=this.$('.bot-bub');if(!bb||bb.hidden)return;const B=this.bounds(),bw=bb.offsetWidth,bh=bb.offsetHeight,hd=this.hd;
+    const HR=hd&&!hd.hidden&&!hd.classList.contains('away')?hd.getBoundingClientRect():null,vis=HR&&HR.bottom>B.t&&HR.top<B.b;
+    const m=vis?{x:HR.left,y:HR.top,w:HR.width,h:HR.height}:{x:B.r-10,y:B.t,w:0,h:0};let best=null; // cabeça fora da tela: balão no canto superior direito
+    const seen=(n,r)=>{const e=document.elementsFromPoint(r.left+r.width/2,r.top+r.height/2).find(x=>!x.closest('#bot'));return!!e&&(e===n||n.contains(e)||e.contains(n))}; // descarta controles escondidos (menu recolhido, recortados)
+    const R=[...document.querySelectorAll(this.INTER)].filter(n=>!n.closest('#bot')&&!n.closest('.bot-head')).map(n=>[n,n.getBoundingClientRect()]).filter(([n,r])=>r.width&&r.height&&r.bottom>0&&r.top<innerHeight&&r.right>0&&r.left<innerWidth&&seen(n,r)).map(x=>x[1]); // controles visíveis
+    const cand=[];for(const dx of[0,.5,1])cand.push([m.x+(m.w-bw)*dx,m.y+m.h+10],[m.x+(m.w-bw)*dx,m.y-bh-10]);
+    for(const dy of[0,.5,1])cand.push([m.x-bw-10,m.y+(m.h-bh)*dy],[m.x+m.w+10,m.y+(m.h-bh)*dy]);
     for(let y=B.t;y<=B.b-bh;y+=28)for(const x of[B.l,(B.l+B.r-bw)/2,B.r-bw])cand.push([x,y]); // perto da cabeça não cabe: procura uma faixa livre na tela
     for(let[x,y]of cand){
-      x=Math.max(B.l,Math.min(B.r-bw,x));y=Math.max(B.t,Math.min(B.b-bh,y));const ov=x<m.x+w&&x+bw>m.x&&y<m.y+h&&y+bh>m.y;let s=ov?30:0;
+      x=Math.max(B.l,Math.min(B.r-bw,x));y=Math.max(B.t,Math.min(B.b-bh,y));const ov=vis&&x<m.x+m.w&&x+bw>m.x&&y<m.y+m.h&&y+bh>m.y;let s=ov?30:0;
       for(const r of R)if(x<r.right+4&&x+bw>r.left-4&&y<r.bottom+4&&y+bh>r.top-4)s+=3;
-      s+=Math.hypot(x+bw/2-(m.x+w/2),y+bh/2-(m.y+h/2))/400; // empate: o mais perto da cabeça
+      s+=Math.hypot(x+bw/2-(m.x+m.w/2),y+bh/2-(m.y+m.h/2))/400; // empate: o mais perto da cabeça
       const a=document.activeElement;if(a&&a.matches&&a.matches('input,textarea,select')){const r=a.getBoundingClientRect();if(x<r.right+8&&x+bw>r.left-8&&y<r.bottom+8&&y+bh>r.top-8)s+=60}
       if(!best||s<best.s)best={x,y,s}}
     bb.style.left=Math.round(best.x)+'px';bb.style.top=Math.round(best.y)+'px'},
   syncFoot(){const b=this.el&&this.$('[data-bot=mute]');if(b)b.textContent=this.st().muted?'Reativar dicas':'Silenciar dicas'},
-  enterArea(kind){this.mount();if(!this.el)return;const first=this.el.hidden;this.area=kind;this.el.hidden=false;this.el.classList.toggle('min',!!this.st().min);this.syncFoot();
-    if(first&&!RM.matches){this.el.classList.add('enter');setTimeout(()=>this.el.classList.remove('enter'),900)}
-    requestAnimationFrame(()=>{this.recheck(true);this.cycle()})},
-  mood(k){if(!this.el)return;this.el.classList.remove('talk','happy');void this.el.offsetWidth;this.el.classList.add(k)},
+  enterArea(kind){this.mount();if(!this.el)return;const first=this.el.hidden;this.area=kind;this.el.hidden=false;this.syncFoot();this.dock();
+    if(first&&!RM.matches&&this.hd){this.hd.classList.add('enter');setTimeout(()=>this.hd.classList.remove('enter'),700)}},
+  /* reação curta ao falar/comemorar; a classe sai ao fim da animação para não travar as animações ocasionais */
+  mood(k){const hd=this.hd;if(!hd)return;hd.classList.remove('talk','happy');void hd.offsetWidth;hd.classList.add(k);clearTimeout(this.mdT);this.mdT=setTimeout(()=>hd.classList.remove(k),950)},
   typing(){const a=document.activeElement;return!!(a&&a.matches&&a.matches('input:not([type=checkbox]):not([type=radio]):not([type=button]),textarea,select')&&!a.closest('#bot'))},
   pick(a,b){return!a||(b.pri||0)>=(a.pri||0)?b:a},
   /* decide se uma fala aparece agora, entra na fila ou é descartada */
   say(m){if(!this.el||this.el.hidden)return false;const s=this.st();
+    if(m.tab&&(this.area!=='app'||m.tab!==tab))return false; // dica de uma aba nunca aparece depois, em outra
     if(!m.crit&&!m.manual&&(s.muted||s.min))return false;
     if(m.id&&m.cd!==0){const t=this.seenAt(m.id);if(t&&Date.now()-t<(m.cd==null?Infinity:m.cd))return false}
     if(!m.force&&this.typing()&&!m.form){this.queue=this.pick(this.queue,m);return false}
@@ -1869,93 +1904,93 @@ const Bot={el:null,cur:null,queue:null,last:0,hideT:0,qT:0,ct:0,pend:[],ckPrev:n
   flush(){if(!this.queue||this.typing())return;const q=this.queue;this.queue=null;this.say(q)},
   show(m){const el=this.el;if(!el)return;this.cur=m;this.$('.bot-msg').innerHTML=m.text;this.$('.bot-extra').innerHTML=m.extra||'';
     const acts=this.$('.bot-acts');acts.innerHTML=(m.acts||[]).map((a,i)=>`<button type="button" data-bota="${i}" class="${a[2]||''}">${esc(a[0])}</button>`).join('');acts.hidden=!(m.acts||[]).length;
-    this.syncFoot();this.$('.bot-bub').hidden=false;this.$('.bot-head').setAttribute('aria-expanded','true');this.mood(m.mood||'talk');
-    const mv=this.mv;if(mv.raf){cancelAnimationFrame(mv.raf);mv.raf=0;mv.tx=mv.x;mv.ty=mv.y;mv.vx=0;this.settle()}this.placeBubble(); // fala: a cabeça para enquanto o balão está aberto
+    this.syncFoot();this.$('.bot-bub').hidden=false;if(this.hd)this.hd.setAttribute('aria-expanded','true');this.mood(m.mood||'talk');
+    this.placeBubble();
     clearTimeout(this.hideT);if(!m.keep||innerWidth<=900)this.hideT=setTimeout(()=>this.hide(),m.ms||(m.keep?22000:(m.acts||[]).length||m.extra?16000:9000));
     if(m.id)this.markSeen(m.id);this.last=Date.now()},
-  hide(){if(!this.el)return;clearTimeout(this.hideT);this.cur=null;this.$('.bot-bub').hidden=true;this.$('.bot-head').setAttribute('aria-expanded','false');clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),1500)},
+  hide(){if(!this.el)return;clearTimeout(this.hideT);this.cur=null;this.$('.bot-bub').hidden=true;if(this.hd)this.hd.setAttribute('aria-expanded','false');clearTimeout(this.qT);this.qT=setTimeout(()=>this.flush(),1500)},
   /* ---------- página pública ---------- */
   landing(){this.enterArea('landing');const v=(this.st().visits||0)+1;this.put({visits:v});clearTimeout(this.lt);
     this.lt=setTimeout(()=>{if(this.area!=='landing')return;
-      if(!this.seenAt('v:intro'))this.say({id:'v:intro',pri:1,keep:true,text:'Fala, motorista! Eu sou o assistente do NESC. Vou te mostrar como organizar seus ganhos, gastos e lucro sem complicar sua rotina.',acts:[['Mostrar o que dá pra fazer',()=>this.feature(0)],['Agora não',null,'sec']]});
-      else{const i=v%BOT_GREET.length;this.say({id:'v:greet:'+i,cd:3*864e5,text:BOT_GREET[i],acts:[['Ver o que dá pra fazer',()=>this.feature(0)]]})}},2600);
+      if(!this.seenAt('v:intro'))this.say({id:'v:intro',pri:1,keep:true,text:'Fala, motorista! Quer ver o que o NESC faz?',acts:[['Mostrar',()=>this.feature(0)],['Agora não',null,'sec']]});
+      else{const i=v%BOT_GREET.length;this.say({id:'v:greet:'+i,cd:3*864e5,text:BOT_GREET[i],acts:[['Ver mais',()=>this.feature(0)]]})}},2600);
     if(!this.io&&window.IntersectionObserver){this.io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting||this.area!=='landing'||this.autoN>=2)return;const t=BOT_SEC[e.target.id];if(t&&this.say({id:'v:sec:'+e.target.id,cd:7*864e5,text:t}))this.autoN++}),{threshold:.5});
       Object.keys(BOT_SEC).forEach(id=>{const n=document.getElementById(id);if(n)this.io.observe(n)})}},
   feature(i){const n=BOT_FEAT.length,cta=['Criar conta grátis',()=>{location.hash='#criar-conta'}];
     this.show({text:BOT_FEAT[i],extra:`<small class="mutd">${i+1} de ${n}</small>`,keep:true,manual:true,acts:i+1<n?[['Próxima',()=>this.feature(i+1)],[cta[0],cta[1],'sec']]:[cta]})},
   /* ---------- entrar / criar conta ---------- */
   auth(mode){this.enterArea('auth:'+mode);
-    if(mode==='register'){if(this.say({id:'a:reg',cd:36e5,pri:1,form:true,force:true,text:'Bora criar sua conta? É rapidinho: nome, e-mail e uma senha. A data de nascimento é opcional.'}))this.markSeen('a:f:name')} // a apresentação já cobre o 1º campo, que recebe foco sozinho
-    else if(mode==='recover')this.say({id:'a:rec',cd:36e5,form:true,text:'Sem estresse: informe o e-mail da conta e siga as instruções que chegarem por lá.'})},
-  field(n){const T={name:'Seu nome aparece só pra você no app. No ranking, quem escolhe o apelido é você.',email:'Use um e-mail que você acessa: é por ele que dá pra recuperar a senha.',birth:'Opcional. Ajuda no suporte à recuperação de acesso e não aparece pra ninguém.',pass:'Boa! Agora crie uma senha forte: pelo menos 8 caracteres, com letras e números. Dica: guarde num gerenciador de senhas confiável. Não compartilhe sua senha comigo nem com ninguém.'};
-    if(T[n])this.say({id:'a:f:'+n,cd:36e5,form:true,force:true,ms:n==='pass'?11000:7000,text:T[n]})}, // nunca lê o valor da senha
+    if(mode==='register'){if(this.say({id:'a:reg',cd:36e5,pri:1,form:true,force:true,text:'Bora criar sua conta? Nome, e-mail e senha bastam.'}))this.markSeen('a:f:name')} // a apresentação já cobre o 1º campo, que recebe foco sozinho
+    else if(mode==='recover')this.say({id:'a:rec',cd:36e5,form:true,text:'Informe o e-mail da conta para receber o link.'})},
+  field(n){const T={name:'Seu nome aparece só para você.',email:'Use um e-mail que você acessa, para recuperar a senha.',birth:'Opcional e privado.',pass:'Crie uma senha forte: 8+ caracteres, letras e números.'};
+    if(T[n])this.say({id:'a:f:'+n,cd:36e5,form:true,force:true,ms:n==='pass'?8000:6000,text:T[n]})}, // nunca lê o valor da senha
   authErr(mode,msg,info){msg=String(msg||'');let t;
-    if(info&&/Conta criada/.test(msg)){this.say({force:true,crit:true,mood:'happy',text:'Conta criada! Falta só confirmar o e-mail que a gente enviou. Depois é só entrar.'});return}
-    if(/já está cadastrado/.test(msg))t='Esse e-mail já tem conta. Tenta entrar ou use "Esqueceu a senha?".';
-    else if(/incorretos/.test(msg))t='E-mail ou senha não bateram. Confere com calma; se esqueceu, dá pra recuperar a senha.';
-    else if(/conexão|internet|servidor/i.test(msg))t='Parece que a conexão caiu. Nada foi criado ainda: tenta de novo quando a internet voltar.';
-    else if(/nascimento|data|futuro|1900|existe/i.test(msg))t='A data de nascimento não está valendo. '+esc(msg)+' Se preferir, deixe em branco.';
-    else if(/senha|caracteres/i.test(msg))t='A senha precisa ter pelo menos 8 caracteres. Use letras e números.';
-    else t='Não deu certo: '+esc(msg)+' Confere e tenta de novo.';
+    if(info&&/Conta criada/.test(msg)){this.say({force:true,crit:true,mood:'happy',text:'Conta criada! Confirme o e-mail para entrar.'});return}
+    if(/já está cadastrado/.test(msg))t='Esse e-mail já tem conta. Tente entrar.';
+    else if(/incorretos/.test(msg))t='E-mail ou senha incorretos.';
+    else if(/conexão|internet|servidor/i.test(msg))t='Sem conexão. Tente de novo em instantes.';
+    else if(/nascimento|data|futuro|1900|existe/i.test(msg))t='Data de nascimento inválida. Pode deixar em branco.';
+    else if(/senha|caracteres/i.test(msg))t='A senha precisa de 8 ou mais caracteres.';
+    else t='Não deu certo. Confira os dados e tente de novo.';
     this.say({force:true,crit:true,mood:'alert',form:true,text:t})},
   signupOk(){try{sessionStorage.setItem('nesc_bot_new','1')}catch(e){}},
   /* ---------- checklist de configuração (dados reais da conta) ---------- */
   ck(){const c=cfg(),wp=workPattern(),skip=this.st().skip||{},rec=db.tx.some(x=>x.type==='in')||db.jr.some(hasAct);
     const items=[{id:'conta',lv:'essencial',label:'Conta criada',done:true},
-      {id:'registro',lv:'essencial',label:'Primeiro lançamento',done:rec,why:'É com ele que o NESC calcula faturamento, gastos e lucro.',act:['Lançar','data-addrec']},
-      {id:'veiculo',lv:'recomendada',label:'Veículo',done:!!db.vehicle,why:'Libera consumo, custo por km e lembretes de manutenção.',act:['Cadastrar','data-onboard']},
-      {id:'dias',lv:'opcional',label:'Dias de trabalho',done:Array.isArray(c.workDays),auto:!Array.isArray(c.workDays)&&wp.enough,why:'Para eu só lembrar de registrar nos dias em que você costuma rodar.',act:['Escolher','data-go="config"']},
-      {id:'meta',lv:'opcional',label:'Meta do dia',done:+c.goal>0||db.goals.length>0,why:'Para acompanhar o progresso do dia.',act:['Definir','data-go="metas"']}];
+      {id:'registro',lv:'essencial',label:'Primeiro lançamento',done:rec,why:'Base do faturamento e do lucro.',act:['Lançar','data-addrec']},
+      {id:'veiculo',lv:'recomendada',label:'Veículo',done:!!db.vehicle,why:'Custo por km e manutenção.',act:['Cadastrar','data-onboard']},
+      {id:'dias',lv:'opcional',label:'Dias de trabalho',done:Array.isArray(c.workDays),auto:!Array.isArray(c.workDays)&&wp.enough,why:'Para lembrar só nos seus dias.',act:['Escolher','data-go="config"']},
+      {id:'meta',lv:'opcional',label:'Meta do dia',done:+c.goal>0||db.goals.length>0,why:'Progresso do dia.',act:['Definir','data-go="metas"']}];
     items.forEach(i=>{i.skip=!i.done&&!i.auto&&!!skip[i.id]});
     return{items,pending:items.filter(i=>!i.done&&!i.auto&&!i.skip),ess:items.filter(i=>i.lv==='essencial'&&!i.done),basic:items.filter(i=>i.lv!=='opcional').every(i=>i.done||i.skip),doneIds:items.filter(i=>i.done).map(i=>i.id)}},
-  ckHTML(){return`<ul class="bot-ck">${this.ck().items.map(i=>`<li class="${i.done?'ok':i.auto?'auto':''}"><span class="ic" aria-hidden="true">${i.done?'✓':i.auto?'~':'•'}</span><div>${esc(i.label)}<span class="lv">${i.lv}</span><small>${i.done?'Feito.':i.auto?'Não precisa: já detectei pela sua rotina.':i.skip?'Pulado. Dá para fazer quando quiser.':esc(i.why)}</small></div>${!i.done&&!i.auto&&i.act?`<button type="button" ${i.act[1]}>${i.act[0]}</button>`:''}${!i.done&&!i.auto&&!i.skip&&i.lv!=='essencial'?`<button type="button" data-botskip="${i.id}">Pular</button>`:''}</li>`).join('')}</ul>`},
-  alertState(){if(!this.el||!user||!db)return;const k=this.ck();this.el.classList.toggle('alert',!!k.ess.length||!!this.syncFail)},
+  ckHTML(){return`<ul class="bot-ck">${this.ck().items.map(i=>`<li class="${i.done?'ok':i.auto?'auto':''}"><span class="ic" aria-hidden="true">${i.done?'✓':i.auto?'~':'•'}</span><div>${esc(i.label)}<span class="lv">${i.lv}</span><small>${i.done?'Feito.':i.auto?'Detectado pela sua rotina.':i.skip?'Pulado.':esc(i.why)}</small></div>${!i.done&&!i.auto&&i.act?`<button type="button" ${i.act[1]}>${i.act[0]}</button>`:''}${!i.done&&!i.auto&&!i.skip&&i.lv!=='essencial'?`<button type="button" data-botskip="${i.id}">Pular</button>`:''}</li>`).join('')}</ul>`},
+  alertState(){if(!this.hd||!user||!db)return;const k=this.ck();this.hd.classList.toggle('alert',!!k.ess.length||!!this.syncFail)},
   /* ---------- dentro do app ---------- */
   app(){this.enterArea('app');this.tabSeen='';this.ckPrev=this.ck().doneIds;this.syncFail=false;this.alertState();let isNew=false;try{isNew=sessionStorage.getItem('nesc_bot_new')==='1';sessionStorage.removeItem('nesc_bot_new')}catch(e){}
-    if(isNew)this.say({force:true,id:'u:welcome',mood:'happy',keep:true,text:'Pronto! Sua conta foi criada. Agora vamos configurar seu espaço. Só o essencial é obrigatório; o resto dá para pular.',extra:this.ckHTML()});
-    else{const k=this.ck();if(k.pending.length&&!this.seenAt('u:setup'))setTimeout(()=>this.say({id:'u:setup',pri:1,keep:true,force:true,text:'Separei uma configuração rápida para você aproveitar melhor o NESC. Só o que for útil, e dá para pular.',extra:this.ckHTML()}),500)}},
-  tab(t){if(!this.el||this.area!=='app'||t===this.tabSeen)return;this.tabSeen=t;this.alertState();clearTimeout(this.tt);this.tt=setTimeout(()=>{if(tab!==t)return;const m=this.tabMsg(t);if(m)this.say(m)},900)},
+    if(isNew)this.say({force:true,id:'u:welcome',mood:'happy',keep:true,text:'Sua conta foi criada! Faltam poucos passos:',extra:this.ckHTML()});
+    else{const k=this.ck();if(k.pending.length&&!this.seenAt('u:setup'))setTimeout(()=>this.say({id:'u:setup',pri:1,keep:true,force:true,text:'Sua configuração rápida:',extra:this.ckHTML()}),500)}},
+  tab(t){if(!this.el||this.area!=='app'||t===this.tabSeen)return;this.tabSeen=t;this.alertState();clearTimeout(this.tt);this.tt=setTimeout(()=>{if(tab!==t)return;const m=this.tabMsg(t);if(m){m.tab=t;this.say(m)}},900)},
   /* resumo financeiro do dia: mesma regra de cor/equilíbrio do app (resTone) e mesmo cálculo de meta (goalPct) */
   finMsg(){const T=TODAY(),c=CS(T,T),act=c.inc>0||c.jr.some(hasAct)||c.exp.length>0;
-    if(!act)return db.tx.length||db.jr.length?{id:'fin:none:'+T,cd:20*36e5,text:'Ainda não vejo lançamentos de hoje. Se você rodou, registre o ganho do dia e eu te mostro o resultado.',acts:[['Adicionar registro',()=>{const b=$('[data-addrec]');b&&b.click()}]]}:null;
+    if(!act)return db.tx.length||db.jr.length?{id:'fin:none:'+T,cd:20*36e5,text:'Rodou hoje? Registre o ganho do dia.',acts:[['Adicionar registro',()=>{const b=$('[data-addrec]');b&&b.click()}]]}:null;
     const tone=resTone(c.op,c.inc),g=+cfg().goal||0,gp=goalPct(c.inc,g);let t,mood='talk';
     const past=[...workedDays(addD(T,-30),addD(T,-1))],mean=past.length>=7?past.reduce((s,d)=>s+CS(d,d).op,0)/past.length:null;
-    if(tone==='pos'){mood='happy';t=mean!=null&&mean>0&&c.op>mean*1.15?`Mandou bem hoje! Seu lucro operacional (<b>${brl(c.op)}</b>) ficou acima da sua média recente de ${brl(mean)} por dia trabalhado (últimos ${past.length} dias).`:`Boa! Hoje você fechou no positivo: <b>${brl(c.op)}</b> de lucro operacional, já descontados os gastos registrados.`}
-    else if(tone==='neg')t=`Hoje os gastos passaram das receitas registradas (<b>${brl(c.op)}</b>). Vale conferir se ficou algum custo lançado a mais ou alguma receita faltando.`;
-    else t='Hoje ficou praticamente no zero a zero. Bora conferir os gastos para entender esse resultado?';
-    if(gp.has)t+=gp.hit?` Olha só: você passou da meta de faturamento de hoje (<b>${pctTxt(gp.pct)}</b>).`:` Faltam ${brl(r2(g-c.inc))} para a meta de faturamento de hoje. Sem pressa: o importante é registrar certinho e rodar com segurança.`;
+    if(tone==='pos'){mood='happy';t=mean!=null&&mean>0&&c.op>mean*1.15?`Acima da sua média: <b>${brl(c.op)}</b> de lucro hoje.`:`Hoje fechou no positivo: <b>${brl(c.op)}</b> de lucro.`}
+    else if(tone==='neg')t=`Hoje os gastos passaram das receitas (<b>${brl(c.op)}</b>).`;
+    else t='Hoje ficou no zero a zero.';
+    if(gp.has)t+=gp.hit?` Meta de faturamento batida: <b>${pctTxt(gp.pct)}</b>.`:` Faltam ${brl(r2(g-c.inc))} para a meta.`;
     return{id:'fin:'+T+':'+tone+':'+(gp.has?(gp.hit?'hit':'miss'):'-'),cd:20*36e5,mood,text:t}},
   tabMsg(t,manual){const T=TODAY(),A=APPS[t];
-    if(t==='hoje')return db.tx.length||db.jr.length?this.finMsg():{id:'tab:hoje:empty',cd:3*864e5,text:'Bora começar? Toque em <b>Adicionar registro</b> e lance o ganho do dia. O resto eu te mostro no caminho.'};
+    if(t==='hoje')return db.tx.length||db.jr.length?this.finMsg():{id:'tab:hoje:empty',cd:3*864e5,text:'Registre seus ganhos do dia em <b>Adicionar registro</b>.'};
     if(A){const has=db.tx.some(x=>appOf(x)===t)||db.jr.some(j=>j.app===t);
-      return has?{id:'tab:'+t+':explain',text:`Aqui, faturamento é o que a ${A.n} te pagou; resultado é o que sobra depois dos gastos registrados. São números diferentes, e o segundo é o que importa no fim do mês.`}
-        :{id:'tab:'+t+':empty',cd:7*864e5,text:`Ainda não tem lançamentos da ${A.n} por aqui. Comece pelo ganho do dia; jornada e gastos são opcionais.`}}
-    if(t==='despesas')return{id:'tab:desp',text:'Lance combustível, manutenção e outros gastos aqui. Combustível e outros entram no lucro operacional; manutenção entra no resultado completo.'};
-    if(t==='historico'){const p=pendingDays(14);if(p.length)return{id:'tab:hist:pend:'+T,cd:20*36e5,mood:'talk',text:`Encontrei ${p.length} ${p.length>1?'dias habituais':'dia habitual'} sem lançamento. Não dá para saber se você trabalhou: se não rodou, é só marcar <b>Não trabalhei</b>.`};
-      if(!db.tx.length)return{id:'tab:hist:empty',cd:3*864e5,text:'O histórico ainda está vazio. Quando você registrar ganhos e gastos, eles aparecem aqui com filtros por período.'};return manual?{text:'Use os filtros para ver um período ou um aplicativo. O "i" do resumo explica o que entra nos totais.'}:null}
-    if(t==='metas')return+cfg().goal>0||db.goals.length?{id:'tab:metas:explain',text:'Meta de faturamento compara com o que entrou; meta de lucro compara com o que sobrou depois dos gastos. Cada uma no seu número.'}:{id:'tab:metas:nogoal',cd:7*864e5,text:'Metas são opcionais. Se quiser, defina uma de faturamento ou de lucro do dia para acompanhar o progresso.'};
-    if(t==='financas'){const[f,to]=frange(),n=workedDays(f,to).size;return n<7?{id:'tab:rel:few',cd:3*864e5,text:`Com ${n} dia${n===1?'':'s'} trabalhado${n===1?'':'s'} no período, ainda não dá para falar em tendência. Vou ficando mais útil conforme você lança.`}:{id:'tab:rel:explain',text:'Lucro operacional desconta combustível, passes e outros gastos. O resultado completo também tira manutenção e custos fixos.'}}
-    if(t==='manutencao'){if(!db.vehicle)return{id:'tab:man:noveh',cd:3*864e5,text:'Cadastre seu veículo para eu organizar consumo, custo por km e manutenção.',acts:[['Cadastrar veículo',()=>openOnboard()]]};
-      if(odoNow().km==null)return{id:'tab:man:odo',cd:7*864e5,text:'Se puder, informe a quilometragem atual. Os lembretes usam o km que você registrar, sem chute.'};return manual?{text:'Registre as trocas e revisões com a quilometragem do dia. Eu nunca invento prazo: os lembretes seguem o que você cadastrar.'}:null}
-    if(t==='produtividade'){const[f,to]=[addD(T,-29),T];return CS(f,to).min>0?null:{id:'tab:prod:nohours',cd:7*864e5,text:'Informe as horas na jornada (horas e minutos) para eu calcular quanto você lucra por hora.'}}
-    return manual?{text:'Estou por aqui. Toque em mim quando quiser uma dica sobre a tela em que você estiver.'}:null},
+      return has?{id:'tab:'+t+':explain',text:`Faturamento é o que a ${A.n} pagou; lucro é o que sobra.`}
+        :{id:'tab:'+t+':empty',cd:7*864e5,text:`Registre o primeiro ganho da ${A.n}.`}}
+    if(t==='despesas')return{id:'tab:desp',text:'Lance combustível, manutenção e outros gastos.'};
+    if(t==='historico'){const p=pendingDays(14);if(p.length)return{id:'tab:hist:pend:'+T,cd:20*36e5,mood:'talk',text:`${p.length} ${p.length>1?'dias':'dia'} sem registro. Não rodou? Marque <b>Não trabalhei</b>.`};
+      if(!db.tx.length)return{id:'tab:hist:empty',cd:3*864e5,text:'Seus registros aparecem aqui.'};return manual?{text:'Filtre por período ou aplicativo.'}:null}
+    if(t==='metas')return+cfg().goal>0||db.goals.length?{id:'tab:metas:explain',text:'Meta de lucro desconta os gastos; a de faturamento, não.'}:{id:'tab:metas:nogoal',cd:7*864e5,text:'Metas são opcionais: defina uma para o dia.'};
+    if(t==='financas'){const[f,to]=frange(),n=workedDays(f,to).size;return n<7?{id:'tab:rel:few',cd:3*864e5,text:`Com ${n} dia${n===1?'':'s'} no período, ainda não há tendência.`}:{id:'tab:rel:explain',text:'Compare períodos e veja para onde vai o dinheiro.'}}
+    if(t==='manutencao'){if(!db.vehicle)return{id:'tab:man:noveh',cd:3*864e5,text:'Cadastre o veículo para ver o custo por km.',acts:[['Cadastrar veículo',()=>openOnboard()]]};
+      if(odoNow().km==null)return{id:'tab:man:odo',cd:7*864e5,text:'Informe o km atual para os lembretes.'};return manual?{text:'Registre cada serviço com o km do dia.'}:null}
+    if(t==='produtividade'){const[f,to]=[addD(T,-29),T];return CS(f,to).min>0?null:{id:'tab:prod:nohours',cd:7*864e5,text:'Informe as horas para calcular seu lucro por hora.'}}
+    return manual?{text:'Toque em mim para uma dica desta tela.'}:null},
   /* toque/clique na cabeça: dica sob demanda (funciona mesmo com as dicas silenciadas) */
-  manual(){this.mood('happy');if(this.cur){this.hide();return}const s=this.st();if(s.min){this.put({min:false});this.el.classList.remove('min')}
+  manual(){this.mood('happy');if(this.cur){this.hide();return}const s=this.st();if(s.min){this.put({min:false});this.dock()}
     if(this.area==='landing')return this.feature(0);
-    if(this.area.startsWith('auth:'))return this.show({manual:true,text:this.area==='auth:register'?'Preencha nome, e-mail e uma senha de pelo menos 8 caracteres. Eu não leio sua senha: ela vai direto e protegida para o sistema de login.':'Use o e-mail e a senha da sua conta. Esqueceu a senha? Toque em "Esqueceu a senha?".'});
-    const k=this.ck();if(k.pending.length&&!this.st().ckHide)return this.show({manual:true,keep:true,text:k.ess.length?'Falta o essencial para eu calcular seus resultados:':'Sua configuração:',extra:this.ckHTML(),acts:[['Esconder esta lista',()=>this.put({ckHide:1}),'sec']]});
-    const m=this.tabMsg(tab,true)||{text:'Tudo certo por aqui. Quando quiser, toque em mim para uma dica.'};this.show(Object.assign({},m,{manual:true}))},
+    if(this.area.startsWith('auth:'))return this.show({manual:true,text:this.area==='auth:register'?'Nome, e-mail e senha de 8+ caracteres. Eu não leio sua senha.':'Entre com e-mail e senha. Esqueceu? Use "Esqueceu a senha?".'});
+    const k=this.ck();if(k.pending.length&&!this.st().ckHide)return this.show({manual:true,keep:true,text:k.ess.length?'Falta o essencial:':'Sua configuração:',extra:this.ckHTML(),acts:[['Esconder esta lista',()=>this.put({ckHide:1}),'sec']]});
+    const m=this.tabMsg(tab,true)||{text:'Tudo certo por aqui.'};this.show(Object.assign({},m,{manual:true}))},
   /* ---------- confirmações: só depois da gravação real ---------- */
   afterSave(){if(!this.el||this.area!=='app')return;const k=this.lastForm;this.lastForm='';
-    if(!Cloud.on){clearTimeout(this.ct);if(LS.fail){this.say({force:true,crit:true,mood:'alert',text:'Não consegui gravar neste aparelho (o armazenamento do navegador está bloqueado). Faça um backup antes de fechar.'});return}this.ct=setTimeout(()=>this.confirm([k]),450);return}
+    if(!Cloud.on){clearTimeout(this.ct);if(LS.fail){this.say({force:true,crit:true,mood:'alert',text:'Não consegui salvar neste aparelho. Faça um backup.'});return}this.ct=setTimeout(()=>this.confirm([k]),450);return}
     this.pend.push(k)},
-  synced(ok){if(!this.el)return;if(!this.pend.length&&ok){if(this.syncFail){this.syncFail=false;this.alertState();this.say({force:true,mood:'happy',text:'Prontinho: o que estava pendente chegou à nuvem.'})}return}
+  synced(ok){if(!this.el)return;if(!this.pend.length&&ok){if(this.syncFail){this.syncFail=false;this.alertState();this.say({force:true,mood:'happy',text:'Pronto: tudo sincronizado.'})}return}
     const ks=this.pend.splice(0);if(ok){this.syncFail=false;this.confirm(ks)}
-    else{this.syncFail=true;this.alertState();this.say({force:true,crit:true,mood:'alert',id:'sync:fail',cd:6e4,text:'Seus dados ficaram salvos neste aparelho, mas ainda não chegaram à nuvem (sem conexão?). Vou tentar de novo sozinho.'})}},
+    else{this.syncFail=true;this.alertState();this.say({force:true,crit:true,mood:'alert',id:'sync:fail',cd:6e4,text:'Salvo no aparelho; ainda não chegou à nuvem. Vou tentar de novo.'})}},
   confirm(ks){const k=this.ck(),prev=this.ckPrev||[],nw=k.items.filter(i=>i.done&&!prev.includes(i.id));this.ckPrev=k.doneIds;this.alertState();
     const L={registro:'Primeiro lançamento salvo',veiculo:'Veículo cadastrado',dias:'Dias de trabalho definidos',meta:'Meta criada'};
     if(nw.length){const fin=k.basic&&!k.ess.length&&!this.seenAt('u:basic');if(fin)this.markSeen('u:basic');
-      this.say({force:true,mood:'happy',text:'Boa! '+nw.map(i=>L[i.id]).join(' e ')+'. Já atualizei isso por aqui.'+(fin?' <b>Fechou!</b> Sua configuração básica está completa. Agora é só manter seus registros em dia.':'')});return}
+      this.say({force:true,mood:'happy',text:'Boa! '+nw.map(i=>L[i.id]).join(' e ')+'.'+(fin?' <b>Fechou!</b> Configuração básica completa.':'')});return}
     if(ks.some(x=>x==='inc'||x==='exp'||x==='jr')){const m=this.finMsg();if(m&&m.id&&!/none/.test(m.id))this.say(m)}}};
 
 const pendRow=d=>`<div class="pendr"><span><b>${WD[pd(d).getDay()]}</b> ${fmtD(d)}</span><span class="pendb"><button type="button" class="btn sm" data-pendrec="${d}">Registrar dia</button><button type="button" class="btn ghost sm" data-offday="${d}">Não trabalhei nesse dia</button></span></div>`;
@@ -2202,7 +2237,7 @@ financas(){
   const cat=[['fuel',L.fuel],['maint',L.maint],['other',L.other],['pass',L.pass]].map(([k,n])=>[n,sum(cs.exp.filter(x=>x.type===k))]),ct=cat.reduce((s,x)=>s+x[1],0);
   const due=billOccs(addD(T,-90),addD(T,30)).filter(o=>o.rem>0),pend=due.reduce((s,o)=>s+o.rem,0),res=db.reserves,rTot=res.reduce((s,r)=>s+resBal(r),0);
   const cmpCard=`<div class="c s12"><div class="mhead"><h3 style="margin:0">Comparação com o período anterior ${tip('Como a comparação é feita','<p>Mesmo motor de cálculo das outras telas. Lucro operacional = faturamento − combustível/energia − passes rateados − outros gastos. Resultado completo também desconta manutenção e custos fixos.</p><p>O período anterior tem o mesmo número de dias, logo antes do período escolhido.</p>')}</h3><span class="sub">${fmtD(f)}${f!==t?'–'+fmtD(t):''} contra ${fmtD(pf)}${pf!==pt?'–'+fmtD(pt):''} (${len} dia${len>1?'s':''} cada)</span></div>
-   <div class="scrollx"><table class="ctab"><thead><tr><th>Indicador</th><th style="text-align:right">Atual</th><th style="text-align:right">Anterior</th><th style="text-align:right">Diferença</th></tr></thead><tbody>${cmpRows.map(r=>`<tr><td>${r[0]}</td><td class="hv">${brl(r[1])}</td><td class="hv">${brl(r[2])}</td><td class="hv">${dl(r[1],r[2],r[3])}</td></tr>`).join('')}<tr><td>Dias trabalhados</td><td class="hv">${N}</td><td class="hv">${PN}</td><td class="hv">${N-PN>0?'+':''}${N-PN}</td></tr></tbody></table></div></div>`;
+   <div class="scrollx"><table class="ctab"><thead><tr><th>Indicador</th><th style="text-align:right">Atual</th><th style="text-align:right">Anterior</th><th style="text-align:right">Diferença</th></tr></thead><tbody>${cmpRows.map(r=>`<tr><td>${r[0]}</td><td class="hv" data-l="Atual">${brl(r[1])}</td><td class="hv" data-l="Anterior">${brl(r[2])}</td><td class="hv" data-l="Diferença">${dl(r[1],r[2],r[3])}</td></tr>`).join('')}<tr><td>Dias trabalhados</td><td class="hv" data-l="Atual">${N}</td><td class="hv" data-l="Anterior">${PN}</td><td class="hv" data-l="Diferença">${N-PN>0?'+':''}${N-PN}</td></tr></tbody></table></div></div>`;
   return`<div class="finbar">${seg('fper',fper,FPER)}${fper==='c'?`<div class="row" style="flex:1 1 280px"><input type="date" data-ffrom value="${f}" max="${T}" aria-label="Data inicial"><input type="date" data-fto value="${t}" max="${T}" aria-label="Data final"></div>`:''}<span class="sub">${fmtD(f)}${f!==t?' – '+fmtD(t):''}</span><button class="btn" data-addrec>+ Adicionar registro</button></div>
   <div class="grid">${cmpCard}
   <div class="c s3 k2"><h3>Faturamento registrado</h3><div class="big">${brl(cs.inc)}</div><div class="sub">Uber + 99 no período${cs.promo>0?' · dos quais '+brl(cs.promo)+' em promoções':''}</div></div>
@@ -2223,7 +2258,7 @@ financas(){
    <button type="button" class="lnk" data-allbills>Ver e gerenciar todas as contas</button>`:`<p class="empty">Nenhuma conta cadastrada. Cadastre aluguel, parcela do carro e outros compromissos para receber lembretes e incluí-los na previsão de saldo.</p><button type="button" class="btn ghost" data-addbill>Cadastrar primeira conta</button>`}</div>
   <div class="c s6"><div class="mhead"><h3 style="margin:0">Reservas e metas de economia</h3><button type="button" class="btn sm" data-addres>Criar reserva</button></div>
    ${res.length?`<div class="stats" style="margin:12px 0"><div><small>Total reservado</small><b>${brl(rTot)}</b></div></div><div class="list">${res.map(r=>{const b=resBal(r),pc=r.target>0?clamp(b/r.target*100,0,100):0,left=Math.max(0,(r.target||0)-b),dd=r.due?dDiff(T,r.due):null;
-     return`<div class="it" style="flex-wrap:wrap"><div class="g">${esc(r.name)} <span class="tag">${RESK[r.kind]||'Reserva'}</span><small>${brl(b)} de ${brl(r.target||0)} · faltam ${brl(left)}${r.due?' · até '+fmtD(r.due)+(dd>0&&left>0?' ('+brl(left/dd)+'/dia)':''):''}</small><div class="bar"><i style="width:${pc}%"></i></div></div><div class="row" style="flex:0 0 auto;gap:6px"><button type="button" class="btn sm" data-resmv="${r.id}:1">Guardar</button><button type="button" class="btn ghost sm" data-resmv="${r.id}:-1">Retirar</button>${del('reserves',r.id)}</div></div>`}).join('')}</div>`
+     return`<div class="it wr"><div class="g">${esc(r.name)} <span class="tag">${RESK[r.kind]||'Reserva'}</span><small>${brl(b)} de ${brl(r.target||0)} · faltam ${brl(left)}${r.due?' · até '+fmtD(r.due)+(dd>0&&left>0?' ('+brl(left/dd)+'/dia)':''):''}</small><div class="bar"><i style="width:${pc}%"></i></div></div><div class="row" style="flex:0 0 auto;gap:6px"><button type="button" class="btn sm" data-resmv="${r.id}:1">Guardar</button><button type="button" class="btn ghost sm" data-resmv="${r.id}:-1">Retirar</button>${del('reserves',r.id)}</div></div>`}).join('')}</div>`
    :`<p class="empty">Nenhuma reserva criada. Reservas separam parte do seu saldo para um objetivo (prestação, manutenção, emergência) sem contar como gasto.</p><button type="button" class="btn ghost" data-addres>Criar primeira reserva</button>`}</div>
   <div class="c s12"><div class="mhead"><h3 style="margin:0">Saldo e previsão até ${fmtD(fc.me)} ${fc.cash==null?'':tip('Como a previsão é feita',`<p>Saldo livre − contas pendentes (${brl(fc.bills)}) − passes previstos (${brl(fc.passes)})${fc.N>=7?' + média diária dos lançamentos ('+brl(fc.mean)+' × '+fc.rem+' dias, estimativa)':''}. Base: ${fc.N} dia(s), confiança ${fc.conf}. Previsão não é garantia.</p>`)}</h3><button type="button" class="btn ghost sm" data-cash>${fc.cash==null?'Informar saldo':'Atualizar saldo'}</button></div>
    ${fc.cash==null?'<p class="empty">Informe o saldo atual da sua conta para ver o saldo livre (sem reservas) e a previsão até o fim do mês.</p>':`<div class="stats" style="margin-top:12px"><div><small>Saldo em conta</small><b>${brl(fc.cash)}</b></div><div><small>Reservado</small><b>${brl(fc.reserved)}</b></div><div><small>Saldo livre</small><b class="${fc.free>=0?'pos':'neg'}">${brl(fc.free)}</b></div>
@@ -2233,8 +2268,15 @@ produtividade(){
   const t=TODAY(),f=pper==='all'?(db.tx.map(x=>x.d).concat(db.jr.map(x=>x.d)).sort()[0]||t):pper==='m'?t.slice(0,8)+'01':addD(t,-(+pper-1)),P=prodSum(f,t),c=P.c,U=prodSum(f,t,['uber']),N=prodSum(f,t,['n99']),rv=hrsReview();
   const nph=o=>o.nph!=null?brl(o.nph)+'/h':'<span class="mutd">Sem dados de horas</span>',dur=m=>m>0?fmtDur(m):'<span class="mutd">não informado</span>';
   const tile=(l,v,sm,cl)=>`<div class="pt${cl?' '+cl:''}"><small>${l}</small><b>${v}</b>${sm?`<span>${sm}</span>`:''}</div>`;
-  const review=rv.length?`<div class="c s12 remind" id="hrs-review"><div class="g"><b>Revise ${rv.length===1?'1 jornada com horas':rv.length+' jornadas com horas'} possivelmente lidas errado</b><small>Antes, "6,30" no campo de horas era lido como 6,3 h (6h18min). Confirme cada caso: nada é alterado sem a sua escolha.</small>
-    <div class="list" style="margin-top:10px">${rv.slice(0,8).map(({j,s})=>`<div class="it" style="flex-wrap:wrap"><div class="g">${fmtD(j.d)} · ${j.app==='n99'?'99':'Uber'}<small>Registrado: ${fmtDur(s.was)}. Se você digitou ${Math.floor(s.was/60)},${String(s.to%60).padStart(2,'0')} querendo dizer ${fmtDur(s.to)}, corrija.</small></div><div class="row" style="flex:0 0 auto;gap:6px"><button type="button" class="btn sm" data-hrsfix="${j.id}:1">Corrigir para ${fmtDur(s.to)}</button><button type="button" class="btn ghost sm" data-hrsfix="${j.id}:0">Manter ${fmtDur(s.was)}</button></div></div>`).join('')}</div>${rv.length>8?`<small>Mais ${rv.length-8} depois destas.</small>`:''}</div></div>`:'';
+  /* revisão de horas: um registro por vez, em coluna única no celular; a ação só vale para o registro mostrado */
+  const hrvItem=({j,s})=>`<div class="hrv-it"><div class="hrv-top"><span class="hrv-d">${fmtD(j.d)}</span><span class="tag">${j.app==='n99'?'99':'Uber'}</span></div>
+    <div class="hrv-vals"><div><small>Registrado</small><b>${fmtDur(s.was)}</b></div><span class="hrv-ar" aria-hidden="true">→</span><div><small>Sugestão</small><b class="hl">${fmtDur(s.to)}</b></div></div>
+    <p class="hrv-why">Se você digitou ${Math.floor(s.was/60)},${String(s.to%60).padStart(2,'0')} querendo dizer ${fmtDur(s.to)}, corrija.</p>
+    <div class="hrv-acts"><button type="button" class="btn" data-hrsfix="${j.id}:1">Corrigir para ${fmtDur(s.to)}</button><button type="button" class="btn ghost" data-hrsfix="${j.id}:0">Manter ${fmtDur(s.was)}</button></div></div>`;
+  const review=rv.length?`<div class="c s12 hrv" id="hrs-review" role="region" aria-labelledby="hrv-t"><div class="hrv-h"><b id="hrv-t">Revisar horas</b><span class="hrv-n">${rv.length===1?'1 jornada':'1 de '+rv.length}</span></div>
+    <p class="hrv-lead">Antes, "6,30" era lido como 6h18min. Escolha o valor certo: nada muda sem a sua confirmação.</p>${hrvItem(rv[0])}
+    ${rv.length>1?`<p class="hrv-more">Depois desta, ${rv.length===2?'mais 1 jornada':'mais '+(rv.length-1)+' jornadas'} para revisar.</p>`:''}</div>`
+    :hrvDone&&Date.now()-hrvDone<6e4?`<div class="c s12 hrv done" id="hrs-review" role="status"><b>Revisão de horas concluída.</b><small>Os valores anteriores ficaram guardados.</small></div>`:'';
   if(!P.n)return`<div class="finbar">${seg('pper',pper,{'7':'7 dias','30':'30 dias','m':'Mês atual','90':'90 dias','all':'Tudo'})}<span class="sub">${fmtD(f)} – ${fmtD(t)}</span></div><div class="grid">${review}<div class="c s12"><h3>Resumo do período</h3>${empt('Nenhum registro de ganhos ou jornada neste período.'+(P.off?' '+P.off+' dia(s) confirmado(s) como folga.':''))}</div></div>`;
   return`<div class="finbar">${seg('pper',pper,{'7':'7 dias','30':'30 dias','m':'Mês atual','90':'90 dias','all':'Tudo'})}<span class="sub">${fmtD(f)} – ${fmtD(t)}</span></div><div class="grid">${review}
   <div class="c s12"><h3>Resumo do período · Uber + 99 ${tip('Como o resumo é calculado',`<p>Lucro operacional = faturamento − despesas operacionais registradas (a mesma conta do Início e de Relatórios). Lucro por hora considera só os dias com horas informadas${P.noH?`; ${P.noH} dia(s) sem horas ficam fora dessa média`:''}. Uber e 99 no mesmo dia: quando você marca que trabalhou nos dois ao mesmo tempo, as horas não são somadas duas vezes.</p>`)}</h3><div class="ptiles">
@@ -2249,11 +2291,12 @@ produtividade(){
   <div class="c s6"><h3>Custos registrados × estimados</h3><div class="kv" style="grid-template-columns:minmax(0,1fr) auto">
    <span>Combustível/energia registrado</span><b>${brl(c.energy)}</b><span>Passes (rateados)</span><b>${brl(c.pass)}</b><span>Outros gastos</span><b>${brl(c.other)}</b><span><b>Total registrado</b></span><b>${brl(c.opCost)}</b></div>
    ${c.estFuel>0?`<div class="estbox"><small>Estimativa, fora da conta</small><b>Combustível estimado por km: ${brl(c.estFuel)}</b><span>${estBasis(c)}. Se esse gasto existiu e não foi lançado, o lucro seria cerca de ${brl(c.opEst)}${P.min>0?' ('+brl(r2(c.opEst-(c.op-P.hOp)) / (P.min/60))+'/h)':''}.</span></div>`:`<p class="note">${c.energy>0?'Há abastecimento registrado no período, então o NESC não soma estimativa por km (evita contar o combustível duas vezes).':c.estMissing?'Há quilometragem informada, mas faltam o preço do litro ou o consumo (km/L) para estimar o custo. Configure em Manutenção → veículo ou informe o consumo do dia na jornada.':'Sem km informados, não é possível estimar o combustível.'}</p>`}</div>
-  <div class="c s6"><h3>Uber × 99</h3><div class="kv" style="grid-template-columns:minmax(0,auto) minmax(0,1fr) minmax(0,1fr)"><span></span><span style="color:var(--uber)"><b>Uber</b></span><span style="color:var(--n99)"><b>99</b></span>
-   <span>Dias</span><span>${U.n}</span><span>${N.n}</span><span>Faturamento</span><span>${brl(U.c.inc)}</span><span>${brl(N.c.inc)}</span><span>Lucro operacional</span><span>${brl(U.c.op)}</span><span>${brl(N.c.op)}</span><span>Horas</span><span>${dur(U.min)}</span><span>${dur(N.min)}</span><span>Lucro/h</span><span>${nph(U)}</span><span>${nph(N)}</span></div>
+  <div class="c s6"><h3>Uber × 99</h3><div class="apc">${[['uber','Uber',U],['n99','99',N]].map(([k,n,o])=>`<div class="apc-c ${k}"><h4><span class="idn ${k}" aria-hidden="true"></span>${n}</h4><dl>
+    <div><dt>Dias trabalhados</dt><dd>${o.n}</dd></div><div><dt>Faturamento</dt><dd>${brl(o.c.inc)}</dd></div><div><dt>Lucro operacional</dt><dd>${brl(o.c.op)}</dd></div>
+    <div><dt>Horas trabalhadas</dt><dd>${o.min>0?fmtDur(o.min):'<span class="mutd">Sem horas registradas</span>'}</dd></div><div><dt>Lucro por hora</dt><dd>${o.nph!=null?brl(o.nph)+'/h':'<span class="mutd">—</span>'}</dd></div></dl></div>`).join('')}</div>
    <p class="note">Gastos gerais do veículo são divididos entre os apps pela participação no faturamento.</p></div>
-  <div class="c s12"><h3>Por dia da semana</h3><div class="scrollx"><div class="kv" style="grid-template-columns:repeat(5,auto);min-width:420px"><span><b>Dia</b></span><span><b>Dias</b></span><span><b>Faturamento</b></span><span><b>Horas</b></span><span><b>Lucro/h</b></span>
-   ${P.D.map((o,i)=>o.n?`<span>${DOW[i]}</span><span>${o.n}</span><span>${brl(o.inc)}</span><span>${dur(o.min)}</span><span>${nph(o)}</span>`:'').join('')}</div></div>${P.D.some(o=>o.n&&o.n<3)?'<p class="note">Dias da semana com menos de 3 registros ainda são uma amostra pequena.</p>':''}</div>
+  <div class="c s12"><h3>Por dia da semana</h3><table class="dowt"><thead><tr><th scope="col">Dia</th><th scope="col">Dias registrados</th><th scope="col">Faturamento</th><th scope="col">Horas</th><th scope="col">Lucro/h</th></tr></thead><tbody>
+   ${P.D.map((o,i)=>o.n?`<tr><th scope="row">${DOWF[i]}${o.n<3?'<small>amostra pequena</small>':''}</th><td data-l="Dias registrados">${o.n}</td><td data-l="Faturamento">${brl(o.inc)}</td>${o.min>0?`<td data-l="Horas">${fmtDur(o.min)}</td><td data-l="Lucro/h">${o.nph!=null?brl(o.nph)+'/h':'—'}</td>`:'<td data-l="Horas" colspan="2" class="noh"><span class="mutd">Sem horas registradas</span></td>'}</tr>`:'').join('')}</tbody></table>${P.D.some(o=>o.n&&o.n<3)?'<p class="note">Dias com menos de 3 registros são uma amostra pequena.</p>':''}</div>
   </div>`},
 ia(){const sug=['Quanto lucrei nos últimos 7 dias?','Qual aplicativo me deu maior lucro por hora?','Quanto preciso guardar para a parcela do carro?','Estou gastando demais com combustível?','Quanto gastei com manutenção este mês?','Qual foi meu custo médio por quilômetro?','Qual é minha previsão de saldo para o final do mês?','Quais dias da semana rendem mais por hora?'];
   return`<div class="grid"><div class="c s8"><h3>Assistente financeiro</h3><div class="chat" id="chat">${chat.length?chat.map(m=>`<div class="msg ${m.me?'me':'ai'}">${m.h}</div>`).join(''):`<div class="msg ai">Pergunte sobre seus ganhos, custos, contas e manutenção. Respondo com os números calculados pelo próprio NESC a partir dos seus registros, indicando o período usado e o que é estimativa.</div>`}</div>
@@ -2506,7 +2549,7 @@ function uberImport(res){const dec=(db.cfg.uberImport=db.cfg.uberImport||{decisi
   dec.pending=pend;dec.lastImport=new Date().toISOString();Store.save();return{inDays,tripDays,conflicts:pend.length}}
 function openUberReview(){const p=(db.cfg.uberImport||{}).pending||[];if(!p.length){toast('Nada para revisar.');return}
   modal(`<h2>Revisar importação da Uber</h2><p class="sub" style="margin-bottom:14px">Nestes dias você já tinha registros manuais. Nada foi alterado. Escolha o que vale em cada dia; registros manuais substituídos ficam guardados e podem ser restaurados.</p>
-  <form data-form="uberrev" novalidate><div class="list">${p.map((x,i)=>`<div class="it" style="flex-wrap:wrap"><div class="g"><b>${fmtD(x.d)} · ${x.k==='inc'?'Faturamento':'Viagens'}</b><small>Manual: ${x.k==='inc'?brl(x.manual):x.manual+' viagem(ns)'} · Oficial Uber: ${x.k==='inc'?brl(x.official):x.official+' viagem(ns)'+(x.km?' ('+num(x.km,1)+' km em viagem)':'')}</small></div>${rseg('c'+i,'manual',{manual:'Manter manual',official:'Usar oficial'})}</div>`).join('')}</div>
+  <form data-form="uberrev" novalidate><div class="list">${p.map((x,i)=>`<div class="it wr"><div class="g"><b>${fmtD(x.d)} · ${x.k==='inc'?'Faturamento':'Viagens'}</b><small>Manual: ${x.k==='inc'?brl(x.manual):x.manual+' viagem(ns)'} · Oficial Uber: ${x.k==='inc'?brl(x.official):x.official+' viagem(ns)'+(x.km?' ('+num(x.km,1)+' km em viagem)':'')}</small></div>${rseg('c'+i,'manual',{manual:'Manter manual',official:'Usar oficial'})}</div>`).join('')}</div>
   <div class="row wrap" style="margin-top:14px"><button class="btn">Aplicar escolhas</button><button type="button" class="btn ghost" data-close>Decidir depois</button></div></form>`)}
 function applyUberReview(f){const dec=db.cfg.uberImport,p=dec.pending||[],arch=(db.cfg.uberArchive=db.cfg.uberArchive||[]);
   p.forEach((x,i)=>{const c=f['c'+i]==='official'?'official':'manual',D=dec.decisions[x.d]=dec.decisions[x.d]||{};D[x.k]=c;
@@ -2593,7 +2636,7 @@ function render(){if(!user||!db)return;Tip.close(true);if(!V[tab]||!TABS.some(t=
   const greet=tab==='hoje'?`Olá, ${esc(user.name.split(' ')[0])}`:(app?`<span class="idn lg ${tab}" aria-hidden="true"></span>`:'')+T[2],I=TABINFO[tab]||['','',''];
   const vw=$('#view');vw.style.setProperty('--app',tab==='uber'?'var(--uber)':tab==='n99'?'var(--n99)':'var(--gold)');
   vw.innerHTML=`<div class="head"><div><h1>${greet}</h1>${tab==='hoje'||app?`<p>${dateLabel()}</p>`:''}${I[0]?`<p class="intro">${I[0]}</p>`:''}</div>${I[1]?`<div class="hact"><button type="button" class="btn" ${I[2]}>${I[1]}</button></div>`:''}</div>${tab==='historico'?'':`<input class="srch" id="q" type="search" placeholder="Buscar no NESC…" aria-label="Buscar em lançamentos, metas, contas e manutenção" autocomplete="off"><div id="sr"></div>`}`+V[tab]();
-  renderNav();Bot.tab(tab);
+  renderNav();Bot.dock();Bot.tab(tab);
   if(tab==='hoje'){mountGlobe();drawChart()}if(tab==='metas')mountGauge();
 }
 function modal(h){$('#mbox').innerHTML=h;const m=$('#modal');m.classList.add('on');const f=m.querySelector('input:not([type=hidden]):not([type=radio]),select,button');if(f)setTimeout(()=>f.focus(),30)}
@@ -2775,7 +2818,7 @@ document.addEventListener('click',e=>{
   const rmt=T.closest('[data-rmet]');if(rmt){rmet=rmt.dataset.rmet;render();return}
   if(T.closest('[data-rkretry]')){const[f,t]=range(rper);RK.key='';loadRanking(f,t,true);render();return}
   const pp=T.closest('[data-pper]');if(pp){pper=pp.dataset.pper;render();return}
-  const hfx=T.closest('[data-hrsfix]');if(hfx){const[id,ok]=hfx.dataset.hrsfix.split(':');hrsFix(id,ok==='1');render();toast(ok==='1'?'Horas corrigidas. O valor anterior ficou guardado.':'Horas mantidas como estavam.');return}
+  const hfx=T.closest('[data-hrsfix]');if(hfx){const[id,ok]=hfx.dataset.hrsfix.split(':');keepView('#hrs-review',()=>{hrsFix(id,ok==='1');if(!hrsReview().length)hrvDone=Date.now();render()});const nb=$('#hrs-review [data-hrsfix]');if(nb)nb.focus({preventScroll:true});toast(ok==='1'?'Horas corrigidas. O valor anterior ficou guardado.':'Horas mantidas como estavam.');return}
   const ak=T.closest('[data-ask]');if(ak){ask(ak.dataset.ask);return}
   if(T.closest('[data-addper]')){const f=T.closest('form'),box=f.querySelector('.periods');if(!box.children.length&&f.dataset.typed==null)f.dataset.typed=f.hh.value+'|'+f.mm.value;box.insertAdjacentHTML('beforeend',periodRow(null));f.hh.readOnly=f.mm.readOnly=true;box.lastElementChild.querySelector('input').focus();perTotal(f);return}
   const rp2=T.closest('[data-rmper]');if(rp2){const f=T.closest('form');rp2.closest('.prow').remove();perTotal(f);return}

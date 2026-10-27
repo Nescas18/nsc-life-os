@@ -1,4 +1,4 @@
-// Mascote/copiloto do NESC: 20 cenários do copiloto + 12 critérios da cabeça flutuante, executados no index.html real em um Chromium (Playwright).
+// Mascote/copiloto do NESC: 20 cenários do copiloto + critérios do mascote ancorado por aba (posição, animações, dicas), executados no index.html real em um Chromium (Playwright).
 // Tudo em modo local (sem Supabase de produção). A "nuvem" é simulada trocando Cloud.push dentro da página.
 // Uso: node tests/bot.spec.mjs
 import http from "node:http";
@@ -63,7 +63,7 @@ const U1 = { email: "motorista1@nesc.local", name: "Ana" }, U2 = { email: "motor
 await test("1. Visitante na página pública: mascote oficial aparece e se apresenta", async (keep) => {
   const ctx = keep(await ctxOf()); const { page, errs } = await open(ctx);
   await page.waitForFunction(() => /Fala, motorista/.test(document.querySelector("#bot .bot-msg")?.textContent || ""), null, { timeout: 6000 });
-  const r = await page.evaluate(() => { const img = document.querySelector("#bot img"), h = document.querySelector("#bot .bot-head").getBoundingClientRect(); return { src: img.currentSrc, w: img.naturalWidth, inView: h.right <= innerWidth && h.bottom <= innerHeight && h.left >= 0 }; });
+  const r = await page.evaluate(() => { const img = document.querySelector(".bot-head img"), h = document.querySelector(".bot-head").getBoundingClientRect(); return { src: img.currentSrc, w: img.naturalWidth, inView: h.right <= innerWidth && h.bottom <= innerHeight && h.left >= 0 }; });
   assert(/cabeca-open-\d+\.(webp|png)/.test(r.src) && r.w > 0, "imagem da cabeça não carregou: " + JSON.stringify(r));
   assert(r.inView, "mascote fora da tela");
   assert(!errs.length, errs.join(" | "));
@@ -79,7 +79,7 @@ await test("2. Visitante dispensa a apresentação e ela não volta na próxima 
 });
 await test("3. Início do cadastro: modo de orientação com dica por campo (sem ler a senha)", async (keep) => {
   const ctx = keep(await ctxOf()); const { page } = await open(ctx, { hash: "#criar-conta" });
-  await page.waitForFunction(() => /Bora criar sua conta/.test(window.__said.join(" ")), null, { timeout: 4000 });
+  await page.waitForFunction(() => /Bora criar sua conta/.test(window.__said.join(" ") + " " + ((Bot.cur && Bot.cur.text) || "")), null, { timeout: 4000 }); // a fala sai já na abertura; o gancho de registro pode chegar depois
   await page.waitForTimeout(100);
   await page.click("#re-email"); await page.waitForTimeout(80);
   assert(/recuperar a senha/.test(await bubble(page)), "sem dica do campo de e-mail");
@@ -93,7 +93,7 @@ await test("4. Erro de validação explicado em linguagem simples", async (keep)
   await page.waitForTimeout(150);
   await page.fill("#re-name", "Ana"); await page.fill("#re-email", "ana@nesc.local"); await page.fill("#re-birth", "2999-01-01"); await page.fill("#re-pass", "Senha2026x");
   await page.click("#form-register .btn-submit");
-  await page.waitForFunction(() => /data de nascimento não está valendo/.test(document.querySelector("#bot .bot-msg")?.textContent || ""), null, { timeout: 3000 });
+  await page.waitForFunction(() => /Data de nascimento inválida/.test(document.querySelector("#bot .bot-msg")?.textContent || ""), null, { timeout: 3000 });
   assert(!/Sua conta foi criada/.test(await said(page)), "anunciou conta criada sem sucesso");
 });
 await test("5. Conta criada: confirmação só depois do sucesso (local) e aviso de confirmação de e-mail (nuvem)", async (keep) => {
@@ -108,7 +108,7 @@ await test("5. Conta criada: confirmação só depois do sucesso (local) e aviso
   await p2.waitForTimeout(150);
   await p2.fill("#re-name", "Bia"); await p2.fill("#re-email", "bia@nesc.local"); await p2.fill("#re-pass", "Senha2026x");
   await p2.click("#form-register .btn-submit");
-  await p2.waitForFunction(() => /Falta só confirmar o e-mail/.test(document.querySelector("#bot .bot-msg")?.textContent || ""), null, { timeout: 3000 });
+  await p2.waitForFunction(() => /Confirme o e-mail para entrar/.test(document.querySelector("#bot .bot-msg")?.textContent || ""), null, { timeout: 3000 });
   assert(!/Sua conta foi criada\. Agora/.test(await said(p2)), "boas-vindas do app antes de existir sessão");
 });
 await test("6. Usuário entra: checklist de configuração com etapas reais e níveis", async (keep) => {
@@ -116,13 +116,13 @@ await test("6. Usuário entra: checklist de configuração com etapas reais e n�
   await page.waitForFunction(() => /configuração rápida/.test(window.__said.join(" ")), null, { timeout: 5000 });
   const ck = await page.evaluate(() => [...document.querySelectorAll("#bot .bot-ck li")].map((li) => li.innerText.replace(/\s+/g, " ")));
   assert(ck.length === 5 && /Primeiro lançamento\s*essencial/i.test(ck[1]) && /Veículo\s*recomendada/i.test(ck[2]) && /Meta do dia\s*opcional/i.test(ck[4]), "checklist: " + JSON.stringify(ck));
-  assert(await page.evaluate(() => document.getElementById("bot").classList.contains("alert")), "sem estado de atenção com pendência essencial");
+  assert(await page.evaluate(() => document.querySelector(".bot-head").classList.contains("alert")), "sem estado de atenção com pendência essencial");
 });
 await test("7/8. Cadastrar veículo atualiza o checklist; com o essencial pronto, avisa que a configuração básica fechou (uma vez)", async (keep) => {
   const ctx = keep(await ctxOf()); const { page } = await open(ctx, { user: U1, seed: { cfg: { pass: OFF }, tx: [tx(T, "in", "uber", 200)] } });
   await page.waitForTimeout(400); await fast(page);
   await page.evaluate(() => { db.vehicle = { brand: "Fiat", model: "Argo", custom: true, energy: "flex", body: "hatch" }; Bot.lastForm = "ob"; Store.save(); });
-  await page.waitForFunction(() => /Veículo cadastrado\. Já atualizei/.test(window.__said.join(" ")), null, { timeout: 3000 });
+  await page.waitForFunction(() => /Boa! Veículo cadastrado\./.test(window.__said.join(" ")), null, { timeout: 3000 });
   const t = await said(page);
   assert(/Fechou!/.test(t), "não avisou configuração básica completa: " + t);
   const pend = await page.evaluate(() => Bot.ck().pending.map((i) => i.id));
@@ -134,7 +134,7 @@ await test("9. Uber sem registros: orientação para começar, sem presumir que 
   const ctx = keep(await ctxOf()); const { page } = await open(ctx, { user: U1, seed: { cfg: { pass: OFF }, tx: [tx(T, "in", "n99", 100)], vehicle: { brand: "X", model: "Y", custom: true } } });
   await page.waitForTimeout(300); await fast(page); await page.evaluate(() => Bot.hide());
   await page.evaluate(() => { tab = "uber"; render(); });
-  const ok9 = await page.waitForFunction(() => /Ainda não tem lançamentos da Uber/.test(window.__said.join(" ") + " " + ((Bot.queue && Bot.queue.text) || "") + " " + ((Bot.cur && Bot.cur.text) || "")), null, { timeout: 4000 }).then(() => true, () => false);
+  const ok9 = await page.waitForFunction(() => /Registre o primeiro ganho da Uber/.test(window.__said.join(" ") + " " + ((Bot.queue && Bot.queue.text) || "") + " " + ((Bot.cur && Bot.cur.text) || "")), null, { timeout: 4000 }).then(() => true, () => false);
   if (!ok9) throw new Error("uber: " + JSON.stringify(await page.evaluate(() => ({ said: window.__said, cur: Bot.cur && Bot.cur.text, q: Bot.queue && Bot.queue.text, area: Bot.area, tabSeen: Bot.tabSeen, last: Date.now() - Bot.last, ae: document.activeElement && document.activeElement.tagName + "#" + document.activeElement.id }))));
 });
 await test("10/11. Lançamento salvo: confirmação só depois da gravação (local imediato; nuvem só após o envio)", async (keep) => {
@@ -154,7 +154,7 @@ await test("10/11. Lançamento salvo: confirmação só depois da gravação (lo
 await test("12. Histórico (dias sem registro ≠ não trabalhei) e Metas (opcional, faturamento × lucro)", async (keep) => {
   const ctx = keep(await ctxOf()); const { page } = await open(ctx, { user: U1, seed: { cfg: { pass: OFF, workDays: [1, 2, 3, 4, 5] }, tx: [tx("2026-10-19", "in", "uber", 100)], vehicle: { brand: "X", model: "Y", custom: true } } });
   await page.waitForTimeout(300); await fast(page); await page.evaluate(() => { Bot.hide(); tab = "historico"; render(); });
-  const ok12 = await page.waitForFunction(() => /(dias habituais|dia habitual) sem lançamento.*Não trabalhei/.test(window.__said.join(" ")), null, { timeout: 3000 }).then(() => true, () => false);
+  const ok12 = await page.waitForFunction(() => /(dias|dia) sem registro.*Não trabalhei/.test(window.__said.join(" ")), null, { timeout: 3000 }).then(() => true, () => false);
   if (!ok12) throw new Error("histórico: " + JSON.stringify(await page.evaluate(() => ({ said: window.__said, pend: pendingDays(14), cur: Bot.cur && Bot.cur.text, q: Bot.queue && Bot.queue.text, area: Bot.area, tabSeen: Bot.tabSeen }))));
   await page.evaluate(() => { Bot.hide(); tab = "metas"; render(); });
   await page.waitForFunction(() => /Metas são opcionais/.test(window.__said.join(" ")), null, { timeout: 3000 });
@@ -170,26 +170,26 @@ await test("13/14. Resumo do dia: positivo, prejuízo, equilíbrio (mesma regra 
   assert(r.pos.tone === "pos" && /fechou no positivo/.test(r.pos.t) && /230,00/.test(r.pos.t), "positivo: " + r.pos.t);
   assert(r.neg.tone === "neg" && /gastos passaram das receitas/.test(r.neg.t), "prejuízo: " + r.neg.t);
   assert(r.even.tone === "even" && /zero a zero/.test(r.even.t), "equilíbrio: " + r.even.t);
-  assert(/passou da meta de faturamento de hoje.*107,03%/.test(r.goal.t), "meta superada: " + r.goal.t);
-  assert(/Faltam .*200,00.*rodar com segurança/.test(r.miss.t), "meta não atingida: " + r.miss.t);
+  assert(/Meta de faturamento batida.*107,03%/.test(r.goal.t), "meta superada: " + r.goal.t);
+  assert(/Faltam .*200,00 para a meta/.test(r.miss.t), "meta não atingida: " + r.miss.t);
 });
 await test("15. Navegar entre abas não repete a mesma fala", async (keep) => {
   const ctx = keep(await ctxOf()); const { page } = await open(ctx, { user: U1, seed: { cfg: { pass: OFF }, tx: [tx(T, "in", "uber", 100)], vehicle: { brand: "X", model: "Y", custom: true } } });
   await page.waitForTimeout(300); await fast(page);
   for (const t of ["uber", "despesas", "uber", "despesas", "uber"]) { await page.evaluate((t) => { Bot.hide(); tab = t; render(); }, t); await page.waitForTimeout(1100); }
   const s = await said(page);
-  assert((s.match(/faturamento é o que a Uber te pagou/g) || []).length === 1, "fala da Uber repetida: " + s);
+  assert((s.match(/Faturamento é o que a Uber pagou/g) || []).length === 1, "fala da Uber repetida: " + s);
   assert((s.match(/Lance combustível, manutenção/g) || []).length === 1, "fala de Despesas repetida");
 });
 await test("16. Celular: mascote menor, dentro da tela, sem rolagem horizontal; balão não sai da tela", async (keep) => {
   const ctx = keep(await ctxOf({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true })); const { page } = await open(ctx, { user: U1, seed: { cfg: { pass: OFF } } });
   await page.waitForFunction(() => !document.querySelector("#bot .bot-bub").hidden, null, { timeout: 5000 });
-  const r = await page.evaluate(() => { const hd = document.querySelector("#bot .bot-head"), h = hd.getBoundingClientRect(), b = document.querySelector("#bot .bot-bub").getBoundingClientRect(); return { hw: hd.offsetWidth, h: [h.left, h.right, h.bottom], b: [b.left, b.right, b.top, b.bottom], vw: innerWidth, vh: innerHeight, sw: document.documentElement.scrollWidth }; });
+  const r = await page.evaluate(() => { const hd = document.querySelector(".bot-head"), h = hd.getBoundingClientRect(), b = document.querySelector("#bot .bot-bub").getBoundingClientRect(); return { hw: hd.offsetWidth, h: [h.left, h.right, h.bottom], b: [b.left, b.right, b.top, b.bottom], vw: innerWidth, vh: innerHeight, sw: document.documentElement.scrollWidth }; });
   assert(r.hw <= 60, "mascote grande demais no celular: " + r.hw);
   assert(r.h[0] >= 0 && r.h[1] <= r.vw && r.h[2] <= r.vh && r.b[0] >= 0 && r.b[1] <= r.vw && r.b[2] >= 0 && r.b[3] <= r.vh, "fora da tela: " + JSON.stringify(r));
   assert(r.sw <= r.vw, "rolagem horizontal");
   const ctx2 = keep(await ctxOf()); const p2 = (await open(ctx2, { user: U1, seed: { cfg: { pass: OFF } } })).page;
-  assert((await p2.evaluate(() => document.querySelector("#bot .bot-head").offsetWidth)) >= 60, "no computador o mascote deveria ser maior");
+  assert((await p2.evaluate(() => document.querySelector(".bot-head").offsetWidth)) > r.hw, "no computador o mascote deveria ser maior");
 });
 await test("16b. Tocar fora do balão o recolhe (não fica preso sobre botões)", async (keep) => {
   const ctx = keep(await ctxOf({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })); const { page } = await open(ctx, { user: U1, seed: { cfg: { pass: OFF } } });
@@ -204,24 +204,26 @@ await test("17. Minimizar e silenciar: persistem e o mascote para de falar sozin
   assert(await page.evaluate(() => Bot.st().muted === true), "não silenciou");
   await page.evaluate(() => { Bot.hide(); window.__said = []; tab = "despesas"; render(); }); await page.waitForTimeout(1200);
   assert(!(await said(page)), "falou sozinho mesmo silenciado");
-  await page.click("#bot .bot-head"); assert(await bubble(page), "toque no mascote silenciado deveria dar dica");
+  await page.click(".bot-head"); assert(await bubble(page), "toque no mascote silenciado deveria dar dica");
   await page.click('#bot [data-bot="min"]');
-  assert(await page.evaluate(() => document.getElementById("bot").classList.contains("min") && Bot.st().min), "não minimizou");
+  assert(await page.evaluate(() => document.querySelector(".bot-head").classList.contains("min") && Bot.st().min), "não minimizou");
   await page.reload(); await page.waitForTimeout(400);
-  assert(await page.evaluate(() => document.getElementById("bot").classList.contains("min")), "preferência não persistiu");
+  assert(await page.evaluate(() => document.querySelector(".bot-head").classList.contains("min")), "preferência não persistiu");
 });
-await test("18. Movimento reduzido: sem flutuação/animações e sem inclinação pelo cursor", async (keep) => {
+await test("18. Movimento reduzido: sem piscadas nem balanços automáticos e sem animação contínua", async (keep) => {
   const ctx = keep(await ctxOf({ reducedMotion: "reduce" })); const { page } = await open(ctx, { user: U1, seed: { cfg: { pass: OFF } } });
-  await page.waitForTimeout(400); await page.mouse.move(50, 50); await page.mouse.move(60, 60); await page.waitForTimeout(100);
-  const r = await page.evaluate(() => ({ anim: getComputedStyle(document.querySelector("#bot .bot-float")).animationName, ry: document.querySelector("#bot .bot-tilt").style.getPropertyValue("--ry") }));
-  assert(r.anim === "none" && !r.ry, "movimento reduzido ignorado: " + JSON.stringify(r));
+  await page.waitForTimeout(300);
+  await page.evaluate(() => { window.__an = 0; const hd = document.querySelector(".bot-head"); new MutationObserver(() => { if (/\b(blink|turn)\b/.test(hd.className)) window.__an++; }).observe(hd, { attributes: true, attributeFilter: ["class"] }); });
+  await page.waitForTimeout(8000);
+  const r = await page.evaluate(() => ({ an: window.__an, fl: getComputedStyle(document.querySelector(".bot-head .bot-float")).animationName }));
+  assert(r.an === 0 && r.fl === "none", "movimento reduzido ignorado: " + JSON.stringify(r));
 });
 await test("19. Falha de rede: nenhuma confirmação falsa; avisa que ficou só no aparelho", async (keep) => {
   const ctx = keep(await ctxOf()); const { page } = await open(ctx, { user: U1, seed: { cfg: { pass: OFF }, vehicle: { brand: "X", model: "Y", custom: true } } });
   await page.waitForTimeout(300); await fast(page);
   await page.evaluate(() => { user.id = "u1"; Cloud.on = true; Cloud.push = async () => { throw new Error("Failed to fetch"); }; Bot.hide(); tab = "uber"; render(); });
   await page.fill("#reg form[data-form=inc] input[name=v]", "150"); await page.click("#reg form[data-form=inc] button.btn:not([type=button])");
-  await page.waitForFunction(() => /ainda não chegaram à nuvem/.test(window.__said.join(" ")), null, { timeout: 4000 });
+  await page.waitForFunction(() => /ainda não chegou à nuvem/.test(window.__said.join(" ")), null, { timeout: 4000 });
   assert(!/Primeiro lançamento salvo/.test(await said(page)), "confirmou salvamento mesmo com falha de rede");
 });
 await test("20. Usuários diferentes não compartilham preferências, pendências nem histórico de falas", async (keep) => {
@@ -233,39 +235,24 @@ await test("20. Usuários diferentes não compartilham preferências, pendência
   assert(r.keys.includes("nesc_bot_" + U1.email), "chave por conta ausente: " + r.keys);
 });
 
-/* ---------- cabeça flutuante autônoma: 13 critérios de aceite ---------- */
+/* ---------- mascote ancorado por aba: posição, animações e dicas curtas ---------- */
 const QUIET = { cfg: { pass: OFF }, tx: [tx(T, "in", "uber", 100)], vehicle: { brand: "X", model: "Y", custom: true } };
-async function quiet(ctx, opts = {}) { // app aberto, dicas silenciadas e balão fechado: a cabeça fica livre para passear
+async function quiet(ctx, opts = {}) { // app aberto, dicas silenciadas e balão fechado
   const o = await open(ctx, { user: U1, seed: QUIET, ...opts });
   await o.page.evaluate(() => { Bot.put({ muted: true }); Bot.hide(); });
   await o.page.waitForTimeout(700); await o.page.evaluate(() => Bot.hide());
-  await settled(o.page);
   return o;
 }
-const head = (page) => page.evaluate(() => { const e = document.querySelector("#bot .bot-head"), r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height, r: r.right, b: r.bottom, cx: r.left + r.width / 2, cy: r.top + r.height / 2, can: e.classList.contains("can"), pe: getComputedStyle(e).pointerEvents }; });
-const settled = (page) => page.waitForFunction(() => !Bot.mv.raf, null, { timeout: 6000 });
-/* congela o passeio autônomo (sem novos deslocamentos espontâneos) para medir reação a mouse/toque de forma isolada */
-const freeze = (page) => page.evaluate(() => { clearTimeout(Bot.wT); Bot.cycle = () => {}; cancelAnimationFrame(Bot.mv.raf); Bot.mv.raf = 0; Bot.mv.tx = Bot.mv.x; Bot.mv.ty = Bot.mv.y; });
-/* controles reais (botões, links, campos) que a cabeça cobre de verdade (margem de 12% da caixa, onde a imagem é transparente) */
-const overControls = (page) => page.evaluate(() => { const h = document.querySelector("#bot .bot-head").getBoundingClientRect(), mx = h.width * .12, my = h.height * .12;
-  return [...document.querySelectorAll("a,button,input,select,textarea,[role=button]")].filter((n) => !n.closest("#bot")).map((n) => [n, n.getBoundingClientRect()])
-    .filter(([, r]) => r.width && r.height && r.left < h.right - mx && r.right > h.left + mx && r.top < h.bottom - my && r.bottom > h.top + my)
-    .filter(([n, r]) => { const e = document.elementFromPoint((Math.max(r.left, h.left) + Math.min(r.right, h.right)) / 2, (Math.max(r.top, h.top) + Math.min(r.bottom, h.bottom)) / 2); return e && n.contains(e); }) // só o que está visível ali (ignora menu recolhido)
-    .map(([n]) => (n.textContent || n.placeholder || n.tagName).trim().slice(0, 30)); });
-/* observa o passeio por `ms`: posições de descanso (quando parado), se esteve em movimento e se fez pausas com raf parado */
-async function watch(page, ms) {
-  await page.evaluate((ms) => { window.__w = { rests: [], frames: 0, moving: 0, gaps: 0, onsets: 0, inside: true }; const b = Bot.bounds(), { w, h } = Bot.dims();
-    let wasMoving = false, restStart = performance.now();
-    const f = () => { const m = Bot.mv; window.__w.frames++;
-      if (m.x < b.l - 1 || m.y < b.t - 1 || m.x + w > b.r + 1 || m.y + h > b.b + 1) window.__w.inside = false;
-      if (m.raf) { window.__w.moving++; if (!wasMoving) { window.__w.onsets = (window.__w.onsets || 0) + 1; if (performance.now() - restStart > 2000) window.__w.gaps++; } wasMoving = true; }
-      else { if (wasMoving) { restStart = performance.now(); const key = Math.round(m.x) + "," + Math.round(m.y); if (!window.__w.rests.includes(key)) window.__w.rests.push(key); } wasMoving = false; }
-      if (performance.now() - window.__w.t0 < ms) requestAnimationFrame(f); };
-    window.__w.t0 = performance.now(); const key = Math.round(Bot.mv.x) + "," + Math.round(Bot.mv.y); window.__w.rests.push(key); requestAnimationFrame(f); }, ms);
-  await page.waitForTimeout(ms + 100);
-  return page.evaluate(() => window.__w);
-}
-const inHead = (h, x, y, pad = 0) => x > h.x - pad && x < h.r + pad && y > h.y - pad && y < h.b + pad;
+const TABS = ["hoje", "uber", "n99", "historico", "despesas", "manutencao", "metas", "financas", "config", "produtividade", "ia", "conquistas", "ranking"];
+/* o que a cabeça cobre de verdade: linhas de texto visíveis e controles da tela (não a caixa inteira dos blocos) */
+const covers = (page) => page.evaluate(() => { const hd = document.querySelector(".bot-head"); if (!hd || hd.hidden || hd.classList.contains("away")) return { shown: false };
+  const R = hd.getBoundingClientRect(), hit = [], rg = document.createRange(), ov = (q) => q.left < R.right - 1 && q.right > R.left + 1 && q.top < R.bottom - 1 && q.bottom > R.top + 1;
+  const tw = document.createTreeWalker(document.getElementById("view"), NodeFilter.SHOW_TEXT, { acceptNode: (n) => n.nodeValue.trim() && !n.parentElement.closest(".bot-head") ? 1 : 3 }); let n;
+  while ((n = tw.nextNode())) { rg.selectNodeContents(n); for (const q of rg.getClientRects()) if (q.width && ov(q)) hit.push("texto: " + n.nodeValue.trim().slice(0, 20)); }
+  document.querySelectorAll("#view a,#view button,#view input,#view select,#view textarea,#view .btn,#view svg,#view canvas").forEach((e) => { if (e.closest(".bot-head")) return; const q = e.getBoundingClientRect(); if (q.width && ov(q)) hit.push("controle: " + (e.textContent || e.placeholder || e.tagName).trim().slice(0, 20)); });
+  const bar = document.querySelector("#app.on aside"), br = bar && innerWidth <= 900 ? bar.getBoundingClientRect().bottom : 0;
+  return { shown: true, hit, x: R.left, r: R.right, y: R.top, w: R.width, inView: R.left >= 0 && R.right <= innerWidth, belowBar: R.top >= br - 1, sw: document.documentElement.scrollWidth, vw: innerWidth }; });
+const plain = (h) => String(h || "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 
 await test("A1/A2. Sem medalhão: só a cabeça recortada (cantos transparentes, proporção da cabeça) e a piscada usa a mesma silhueta", async (keep) => {
   const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
@@ -275,172 +262,98 @@ await test("A1/A2. Sem medalhão: só a cabeça recortada (cantos transparentes,
     for (const k of ["open", "closed"]) { const i = await load(`/cabeca-${k}-256.webp`), c = document.createElement("canvas"); c.width = i.naturalWidth; c.height = i.naturalHeight; const g = c.getContext("2d"); g.drawImage(i, 0, 0);
       const a = (x, y) => g.getImageData(x, y, 1, 1).data[3], W = c.width - 1, H = c.height - 1;
       out[k] = { w: c.width, h: c.height, corners: [a(0, 0), a(W, 0), a(0, H), a(W, H), a(W >> 1, 0), a(W >> 1, H)].reduce((s, v) => s + v, 0), center: a(W >> 1, H >> 1) }; }
-    out.imgs = [...document.querySelectorAll("#bot .bot-tilt img")].map((i) => i.currentSrc.split("/").pop());
-    out.legacy = !!document.querySelector('#bot [src*="mascote"],#bot [srcset*="mascote"]');
+    out.imgs = [...document.querySelectorAll(".bot-head .bot-tilt img")].map((i) => i.currentSrc.split("/").pop());
+    out.legacy = !!document.querySelector('[src*="mascote-"],[srcset*="mascote-"]');
     return out; });
   assert(!r.legacy, "ainda referencia a imagem antiga com medalhão");
   assert(r.imgs.length === 2 && /cabeca-open/.test(r.imgs[0]) && /cabeca-closed/.test(r.imgs[1]), "imagens: " + r.imgs);
   for (const k of ["open", "closed"]) {
-    assert(r[k].corners === 0, `${k}: bordas/cantos não são transparentes (sobrou fundo ou moeda)`);
+    assert(r[k].corners === 0, `${k}: bordas/cantos não são transparentes`);
     assert(r[k].center === 255, `${k}: o rosto deveria ser opaco`);
-    assert(r[k].w / r[k].h > .75 && r[k].w / r[k].h < .95, `${k}: proporção ${r[k].w}x${r[k].h} não é a da cabeça (o medalhão era redondo)`);
+    assert(r[k].w / r[k].h > .75 && r[k].w / r[k].h < .95, `${k}: proporção ${r[k].w}x${r[k].h} não é a da cabeça`);
   }
   assert(r.open.w === r.closed.w && r.open.h === r.closed.h, "olhos fechados com tamanho diferente: deformaria na piscada");
 });
-await test("A3. Computador: a cabeça não segue o cursor (mover o mouse não a desloca nem a inclina)", async (keep) => {
-  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  await freeze(page); await page.waitForTimeout(100);
-  const h0 = await head(page), rz0 = await page.evaluate(() => document.querySelector("#bot .bot-tilt").style.getPropertyValue("--rz"));
-  for (let i = 0; i < 24; i++) { await page.mouse.move(120 + i * 45, 120 + (i % 7) * 95); await page.waitForTimeout(20); }
-  await page.mouse.move(Math.round(h0.cx), Math.round(h0.cy)); await page.waitForTimeout(200); // até por cima dela
-  const h1 = await head(page), rz1 = await page.evaluate(() => document.querySelector("#bot .bot-tilt").style.getPropertyValue("--rz"));
-  assert(Math.hypot(h1.x - h0.x, h1.y - h0.y) < 1, "a cabeça seguiu o cursor: " + JSON.stringify([h0, h1]));
-  assert(!(await page.evaluate(() => !!Bot.mv.raf)), "um movimento começou por causa do mouse");
-  assert(rz1 === rz0, "a cabeça se inclinou seguindo o cursor: " + rz0 + " → " + rz1);
-  assert(!(await page.evaluate(() => document.querySelector("#bot .bot-tilt").style.getPropertyValue("--ry"))), "inclinação 3D pelo cursor ainda presente");
-});
-await test("A4. Celular: a cabeça não segue cada toque (tocar na tela não a desloca nem inicia movimento)", async (keep) => {
-  const ctx = keep(await ctxOf({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })); const { page } = await quiet(ctx);
-  await freeze(page); await page.waitForTimeout(100);
-  const h0 = await head(page);
-  for (const [x, y] of [[60, 300], [330, 500], [200, 700], [60, 760]]) { await page.touchscreen.tap(x, y); await page.waitForTimeout(150); }
-  const h1 = await head(page);
-  assert(Math.hypot(h1.x - h0.x, h1.y - h0.y) < 1, "a cabeça se moveu em direção aos toques: " + JSON.stringify([h0, h1]));
-  assert(!(await page.evaluate(() => !!Bot.mv.raf)), "um toque iniciou um movimento");
-});
-await test("A5. Movimentação autônoma: escolhe sozinha várias posições diferentes, com o mouse parado", async (keep) => {
-  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  const w = await watch(page, 18000); // não toca em nada durante a observação
-  assert(w.moving > 0 && w.onsets >= 2, "não passeou sozinha o suficiente: " + w.onsets + " deslocamentos");
-  assert(w.rests.length >= 2, "poucas posições autônomas distintas: " + w.rests.length + " (" + w.rests.join(" ") + ")");
-  const xs = w.rests.map((k) => +k.split(",")[0]), ys = w.rests.map((k) => +k.split(",")[1]);
-  assert(Math.max(...xs) - Math.min(...xs) > 100 || Math.max(...ys) - Math.min(...ys) > 100, "passeio concentrado num ponto só: " + w.rests.join(" "));
-});
-await test("A6. Deslocamento lento e suave: dura ~1,5–3 s, com aceleração/desaceleração e sem saltos", async (keep) => {
-  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  await freeze(page);
-  const tr = await page.evaluate(() => new Promise((ok) => { const m = Bot.mv, b = Bot.bounds(), { w, h } = Bot.dims();
-    const far = Math.hypot(m.x - (b.l + 20), m.y - (b.b - h - 20)) > Math.hypot(m.x - (b.r - w - 20), m.y - (b.t + 20)) ? [b.l + 20, b.b - h - 20] : [b.r - w - 20, b.t + 20];
-    const pts = []; const t0 = performance.now(); Bot.go(far[0], far[1]);
-    const f = () => { pts.push([performance.now() - t0, Bot.mv.x, Bot.mv.y]); if (Bot.mv.raf) requestAnimationFrame(f); else ok({ pts, dur: performance.now() - t0 }); }; requestAnimationFrame(f); }));
-  assert(tr.dur >= 1400 && tr.dur <= 3200, "duração fora de 1,5–3 s: " + Math.round(tr.dur) + " ms");
-  let maxStep = 0; for (let i = 1; i < tr.pts.length; i++) maxStep = Math.max(maxStep, Math.hypot(tr.pts[i][1] - tr.pts[i - 1][1], tr.pts[i][2] - tr.pts[i - 1][2]));
-  assert(maxStep < 40, "salto entre quadros (não é suave): " + maxStep.toFixed(1) + " px");
-  // easeInOut: o deslocamento no 1º quinto do tempo é bem menor que no quinto central (acelera no meio)
-  const at = (f) => { const tt = tr.dur * f; let p = tr.pts[0]; for (const q of tr.pts) { if (q[0] <= tt) p = q; else break; } return p; };
-  const d = (a, b) => Math.hypot(a[1] - b[1], a[2] - b[2]);
-  const start = d(at(0), at(.2)), mid = d(at(.4), at(.6));
-  assert(mid > start * 1.4, `sem aceleração/desaceleração (início ${start.toFixed(0)} vs meio ${mid.toFixed(0)})`);
-});
-await test("A7. Pausas perceptíveis entre os deslocamentos (a maior parte do tempo fica relativamente parada)", async (keep) => {
-  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  const w = await watch(page, 16000);
-  assert(w.gaps >= 1, "não houve pausa perceptível (>2 s parada) entre movimentos");
-  assert(w.moving / w.frames < 0.6, "passou a maior parte do tempo em movimento: " + (100 * w.moving / w.frames).toFixed(0) + "%");
-});
-await test("A8. Piscadas naturais durante o repouso: curtas, intervalos variáveis, sem deformar a cabeça", async (keep) => {
-  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  await page.evaluate(() => { window.__bl = []; const el = document.getElementById("bot"), hd = el.querySelector(".bot-head"); new MutationObserver(() => { if (el.classList.contains("blink")) window.__bl.push({ t: performance.now(), w: hd.offsetWidth, h: hd.offsetHeight }); }).observe(el, { attributes: true, attributeFilter: ["class"] }); });
-  await page.waitForTimeout(8000);
-  const r = await page.evaluate(() => ({ bl: window.__bl.filter((b, i, a) => !i || b.t - a[i - 1].t > 50), w: document.querySelector("#bot .bot-head").offsetWidth, h: document.querySelector("#bot .bot-head").offsetHeight }));
-  assert(r.bl.length >= 1, "não piscou em 8 s");
-  assert(r.bl.every((b) => b.w === r.w && b.h === r.h), "a cabeça mudou de tamanho ao piscar");
-  await page.evaluate(() => Bot.blink());
-  assert(await page.evaluate(() => getComputedStyle(document.querySelector("#bot img.cl")).opacity === "1"), "olhos fechados não apareceram");
-  const t0 = Date.now(); await page.waitForFunction(() => !document.getElementById("bot").classList.contains("blink"), null, { timeout: 1000, polling: 10 }).catch(() => { throw new Error("a piscada não terminou"); });
-  assert(Date.now() - t0 < 400, "olhos fechados por tempo demais: " + (Date.now() - t0) + " ms");
-  const gaps = await page.evaluate(() => new Promise((ok) => { const g = []; const o = Bot.blink.bind(Bot); let last = 0; Bot.blink = () => { const t = performance.now(); if (last) g.push(Math.round(t - last)); last = t; o(); if (g.length >= 4) { Bot.blink = o; ok(g); } }; setTimeout(() => { Bot.blink = o; ok(g); }, 16000); }));
-  const nat = gaps.filter((g) => g >= 300); // ignora a segunda piscada de uma dupla (~240 ms)
-  assert(nat.length >= 1 && nat.every((g) => g < 8000), "intervalos fora da faixa natural: " + gaps);
-  assert(new Set(nat.map((g) => Math.round(g / 500))).size > 1 || nat.length < 2, "intervalos sem variação natural: " + nat);
-});
-await test("A9. Não fica preso no canto nem sai da tela, em vários tamanhos", async (keep) => {
-  for (const [w, hgt, mob] of [[320, 568, true], [768, 1024, true], [1024, 700, false], [1920, 1080, false]]) {
-    const ctx = keep(await ctxOf({ viewport: { width: w, height: hgt }, isMobile: mob, hasTouch: mob })); const { page } = await quiet(ctx);
-    const ob = await watch(page, 12000);
-    assert(ob.inside, `${w}x${hgt}: saiu da área visível`);
-    assert((await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)), `${w}x${hgt}: rolagem horizontal`);
-    const corners = ob.rests.filter((k) => { const [x, y] = k.split(",").map(Number); return (x < 40 || x > w - 110) && (y < 40 || y > hgt - 120); });
-    assert(!(ob.rests.length >= 3 && corners.length === ob.rests.length), `${w}x${hgt}: ficou preso em cantos: ` + ob.rests.join(" "));
-    const r = await page.evaluate(() => { const h = document.querySelector("#bot .bot-head").getBoundingClientRect(); return [h.left >= 0, h.top >= 0, h.right <= innerWidth, h.bottom <= innerHeight, h.width]; });
-    assert(r[0] && r[1] && r[2] && r[3], `${w}x${hgt}: cabeça cortada na borda`);
-    assert(w <= 900 ? r[4] < 52 : r[4] > 60, `${w}x${hgt}: tamanho ${r[4]}`);
+await test("M1. Em cada aba e largura (1280, 430, 390, 375, 320): no topo da aba, sem cobrir texto nem controles, abaixo da barra fixa e sem empurrar o conteúdo", async (keep) => {
+  const fails = [];
+  for (const [w, h, mob] of [[1280, 860, false], [430, 932, true], [390, 844, true], [375, 812, true], [320, 640, true]]) {
+    const ctx = keep(await ctxOf({ viewport: { width: w, height: h }, isMobile: mob, hasTouch: mob })); const { page } = await quiet(ctx);
+    for (const t of TABS) {
+      await page.evaluate((t) => { tab = t; render(); document.querySelector("main").scrollTop = 0; }, t); await page.waitForTimeout(60);
+      const c = await covers(page);
+      // mesmo layout do cabeçalho com e sem a cabeça (ela não ocupa espaço no fluxo)
+      const same = await page.evaluate(() => { const hd = document.querySelector(".bot-head"), H = document.querySelector("#view>.head"), snap = () => [...H.children].filter((e) => e !== hd).map((e) => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.width, r.height].map(Math.round).join(","); }).join("|") + "#" + H.offsetHeight + "#" + document.getElementById("view").scrollWidth;
+        const a = snap(); const p = hd.parentNode, nx = hd.nextSibling; hd.remove(); const b = snap(); p.insertBefore(hd, nx); return a === b; });
+      if (!c.shown) fails.push(`${w} ${t}: mascote não aparece`);
+      else if (c.hit.length || !c.inView || !c.belowBar || c.sw > c.vw || !same) fails.push(`${w} ${t}: ` + JSON.stringify({ hit: c.hit, inView: c.inView, belowBar: c.belowBar, sw: c.sw, same }));
+    }
   }
+  assert(!fails.length, fails.slice(0, 6).join(" ; "));
 });
-await test("A10. Evita botões, formulários e áreas importantes ao descansar", async (keep) => {
-  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  let checks = 0;
-  for (let i = 0; i < 20; i++) { // amostra várias posições de descanso ao longo do passeio
-    await page.waitForTimeout(900);
-    if (await page.evaluate(() => !Bot.mv.raf && !Bot.cur)) { const over = await overControls(page); assert(!over.length, "descansou sobre um controle: " + over.join(", ")); checks++; }
-  }
-  assert(checks >= 3, "poucas paradas observadas para validar: " + checks);
-  // com um campo em foco (formulário), não para sobre ele
-  const ctx2 = keep(await ctxOf({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })); const { page: p2 } = await open(ctx2, { hash: "#criar-conta" });
-  await p2.waitForTimeout(300); await p2.tap("#re-email"); await p2.waitForTimeout(300);
-  for (let i = 0; i < 8; i++) { await p2.waitForTimeout(700); const bad = await p2.evaluate(() => { const f = document.activeElement, fr = f && f.getBoundingClientRect(), h = document.querySelector("#bot .bot-head").getBoundingClientRect(); return f && f.id === "re-email" && fr.left < h.right && fr.right > h.left && fr.top < h.bottom && fr.bottom > h.top; }); assert(!bad, "cobriu o campo em edição"); }
-});
-await test("A11. Não bloqueia a interface: cliques, digitação, toque e rolagem passam pela cabeça", async (keep) => {
-  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  assert((await page.evaluate(() => getComputedStyle(document.getElementById("bot")).pointerEvents)) === "none", "a camada do mascote captura o ponteiro");
-  await freeze(page);
-  // clique num botão com a cabeça por cima dele
-  // coloca a cabeça EM MOVIMENTO por cima do botão (caso real: ela passeia por cima) — em movimento não intercepta
-  const btn = await page.evaluate(() => { const b = [...document.querySelectorAll("#app main button")].find((n) => /Adicionar registro/.test(n.textContent) && n.getBoundingClientRect().width); const r = b.getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) }; });
-  await page.evaluate(({ x, y }) => { const m = Bot.mv, { w, h } = Bot.dims(); m.x = x - w / 2; m.y = y - h / 2; m.tx = m.x; m.ty = m.y; Bot.paint(); Bot.go(x - w / 2 - 400, y - h / 2); }, btn);
-  assert(await page.evaluate(() => !!Bot.mv.raf && getComputedStyle(document.querySelector("#bot .bot-head")).pointerEvents === "none"), "em movimento a cabeça deveria deixar o clique passar");
-  await page.mouse.click(btn.x, btn.y);
-  assert(await page.evaluate(() => document.getElementById("modal").classList.contains("on")), "o botão sob a cabeça não respondeu ao clique");
-  await page.evaluate(() => closeModal()); await page.waitForTimeout(200);
-  // digitação num campo sob a cabeça em movimento
-  const inp = await page.evaluate(() => { const i = [...document.querySelectorAll("#app main input")].find((n) => n.getBoundingClientRect().width > 100); i.id = i.id || "__alvo"; const r = i.getBoundingClientRect(); return { id: i.id, x: Math.round(r.left + 30), y: Math.round(r.top + r.height / 2) }; });
-  await page.evaluate(({ x, y }) => { const m = Bot.mv, { w, h } = Bot.dims(); m.x = x - w / 2; m.y = y - h / 2; m.tx = m.x; m.ty = m.y; Bot.paint(); Bot.go(x - w / 2 + 400, y - h / 2); }, inp);
-  await page.mouse.click(inp.x, inp.y); await page.keyboard.type("Uber 99");
-  assert((await page.evaluate((id) => document.activeElement.id === id && document.activeElement.value, inp.id)) === "Uber 99", "digitação no campo sob a cabeça falhou");
-  // roda do mouse sobre a cabeça parada rola o conteúdo
-  await page.evaluate(() => document.activeElement.blur()); await settled(page);
-  const s0 = await page.evaluate(() => document.querySelector("#app main").scrollTop);
-  const h = await head(page); await page.mouse.move(h.cx, h.cy); await page.mouse.wheel(0, 300); await page.waitForTimeout(300);
-  assert((await page.evaluate(() => document.querySelector("#app main").scrollTop)) > s0 + 100, "a roda do mouse sobre a cabeça não rolou a página");
-});
-await test("A11b. Celular: arrastar o dedo começando na cabeça rola a página; um toque curto nela abre a dica", async (keep) => {
-  const ctx = keep(await ctxOf({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })); const { page } = await quiet(ctx);
+await test("M2. Rola junto com o cabeçalho (nunca fica parado sobre os cartões) e arrastar o dedo sobre ela rola a página", async (keep) => {
+  const ctx = keep(await ctxOf({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })); const { page } = await quiet(ctx, { seed: { ...QUIET, tx: Array.from({ length: 40 }, (_, i) => tx(T, "in", "uber", 10 + i)) } });
+  await page.evaluate(() => { tab = "historico"; render(); });
+  const a = await page.evaluate(() => [document.querySelector(".bot-head").getBoundingClientRect().top, document.querySelector("#view>.head h1").getBoundingClientRect().top]);
+  await page.evaluate(() => { document.querySelector("main").scrollTop = 220; }); await page.waitForTimeout(100);
+  const b = await page.evaluate(() => [document.querySelector(".bot-head").getBoundingClientRect().top, document.querySelector("#view>.head h1").getBoundingClientRect().top]);
+  assert(Math.abs((a[0] - b[0]) - (a[1] - b[1])) < 1 && a[0] - b[0] > 150, "não acompanhou o cabeçalho: " + JSON.stringify([a, b]));
+  await page.evaluate(() => { document.querySelector("main").scrollTop = 0; }); await page.waitForTimeout(100);
+  const h = await page.evaluate(() => { const r = document.querySelector(".bot-head").getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) }; });
   const cdp = await ctx.newCDPSession(page);
-  await page.evaluate(() => { const m = document.querySelector("#app main"); m.scrollTop = 400; }); await page.waitForTimeout(400); await settled(page);
-  const h = await head(page), x = Math.round(h.cx), y = Math.round(h.cy), dir = y < 422 ? 1 : -1;
-  const s0 = await page.evaluate(() => document.querySelector("#app main").scrollTop);
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
-  for (let i = 1; i <= 12; i++) { await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y: y + dir * i * 25 }] }); await page.waitForTimeout(16); }
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [h] });
+  for (let i = 1; i <= 12; i++) { await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: h.x, y: h.y - i * 30 }] }); await page.waitForTimeout(16); }
   await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] }); await page.waitForTimeout(300);
-  assert(Math.abs((await page.evaluate(() => document.querySelector("#app main").scrollTop)) - s0) > 100, "a rolagem iniciada sobre a cabeça foi bloqueada");
-  await page.waitForTimeout(300); await settled(page);
-  const h2 = await head(page); await page.touchscreen.tap(Math.round(h2.cx), Math.round(h2.cy)); await page.waitForTimeout(200);
-  assert(await bubble(page), "tocar na cabeça parada deveria abrir uma dica");
+  assert((await page.evaluate(() => document.querySelector("main").scrollTop)) > 100, "a rolagem iniciada sobre a cabeça foi bloqueada");
 });
-await test("A12. Desempenho e movimento reduzido: o mouse não renderiza o app nem move a cabeça; a animação para no repouso; RM desativa o passeio", async (keep) => {
+await test("M3. Animações: piscadas ocasionais e um leve balanço de vez em quando, nunca duas ao mesmo tempo e nada contínuo", async (keep) => {
   const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  await page.evaluate(() => { window.__r = 0; const r = window.render; window.render = function () { __r++; return r.apply(this, arguments); }; });
-  const h0 = await head(page);
-  for (let i = 0; i < 50; i++) { await page.mouse.move(250 + i * 14, 180 + (i % 9) * 40); await page.waitForTimeout(16); }
-  assert((await page.evaluate(() => window.__r)) === 0, "o app foi renderizado ao mover o mouse: " + (await page.evaluate(() => window.__r)));
-  // a animação não roda o tempo todo: em algum momento do repouso raf fica parado
-  let idle = false; for (let i = 0; i < 20; i++) { if (await page.evaluate(() => !Bot.mv.raf)) { idle = true; break; } await page.waitForTimeout(400); }
-  assert(idle, "a animação nunca parou (rAF girando sem parar)");
-  // movimento reduzido: sem passeio autônomo
-  const ctx2 = keep(await ctxOf({ reducedMotion: "reduce" })); const { page: p2 } = await quiet(ctx2);
-  const a = await head(p2); const w = await watch(p2, 6000);
-  assert(w.moving === 0, "passou a passear mesmo com movimento reduzido");
-  assert((await p2.evaluate(() => getComputedStyle(document.querySelector("#bot .bot-float")).animationName)) === "none", "flutuação ativa com movimento reduzido");
+  await page.evaluate(() => { window.__ov = []; window.__ev = { blink: 0, turn: 0 }; const hd = document.querySelector(".bot-head"); let prev = "";
+    new MutationObserver(() => { const on = ["blink", "turn", "talk", "happy", "enter"].filter((k) => hd.classList.contains(k)); if (on.length > 1) window.__ov.push(on.join("+")); for (const k of ["blink", "turn"]) if (on.includes(k) && !prev.includes(k)) window.__ev[k]++; prev = on.join(" "); }).observe(hd, { attributes: true, attributeFilter: ["class"] });
+    Bot.turnAt = 0; });
+  const idle = await page.evaluate(() => getComputedStyle(document.querySelector(".bot-head .bot-float")).animationName);
+  assert(idle === "none", "animação contínua no repouso: " + idle);
+  await page.waitForTimeout(14000);
+  const r = await page.evaluate(() => ({ ov: window.__ov, ev: window.__ev }));
+  assert(!r.ov.length, "animações simultâneas: " + r.ov.join(", "));
+  assert(r.ev.blink >= 1, "não piscou em 14 s");
+  // balanço: suave (≤ 10°), curto e bloqueia outras animações enquanto dura
+  const t = await page.evaluate(async () => { Bot.turn(); const hd = document.querySelector(".bot-head"), a = getComputedStyle(hd.querySelector(".bot-float")).animationName, busy = Bot.busy(); await new Promise((ok) => setTimeout(ok, 1600)); return { a, busy, after: hd.classList.contains("turn") }; });
+  assert(t.a === "botturn" && t.busy && !t.after, "balanço: " + JSON.stringify(t));
+  const deg = await page.evaluate(() => { for (const sh of document.styleSheets) for (const ru of sh.cssRules) if (ru.name === "botturn") return [...ru.cssRules].map((k) => k.style.transform).join(" "); return ""; });
+  const max = Math.max(...[...deg.matchAll(/rotate\((-?\d+(?:\.\d+)?)deg\)/g)].map((m) => Math.abs(+m[1])));
+  assert(max <= 10, "rotação exagerada: " + deg);
 });
-await test("A13. Minimizar não passeia e silenciar não abre balão sozinho (controles preservados)", async (keep) => {
-  const ctx = keep(await ctxOf()); const { page } = await quiet(ctx);
-  await page.evaluate(() => Bot.show({ text: "teste" })); await page.click('#bot [data-bot="min"]');
-  await page.waitForTimeout(300); await settled(page);
-  const h0 = await head(page); const w = await watch(page, 5000);
-  assert(w.moving === 0, "minimizada continuou passeando");
-  assert(h0.w < 50 && h0.can, "minimizada deveria ficar pequena e clicável: " + JSON.stringify(h0));
-  await page.evaluate(() => { window.__said = []; tab = "despesas"; render(); }); await page.waitForTimeout(1200);
-  assert(!(await bubble(page)), "silenciada abriu balão sozinha");
+await test("M4. Dicas curtas (uma frase, adaptadas à aba), balão estreito e dentro da tela em 320 px sem cobrir o campo em edição", async (keep) => {
+  const ctx = keep(await ctxOf({ viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true })); const { page } = await open(ctx, { user: U1, seed: QUIET });
+  await page.waitForTimeout(300);
+  const tips = await page.evaluate((TABS) => { const out = []; for (const t of TABS) { const m = Bot.tabMsg(t, true); if (m) out.push([t, m.text]); }
+    const keep = db; for (const [inc, exp, goal] of [[350, 120, 0], [100, 130, 0], [150, 149, 0], [321.1, 0, 300], [100, 0, 300]]) { db = Object.assign(empty(), { cfg: { pass: { uber: { on: false }, n99: { on: false } }, goal }, tx: [{ id: "a", d: TODAY(), type: "in", app: "uber", v: inc, at: 1 }].concat(exp ? [{ id: "b", d: TODAY(), type: "other", app: "veic", v: exp, at: 1 }] : []) }); migrate(); out.push(["resumo", Bot.finMsg().text]); } db = keep; return out; }, TABS);
+  const long = tips.filter(([, t]) => plain(t).length > 90);
+  assert(!long.length, "dicas longas: " + long.map(([t, x]) => t + ": " + plain(x)).join(" | "));
+  // dicas diferentes por aba (nada de frase genérica repetida)
+  const tabTips = tips.filter(([t]) => t !== "resumo").map(([, x]) => plain(x));
+  assert(new Set(tabTips).size >= tabTips.length - 3, "dicas repetidas entre abas: " + tabTips.join(" | "));
+  // balão estreito, dentro da tela e fora do campo em edição
+  await page.evaluate(() => { tab = "despesas"; render(); }); await page.waitForTimeout(100);
+  await page.evaluate(() => { const i = [...document.querySelectorAll("#view input")].find((n) => n.getBoundingClientRect().width > 100 && n.type !== "search") || document.getElementById("q"); i.focus(); Bot.show({ text: "Lance combustível, manutenção e outros gastos." }); });
+  await page.waitForTimeout(100);
+  const b = await page.evaluate(() => { const bb = document.querySelector("#bot .bot-bub").getBoundingClientRect(), f = document.activeElement.getBoundingClientRect(); return { w: bb.width, inView: bb.left >= 0 && bb.right <= innerWidth && bb.top >= 0 && bb.bottom <= innerHeight, overField: bb.left < f.right && bb.right > f.left && bb.top < f.bottom && bb.bottom > f.top }; });
+  assert(b.w <= 272.5 && b.inView && !b.overField, "balão: " + JSON.stringify(b));
+});
+await test("M5. Dicas não reaparecem nem aparecem fora de hora: uma dica de aba nunca surge depois, em outra aba; intervalo entre dicas automáticas", async (keep) => {
+  const ctx = keep(await ctxOf()); const { page } = await open(ctx, { user: U1, seed: QUIET });
+  await page.waitForTimeout(400); await page.evaluate(() => Bot.hide());
+  const r = await page.evaluate(() => { tab = "despesas"; render(); Bot.hide(); window.__said = []; Bot.last = Date.now(); // dentro do intervalo: a dica vai para a fila
+    Bot.say({ id: "tab:teste", tab: "despesas", text: "Lance combustível, manutenção e outros gastos." }); const queued = !!Bot.queue;
+    tab = "metas"; render(); Bot.last = 0; Bot.flush(); return { queued, said: window.__said.slice(), gap: Bot.GAP }; });
+  assert(r.queued && !r.said.length, "dica de outra aba apareceu depois da troca de aba: " + JSON.stringify(r));
+  assert(r.gap >= 30000, "intervalo entre dicas automáticas curto demais: " + r.gap);
+});
+await test("M6. Tocar na cabeça abre a dica; ✕ e toque fora fecham (celular)", async (keep) => {
+  const ctx = keep(await ctxOf({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true })); const { page } = await quiet(ctx);
+  await page.tap(".bot-head"); await page.waitForTimeout(100); assert(await bubble(page), "toque na cabeça não abriu a dica");
+  await page.tap("#bot .bot-x"); assert(!(await bubble(page)), "✕ não fechou");
+  await page.tap(".bot-head"); await page.waitForTimeout(100); await page.touchscreen.tap(30, 500); assert(!(await bubble(page)), "toque fora não fechou");
 });
 
 await browser.close(); server.close();
