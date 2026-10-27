@@ -581,7 +581,7 @@ body.boot #auth,body.boot #canvas-container,body.boot #landing{visibility:hidden
    aiEndpoint é a URL do SEU servidor/função que guarda a chave da IA. Nunca coloque chaves privadas aqui.
    functionsUrl/uberEnabled ligam o cartão da Uber às Edge Functions (ver docs/INTEGRACAO_UBER.md).
    Os valores normalmente vêm de config.js, gerado por scripts/build-config.mjs a partir de variáveis PÚBLICAS. */
-window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:'',functionsUrl:'',uberEnabled:false},window.NSC_CONFIG||{});
+window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:'',functionsUrl:'',uberEnabled:false,allowedOrigins:[]},window.NSC_CONFIG||{});
 </script>
 </head>
 <body class="boot">
@@ -785,7 +785,10 @@ const C=window.NSC_CONFIG;
    de modo que o link do e-mail nunca aponta para localhost:3000 nem para um domínio externo não autorizado. */
 function publicUrl(){
   const site=String(C.siteUrl||'').replace(/\/+$/,''),o=location.origin,p=location.pathname;
-  const allow=[site,/^https:\/\/indexnscai(-[a-z0-9-]+)?-nsc-ai1\.vercel\.app$/,/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
+  // Origens autorizadas: o endereço oficial (siteUrl), as origens extras definidas em NSC_CONFIG.allowedOrigins
+  // (ex.: o novo domínio na Hostinger, com e sem www), os previews do projeto na Vercel e o ambiente local.
+  const extra=(Array.isArray(C.allowedOrigins)?C.allowedOrigins:[]).map(x=>String(x).replace(/\/+$/,'')).filter(Boolean);
+  const allow=[site,...extra,/^https:\/\/indexnscai(-[a-z0-9-]+)?-nsc-ai1\.vercel\.app$/,/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
   const ok=o&&allow.some(a=>a instanceof RegExp?a.test(o):a&&o===a);
   return ok?o+p:(site||o+p);
 }

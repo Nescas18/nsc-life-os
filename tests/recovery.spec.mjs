@@ -150,18 +150,25 @@ await test("publicUrl usa a origem local permitida; origem estranha e preview se
   // a função é testada com uma allowlist idêntica à do app, mas aplicada a origens arbitrárias
   const r = await o.pg.evaluate(() => {
     const site = String(C.siteUrl || "").replace(/\/+$/, "");
+    // espelha publicUrl(): agora também aceita as origens de NSC_CONFIG.allowedOrigins (migração de domínio)
+    const extra = (Array.isArray(C.allowedOrigins) ? C.allowedOrigins : []).map((x) => String(x).replace(/\/+$/, "")).filter(Boolean);
     const decide = (origin) => {
-      const allow = [site, /^https:\/\/indexnscai(-[a-z0-9-]+)?-nsc-ai1\.vercel\.app$/, /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
+      const allow = [site, ...extra, /^https:\/\/indexnscai(-[a-z0-9-]+)?-nsc-ai1\.vercel\.app$/, /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
       const ok = origin && allow.some((a) => a instanceof RegExp ? a.test(origin) : a && origin === a);
       return ok ? origin : site;
     };
-    return { here: publicUrl(), site, prod: decide(site), preview: decide("https://indexnscai-abc123-nsc-ai1.vercel.app"), phish: decide("https://phishing.example.com"), localhost: decide("http://localhost:3000") };
+    return { here: publicUrl(), site, extra, prod: decide(site), preview: decide("https://indexnscai-abc123-nsc-ai1.vercel.app"), phish: decide("https://phishing.example.com"), localhost: decide("http://localhost:3000"), custom: decide("https://meu-dominio.com"), customExtra: decide((extra[0] || "https://nao-configurado.invalid")) };
   });
   assert(r.here === BASE, "origem local permitida (127.0.0.1) deveria ser usada: " + r.here);
   assert(r.prod === r.site, "produção aceita");
   assert(r.preview === "https://indexnscai-abc123-nsc-ai1.vercel.app", "preview aceito: " + r.preview);
   assert(r.localhost === "http://localhost:3000", "localhost de desenvolvimento aceito");
   assert(r.phish === r.site, "origem desconhecida deveria cair para o endereço oficial: " + r.phish);
+  assert(r.custom === r.site, "domínio não autorizado deveria cair para o oficial: " + r.custom);
+  // migração de domínio: uma origem listada em allowedOrigins passa a ser aceita (sem editar o código)
+  const r2 = await o.pg.evaluate(() => { C.allowedOrigins = ["https://nesc.exemplo.com", "https://www.nesc.exemplo.com"]; const site = String(C.siteUrl || "").replace(/\/+$/, ""); const extra = C.allowedOrigins.map((x) => String(x).replace(/\/+$/, "")); const decide = (origin) => { const allow = [site, ...extra]; return origin && allow.some((a) => origin === a) ? origin : site; }; return { ok: decide("https://nesc.exemplo.com"), www: decide("https://www.nesc.exemplo.com"), bad: decide("https://phishing.example.com") }; });
+  assert(r2.ok === "https://nesc.exemplo.com" && r2.www === "https://www.nesc.exemplo.com", "allowedOrigins não autorizou o novo domínio: " + JSON.stringify(r2));
+  assert(r2.bad === r.site, "allowedOrigins não deveria autorizar origem estranha: " + r2.bad);
   return o;
 });
 

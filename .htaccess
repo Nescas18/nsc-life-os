@@ -1,0 +1,47 @@
+# NESC — configuração Apache para hospedagem estática na Hostinger (public_html).
+# O NESC é um site estático (HTML/CSS/JS). Não precisa de Node.js no servidor:
+# o Supabase (banco + autenticação) continua sendo acessado direto do navegador.
+
+# ---- HTTPS obrigatório ----
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ---- (Opcional) padronizar o domínio. Descomente SÓ UMA opção, com o seu domínio real. ----
+# Forçar SEM www:
+#   RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+#   RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+# Forçar COM www:
+#   RewriteCond %{HTTP_HOST} !^www\. [NC]
+#   RewriteRule ^ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ---- SPA: qualquer caminho que não seja um arquivo real cai no index.html ----
+# (as rotas do app são por #âncora; isto só cobre quem digita um caminho direto)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ /index.html [L]
+
+# ---- Tipos de conteúdo ----
+AddType application/manifest+json .webmanifest
+AddType image/webp .webp
+
+# ---- Cache ----
+<IfModule mod_headers.c>
+  # index.html e config.js nunca ficam em cache: mudanças de versão/domínio propagam na hora.
+  <FilesMatch "^(index\.html|config\.js)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  # Imagens/ícones podem ficar em cache longo (têm nomes estáveis).
+  <FilesMatch "\.(webp|png|ico|webmanifest)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+  # ---- Cabeçalhos de segurança ----
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# ---- Compressão ----
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/manifest+json image/svg+xml
+</IfModule>
