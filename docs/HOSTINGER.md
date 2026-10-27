@@ -1,68 +1,55 @@
-# Migração do NESC para a Hostinger
+# Migração do NESC para a Hostinger — domínio nescar.com.br
 
-## O que o NESC é (resumo da auditoria)
-- **Site estático**: um `index.html` (todo o HTML/CSS/JS embutido) + `config.js` + imagens/ícones.
-- **Sem framework e sem Node.js no servidor**. As bibliotecas externas (Supabase JS, three.js)
-  são carregadas de CDN em tempo de execução. O banco e a autenticação são do **Supabase**,
-  acessados direto do navegador — **nada muda no Supabase** nesta migração.
-- `npm run build` só copia os arquivos para `www/` (usado pelo app Android). **Para a web não é
-  necessário build**: os arquivos a publicar são os do próprio repositório.
+## Resumo da auditoria
+- **Site estático**: `index.html` (HTML/CSS/JS embutido) + `config.js` + imagens/ícones.
+- **Sem framework e sem Node.js no servidor.** Supabase (banco + auth) é acessado do navegador;
+  bibliotecas externas (Supabase JS, three.js) vêm de CDN. **Nada muda no Supabase.**
+- `npm run build` só copia arquivos para `www/` (app Android). **A web não precisa de build.**
+- Compatível com qualquer plano de hospedagem de sites da Hostinger (não precisa de Node/PHP/MySQL).
 
-## Plano da Hostinger
-Qualquer plano que sirva arquivos estáticos funciona (Hospedagem/Website/Cloud). **Não precisa de
-Node.js, banco MySQL nem PHP.** Basta enviar os arquivos para `public_html` e ativar o SSL gratuito.
+## Estratégia de migração (sem quebrar a Vercel)
+`publicUrl()` usa a **origem atual** quando ela está autorizada. Com Vercel e Hostinger em
+`allowedOrigins`/`siteUrl`, cada ambiente usa o próprio endereço nos links de e-mail. A Vercel
+continua no ar até o corte final de DNS.
 
-## Arquivos a enviar para `public_html`
-```
-index.html
-config.js
-.htaccess
-manifest.webmanifest
-favicon.ico
-favicon-32.png
-icon-192.png
-icon-512.png
-icon-maskable-512.png
-apple-touch-icon.png
-og-image.png
-cabeca-open-160.webp
-cabeca-open-256.webp
-cabeca-closed-160.webp
-cabeca-closed-256.webp
-cabeca-open-256.png
-cabeca-closed-256.png
-```
-**Não** envie: `node_modules/`, `tests/`, `scripts/`, `android/`, `www/`, `vercel.json`.
+## Deploy via Git no hPanel (escolhido)
+**Branch de deploy:** `chore/hostinger-migracao-prep`
+**Repositório:** `git@github.com:Nescas18/nsc-life-os.git` (privado → usar Deploy Key)
 
-## Passo a passo
-1. **hPanel → Hospedagem → Gerenciador de arquivos** (ou FTP) → entre em `public_html`.
-2. Envie os arquivos da lista acima (ou o `.zip` preparado e extraia lá dentro).
-3. **hPanel → SSL**: garanta o certificado gratuito ativo (HTTPS). O `.htaccess` já força HTTPS.
-4. **Domínio**: aponte o domínio para a Hostinger (ver "Domínio e DNS" abaixo) — só depois da validação.
+1. **hPanel → Avançado → GIT → Criar um novo repositório:**
+   - Repositório: `git@github.com:Nescas18/nsc-life-os.git`
+   - Branch: `chore/hostinger-migracao-prep`
+   - Diretório de instalação: a pasta do **subdomínio de teste** (ver abaixo), ex.: `teste.nescar.com.br`
+2. A Hostinger mostra uma **chave SSH de deploy**. Em GitHub → repo → **Settings → Deploy keys →
+   Add deploy key** (somente leitura). Depois clique em **Deploy/Atualizar** no hPanel.
+3. Observação: o repositório tem pastas que não são do site (`tests/`, `scripts/`, `docs/`, `www/`).
+   Elas são inertes (não referenciadas). O site é servido pelo `index.html` na raiz.
 
-## Ajustes de domínio (feitos quando o domínio for confirmado)
-1. **`config.js`**: trocar `siteUrl` para `https://SEU_DOMINIO` e preencher
-   `allowedOrigins: ['https://SEU_DOMINIO','https://www.SEU_DOMINIO']`.
-2. **`index.html`** (SEO/preview social): atualizar `canonical`, `og:url`, `og:image`, `twitter:image`
-   do domínio da Vercel para o novo domínio.
-3. **Supabase → Authentication → URL Configuration**:
-   - **Site URL**: `https://SEU_DOMINIO`
-   - **Redirect URLs**: adicionar `https://SEU_DOMINIO/**` e `https://www.SEU_DOMINIO/**`
-     (mantenha o domínio da Vercel enquanto os dois ambientes coexistirem).
-   Sem isso, os links de recuperação/confirmação de e-mail continuam indo para o endereço antigo.
+### Site de teste (validar antes de tocar no domínio principal)
+- **hPanel → Domínios → Subdomínios → Criar:** `teste.nescar.com.br`.
+- Faça o Git deploy apontando para a pasta desse subdomínio.
+- **hPanel → SSL:** garanta o certificado para `teste.nescar.com.br` (HTTPS). O `.htaccess` força HTTPS.
+- Endereço de teste: `https://teste.nescar.com.br`.
 
-## Domínio e DNS (somente após validar o site de teste)
-- Opção A — **domínio na Hostinger**: use o site de teste no subdomínio/preview da Hostinger até validar;
-  depois conecte o domínio ao site em hPanel → Domínios.
-- Opção B — **domínio em outro registrador**: apontar os **nameservers** para a Hostinger OU criar
-  registros **A/CNAME** conforme o painel da Hostinger indicar. Use **somente** os valores reais
-  mostrados no hPanel (não há IP/registro fixo a inventar).
-- Propagação de DNS pode levar de minutos a 24–48 h. O SSL é reemitido para o domínio após apontar.
+## Supabase → Authentication → URL Configuration (fazer antes de testar recuperação)
+- **Site URL:** manter `https://indexnscai.vercel.app` por enquanto (fallback; preserva a Vercel).
+- **Redirect URLs:** ADICIONAR (mantendo os da Vercel):
+  - `https://teste.nescar.com.br/**`
+  - `https://nescar.com.br/**`
+  - `https://www.nescar.com.br/**`
+Sem isso, os links de recuperação/confirmação não voltam para o novo endereço.
+
+## Corte final (somente após validar o teste e com sua confirmação)
+1. `config.js`: trocar `siteUrl` para `https://nescar.com.br`.
+2. `index.html`: atualizar `canonical`, `og:url`, `og:image`, `twitter:image` para `https://nescar.com.br`.
+3. Supabase: trocar **Site URL** para `https://nescar.com.br` (manter os Redirect URLs).
+4. **Apontar o domínio principal** `nescar.com.br` para a Hostinger (hPanel → Domínios); como o domínio
+   já está na Hostinger, normalmente é associar o domínio ao site/pasta. Usar SOMENTE os valores que o
+   hPanel indicar — não há IP/registro a inventar. Emitir SSL para o apex e o www.
+5. Validar de novo no domínio final; só então desativar a Vercel, se desejar.
 
 ## O que NÃO muda
-- Supabase (banco + auth), contas e dados dos usuários atuais.
-- A chave usada no frontend é a **anon pública** (segura com RLS). Nenhuma chave secreta vai para o
-  código ou para o host.
+Supabase (banco + auth), contas e dados; a chave do frontend é a **anon pública** (segura com RLS).
 
 ## Rollback
-Enquanto o DNS do domínio não for alterado, a Vercel continua no ar e atendendo normalmente.
+Enquanto o DNS do apex não mudar, a Vercel permanece no ar.
