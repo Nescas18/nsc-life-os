@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#030305" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<title>NESC</title>
-<meta name="description" content="Seu ecossistema pessoal de ferramentas e produtividade." />
+<title>NESC · Controle financeiro grátis para motoristas de Uber e 99</title>
+<meta name="description" content="Registre ganhos da Uber e da 99, acompanhe despesas, veja seu lucro real e bata suas metas. 100% gratuito, sem mensalidade." />
+<link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/sora.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="canonical" href="https://indexnscai.vercel.app/" />
 <meta name="application-name" content="NESC" />
 <meta name="apple-mobile-web-app-title" content="NESC" />
@@ -18,8 +20,8 @@
 <!-- Open Graph / prévia ao compartilhar (WhatsApp, Telegram, redes sociais) -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="NESC" />
-<meta property="og:title" content="NESC" />
-<meta property="og:description" content="Seu ecossistema pessoal de ferramentas e produtividade." />
+<meta property="og:title" content="NESC · Seu lucro real nas corridas" />
+<meta property="og:description" content="Ganhos, despesas, lucro e metas de Uber e 99 em um só lugar. 100% gratuito." />
 <meta property="og:url" content="https://indexnscai.vercel.app/" />
 <meta property="og:image" content="https://indexnscai.vercel.app/og-image.png" />
 <meta property="og:image:width" content="1200" />
@@ -27,8 +29,8 @@
 <meta property="og:image:alt" content="NESC" />
 <meta property="og:locale" content="pt_BR" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="NESC" />
-<meta name="twitter:description" content="Seu ecossistema pessoal de ferramentas e produtividade." />
+<meta name="twitter:title" content="NESC · Seu lucro real nas corridas" />
+<meta name="twitter:description" content="Ganhos, despesas, lucro e metas de Uber e 99 em um só lugar. 100% gratuito." />
 <meta name="twitter:image" content="https://indexnscai.vercel.app/og-image.png" />
 <script>
 /* Link limpo: remove só parâmetros de RASTREAMENTO da barra de endereço, sem redirecionar nem recarregar.
@@ -41,7 +43,13 @@
 }catch(e){}})();
 </script>
 <style>
+/* Tipografia NESC: Sora (títulos e números de destaque) + Inter (texto e interface). Fontes variáveis hospedadas
+   no próprio site (sem depender de terceiros); enquanto carregam, o texto aparece na fonte do sistema. */
+@font-face{font-family:"Inter Variable";font-style:normal;font-display:swap;font-weight:100 900;src:url(/fonts/inter.woff2) format("woff2-variations"),url(/fonts/inter.woff2) format("woff2")}
+@font-face{font-family:"Sora Variable";font-style:normal;font-display:swap;font-weight:100 800;src:url(/fonts/sora.woff2) format("woff2-variations"),url(/fonts/sora.woff2) format("woff2")}
 :root{
+--ff:"Inter Variable",-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+--fd:"Sora Variable","Inter Variable",-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
 /* NESC · tokens de design: base preta profunda, títulos brancos, destaque dourado, cinzas secundários.
    Cores semânticas (ok/bad/warn) só para sinal de valor e alertas pontuais. Uber = preto/branco, 99 = amarelo. */
 --bg:#040405;--surface:#0b0b0d;--surface2:#111114;--panel:rgba(255,255,255,.032);--panel2:rgba(255,255,255,.06);--line:rgba(255,255,255,.085);--line2:rgba(255,255,255,.14);
@@ -50,7 +58,10 @@
 --ac:#e4e4e7;--ok:#5fc48e;--bad:#ef6f66;--warn:#e9a84b;--uber:#e9e9ee;--n99:#ffd400;--n99s:#f4e04d;--tot:#e2b250;--app:var(--gold);
 --r-sm:9px;--r:12px;--r-lg:16px;--ease:cubic-bezier(.2,.7,.2,1);--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);color-scheme:dark;box-sizing:border-box}
 html{scroll-padding-top:var(--sat)}
-*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;font-family:inherit}
+html{font-family:var(--ff)}
+body{font-feature-settings:"cv11","ss01","ss03";-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+h1,h2,.brand-title,.lp-logo b,.lp h3,.lp-n,.lp-stat b{font-family:var(--fd);font-feature-settings:normal}
 body,html{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);-webkit-text-size-adjust:100%}
 #canvas-container{position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 68% 45%,#17130a 0%,#070707 45%,#040405 75%)}
 .gl-fallback{position:absolute;inset:0;overflow:hidden}.gl-fallback i{position:absolute;left:62%;top:46%;width:min(34vw,300px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 35% 30%,#1a1710,#060606 70%);box-shadow:0 0 80px rgba(226,178,80,.18),0 0 0 1px rgba(226,178,80,.12)}.gl-fallback i::after{content:'';position:absolute;inset:-60%;border-radius:50%;border:1px solid rgba(226,178,80,.18);transform:rotateX(75deg)}
@@ -607,7 +618,7 @@ body.boot #auth,body.boot #canvas-container,body.boot #landing{visibility:hidden
 .lp-n{font-size:.78rem;color:var(--gold);font-weight:700;letter-spacing:.1em}.lp-steps h3,.lp-card h3{font-size:1.05rem;margin:12px 0 8px;letter-spacing:-.01em}.lp-steps p,.lp-card p{color:var(--tx2);font-size:.9rem;line-height:1.55}
 .lp-ic{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;margin-top:12px;color:var(--gold-hi);background:var(--gold-a);border:1px solid var(--gold-line)}.lp-ic svg{width:22px;height:22px}
 .lp-card{padding:22px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(24,21,16,.85),rgba(10,10,10,.88));transition:border-color .25s,transform .25s}.lp-card:hover{border-color:var(--gold-line);transform:translateY(-2px)}
-.lp-card.big{padding:28px;background:radial-gradient(ellipse at 100% 0%,rgba(226,178,80,.12),transparent 55%),linear-gradient(180deg,rgba(28,24,17,.9),rgba(10,10,10,.9))}.lp-card.big h3{font-size:1.25rem}
+.lp-card.big{font-size:1rem;font-weight:400;letter-spacing:normal;font-variant-numeric:normal;padding:28px;background:radial-gradient(ellipse at 100% 0%,rgba(226,178,80,.12),transparent 55%),linear-gradient(180deg,rgba(28,24,17,.9),rgba(10,10,10,.9))}.lp-card.big h3{font-size:1.25rem}
 .lp-feat-main{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:16px}.lp-feat-mini{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
 .lp-rk{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:48px;align-items:center}
 .lp-list{list-style:none;display:flex;flex-direction:column;gap:14px;margin-bottom:28px;color:var(--tx2);line-height:1.55}.lp-list b{color:var(--tx)}
@@ -641,6 +652,88 @@ body.boot #auth,body.boot #canvas-container,body.boot #landing{visibility:hidden
 }
 @media(max-width:480px){.lp-w{padding:0 16px}.lp-hide-xs{display:none}.lp-ctas .lp-btn{flex:1 1 100%}.lp-feat-mini{grid-template-columns:minmax(0,1fr)}.lp h1{font-size:2.15rem}}
 @media(prefers-reduced-motion:reduce){.lp{scroll-behavior:auto}.lp-rv{opacity:1;transform:none}.ph-tilt{animation:none!important}}
+/* ===== Página inicial · movimento e hover (NESC 2.0). Mesmas cores; só acabamento, ritmo e resposta ao toque/mouse.
+   Tudo some com "reduzir movimento" do sistema. ===== */
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+.lp-prog{position:absolute;left:0;bottom:-1px;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(var(--p,0));background:linear-gradient(90deg,var(--gold-lo),var(--gold),var(--gold-hi));box-shadow:0 0 12px rgba(226,178,80,.55);pointer-events:none}
+.lp-h{transition:background .3s,box-shadow .3s}.lp-h.sc{background:linear-gradient(180deg,rgba(6,6,6,.97),rgba(6,6,6,.9));box-shadow:0 12px 34px rgba(0,0,0,.5)}
+.lp-logo b{font-weight:700;letter-spacing:.2em}.lp-logo img{transition:transform .6s var(--ease)}.lp-logo:hover img{transform:rotate(-10deg) scale(1.08)}
+@media(min-width:901px){.lp-nav>a{position:relative}.lp-nav>a::after{content:'';position:absolute;left:12px;right:12px;bottom:4px;height:1.5px;border-radius:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}.lp-nav>a:hover::after{transform:scaleX(1)}}
+.lp-cur{position:fixed;left:0;top:0;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(226,178,80,.085),transparent 62%);pointer-events:none;z-index:0;opacity:0;transition:opacity .5s}.lp-cur.on{opacity:1}
+/* hero */
+.lp-hero{position:relative}
+.lp-hero::before{content:'';position:absolute;z-index:-1;left:-25%;right:0;top:4%;height:88%;background:radial-gradient(ellipse at 38% 42%,rgba(226,178,80,.15),transparent 62%);animation:lpaura 16s ease-in-out infinite alternate;pointer-events:none}
+@keyframes lpaura{0%{transform:translate(0,0) scale(1);opacity:.85}100%{transform:translate(8%,6%) scale(1.12);opacity:1}}
+.lp h1{letter-spacing:-.045em;font-weight:700}
+.lp-ln{display:block;overflow:hidden;padding:0 .04em .1em 0;margin-bottom:-.1em}
+.lp-ln>span{display:inline-block;transform:translateY(108%);animation:lpline 1s var(--ease) forwards}
+.lp-hero .lp-gold{background:linear-gradient(100deg,var(--gold) 0%,var(--gold-hi) 16%,var(--gold) 32%,#c8932f 50%,var(--gold) 68%,var(--gold-hi) 84%,var(--gold) 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:lpline 1s .14s var(--ease) forwards,lpsheen 8s 1.4s linear infinite}
+@keyframes lpline{to{transform:none}}@keyframes lpsheen{to{background-position:-200% 0}}
+.lp-hero>.lp-free,.lp-hero>.lp-lead,.lp-hero>.lp-sub,.lp-hero>.lp-ctas,.lp-hero>.lp-trust{animation:lpup .9s var(--ease) both}
+.lp-hero>.lp-free{animation-delay:.02s}.lp-hero>.lp-lead{animation-delay:.32s}.lp-hero>.lp-sub{animation-delay:.42s}.lp-hero>.lp-ctas{animation-delay:.52s}.lp-hero>.lp-trust{animation-delay:.64s}
+@keyframes lpup{from{opacity:0;transform:translateY(16px)}}
+.lp-free i{position:relative}.lp-free i::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--gold);animation:lpping 2.4s var(--ease) infinite}
+@keyframes lpping{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.2);opacity:0}}
+.lp-trust li{transition:color .25s}.lp-trust li:hover{color:var(--tx)}
+/* botões: brilho que atravessa, leve elevação, seta que avança, atração magnética (mouse) */
+.lp-btn{position:relative;overflow:hidden;isolation:isolate;font-family:var(--fd);font-weight:600;letter-spacing:-.005em;transition:filter .2s,box-shadow .4s var(--ease),transform .4s var(--ease),background .25s}
+.lp-btn:not(.ghost)::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(115deg,transparent 28%,rgba(255,255,255,.6) 47%,transparent 64%);transform:translateX(-130%);transition:transform .9s var(--ease)}
+.lp-btn:not(.ghost):hover::before{transform:translateX(130%)}
+.lp-btn:not(.ghost):hover{filter:brightness(1.06);box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 16px 40px rgba(226,178,80,.34)}
+.lp-btn.ghost:hover{box-shadow:inset 0 0 0 1px var(--gold-line);color:var(--gold-hi)}
+.lp-mag{transform:translate3d(var(--bx,0px),calc(var(--by,0px) + var(--lift,0px)),0)}.lp-btn:hover{--lift:-2px}.lp-btn:active{transform:scale(.97)}
+.lp-btn>.lp-hide-xs{margin-left:-4px}.lp-arr{width:18px;height:18px;flex:0 0 18px;margin-right:-3px;transition:transform .4s var(--ease)}.lp-btn:hover .lp-arr{transform:translateX(4px)}
+.lp-hero .lp-btn.lg:not(.ghost){animation:lpglow 3.2s 2s ease-in-out infinite}.lp-btn:not(.lp-mag):hover{transform:translateY(-1px)}
+@keyframes lpglow{0%,100%{box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 10px 28px rgba(226,178,80,.18)}50%{box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 12px 44px rgba(226,178,80,.42)}}
+.lp-hero .lp-btn.lg:not(.ghost):hover{animation-play-state:paused}
+/* títulos de seção e números */
+.lp-k::before{content:'';display:inline-block;width:18px;height:1.5px;border-radius:2px;background:var(--gold);vertical-align:middle;margin:-2px 10px 0 0}
+.lp-h2{font-weight:650;letter-spacing:-.04em}
+.lp-n{font-size:.95rem;background:linear-gradient(180deg,var(--gold-hi),var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+/* cards: luz que segue o mouse, elevação, inclinação 3D sutil, ícone que reage */
+.lp-card,.lp-steps li,.lp-stat{transition:opacity .8s var(--ease),border-color .35s,box-shadow .5s var(--ease),transform .6s var(--ease)}
+.lp-card::before,.lp-steps li::before,.lp-stat::before{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(420px circle at var(--mx,50%) var(--my,0%),rgba(226,178,80,.15),transparent 45%);opacity:0;transition:opacity .45s;pointer-events:none}
+.lp-card,.lp-stat{position:relative}
+.lp-card:hover::before,.lp-steps li:hover::before,.lp-stat:hover::before{opacity:1}
+.lp-card.in,.lp-steps li.in,.lp-stat.in{transform:none}
+.lp-card.in:hover,.lp-steps li.in:hover,.lp-stat.in:hover{transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-5px)}
+.lp-card:hover,.lp-steps li:hover,.lp-stat:hover{border-color:var(--gold-line);box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 1px rgba(226,178,80,.06),0 0 40px rgba(226,178,80,.06)}
+.lp-rv:not(.in){opacity:0;transform:translateY(26px) scale(.985)}.lp-rv:not(.lp-did){transition-delay:var(--rd,0s)}
+.lp-ic{transition:transform .55s var(--ease),background .3s,box-shadow .35s}
+.lp-card:hover .lp-ic,.lp-steps li:hover .lp-ic{transform:translateY(-2px) rotate(-7deg) scale(1.1);background:rgba(226,178,80,.22);box-shadow:0 10px 26px rgba(226,178,80,.26)}
+.lp-card h3,.lp-steps h3{transition:color .3s}.lp-card:hover h3,.lp-steps li:hover h3{color:var(--gold-hi)}
+.lp-rkdemo li{transition:background .3s,transform .35s var(--ease)}.lp-rkdemo li:hover{transform:translateX(4px)}
+/* faixa de números + letreiro */
+.lp-stats{padding:30px 0 6px;position:relative}
+.lp-statrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.lp-stat{padding:24px 22px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(24,21,16,.75),rgba(10,10,10,.75))}
+.lp-stat b{display:block;font-size:clamp(2.1rem,3.8vw,3rem);font-weight:700;letter-spacing:-.045em;line-height:1;background:linear-gradient(180deg,var(--gold-hi),var(--gold) 78%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-variant-numeric:tabular-nums}
+.lp-stat span{display:block;margin-top:10px;color:var(--tx2);font-size:.9rem;line-height:1.4}
+.lp-marq{margin-top:30px;overflow:hidden;border-top:1px solid rgba(226,178,80,.14);border-bottom:1px solid rgba(226,178,80,.14);padding:15px 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.lp-marq-in{display:flex;width:max-content;animation:lpmarq 46s linear infinite}
+.lp-marq span{display:inline-flex;align-items:center;gap:22px;padding-right:22px;color:var(--tx2);font:500 .98rem/1 var(--fd);letter-spacing:-.01em;white-space:nowrap}
+.lp-marq span::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold)}
+.lp-marq:hover .lp-marq-in{animation-play-state:paused}
+@keyframes lpmarq{to{transform:translateX(-50%)}}
+/* FAQ */
+.lp-faq summary{transition:color .25s,padding-left .35s var(--ease)}.lp-faq summary:hover{color:var(--gold-hi);padding-left:6px}
+.lp-faq details[open] p{animation:lpfaq .5s var(--ease)}@keyframes lpfaq{from{opacity:0;transform:translateY(-8px)}}
+/* caixas de chamada: borda dourada em movimento */
+.lp-freebox,.lp-finalbox{isolation:isolate}
+.lp-freebox::before,.lp-finalbox::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1.5px;background:conic-gradient(from var(--ang),transparent 0 62%,var(--gold-lo) 72%,var(--gold-hi) 82%,var(--gold) 86%,transparent 96%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:lpspin 7s linear infinite;pointer-events:none}
+@keyframes lpspin{to{--ang:360deg}}
+/* barra fixa de cadastro (celular) */
+.lp-sticky{position:fixed;left:12px;right:12px;bottom:calc(12px + var(--sab));z-index:12;display:none;align-items:center;gap:12px;padding:10px 10px 10px 16px;border-radius:16px;background:rgba(16,13,8,.94);border:1px solid var(--gold-line);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 18px 44px rgba(0,0,0,.65);transform:translateY(calc(100% + 30px));transition:transform .5s var(--ease)}
+.lp-sticky>div{flex:1;min-width:0}.lp-sticky b{display:block;font:650 .9rem/1.2 var(--fd);color:var(--gold-hi)}.lp-sticky span{display:block;font-size:.74rem;color:var(--mut);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lp-sticky .lp-btn{min-height:44px;padding:10px 14px;font-size:.88rem;flex:0 0 auto}.lp-sticky.on{transform:none}
+.bot-head.corner{transition:bottom .5s var(--ease)}
+@media(max-width:900px){.lp-sticky{display:flex}body.lp-bar .bot-head.corner{bottom:calc(90px + env(safe-area-inset-bottom,0px))}.lp-foot{padding-bottom:calc(100px + var(--sab))}.lp-statrow{grid-template-columns:repeat(2,minmax(0,1fr))}.lp-stats{padding-top:8px}}
+@media(max-width:480px){.lp-stat{padding:18px 16px}.lp-stat span{font-size:.82rem}}
+/* login: o botão principal ganha o mesmo brilho */
+.btn-submit{overflow:hidden;isolation:isolate;font-family:var(--fd);font-weight:600}
+.btn-submit::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(115deg,transparent 28%,rgba(255,255,255,.55) 47%,transparent 64%);transform:translateX(-130%);transition:transform .9s var(--ease)}
+.btn-submit:hover::before{transform:translateX(130%)}.btn-submit:hover{box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 14px 34px rgba(226,178,80,.3)}
+@media(prefers-reduced-motion:reduce){.lp-ln>span,.lp-hero .lp-gold{transform:none;animation:none}.lp-hero>*,.lp-hero .lp-btn.lg:not(.ghost){animation:none!important}.lp-hero::before,.lp-free i::after,.lp-marq-in,.lp-freebox::before,.lp-finalbox::before{animation:none}.lp-rv:not(.in){transform:none;opacity:1}.lp-card.in:hover,.lp-steps li.in:hover,.lp-stat.in:hover{transform:none}.lp-btn::before,.btn-submit::before{display:none}.lp-sticky,.lp-mag{transition:none}}
 </style>
 <script src="config.js"></script>
 <script>
@@ -660,6 +753,7 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
 <div id="landing" class="lp" hidden>
  <canvas id="lpfx" aria-hidden="true"></canvas>
  <header class="lp-h" id="lp-top">
+  <i class="lp-prog" id="lp-prog" aria-hidden="true"></i>
   <div class="lp-w lp-hrow">
    <a class="lp-logo" href="#" data-lpgo="lp-top" aria-label="NESC, início"><img src="/icon-192.png" alt="" width="32" height="32"><b>NESC</b></a>
    <nav class="lp-nav" id="lp-nav" aria-label="Seções da página">
@@ -675,10 +769,10 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
    <div class="lp-left">
     <div class="lp-hero" data-scene="auto">
      <span class="lp-free"><i aria-hidden="true"></i>100% gratuito · sem mensalidade</span>
-     <h1>Você dirige.<br><span class="lp-gold">O NESC organiza seus números.</span></h1>
+     <h1><span class="lp-ln"><span>Você dirige. </span></span><span class="lp-ln"><span class="lp-gold">O NESC organiza seus números.</span></span></h1>
      <p class="lp-lead">Controle financeiro 100% gratuito para motoristas de Uber e 99.</p>
      <p class="lp-sub">Registre seus ganhos, acompanhe suas despesas, veja seu lucro e organize suas metas em um só lugar. Sem mensalidade para usar o NESC.</p>
-     <div class="lp-ctas"><a class="lp-btn lg" href="#criar-conta" data-track="cta_signup">Criar conta grátis</a><a class="lp-btn ghost lg" href="#como-funciona" data-lpgo="como-funciona" data-track="cta_how">Ver como funciona</a></div>
+     <div class="lp-ctas"><a class="lp-btn lg lp-mag" href="#criar-conta" data-track="cta_signup">Criar conta grátis<svg class="lp-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="lp-btn ghost lg" href="#como-funciona" data-lpgo="como-funciona" data-track="cta_how">Ver como funciona</a></div>
      <ul class="lp-trust"><li>Sem cartão de crédito</li><li>Uber e 99 no mesmo lugar</li><li>Funciona no celular e no computador</li></ul>
     </div>
     <div class="lp-story">
@@ -705,6 +799,19 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
      </div>
     </div>
    </div>
+  </section>
+
+  <section class="lp-stats" aria-label="O NESC em números">
+   <div class="lp-w lp-statrow">
+    <div class="lp-stat lp-rv"><b data-count="0" data-pre="R$ ">R$ 0</b><span>de mensalidade, para sempre</span></div>
+    <div class="lp-stat lp-rv"><b data-count="2">2</b><span>apps no mesmo painel: Uber e 99</span></div>
+    <div class="lp-stat lp-rv"><b data-count="5">5</b><span>passos para começar a usar</span></div>
+    <div class="lp-stat lp-rv"><b data-count="100" data-suf="%">100%</b><span>dos cálculos abertos para conferir</span></div>
+   </div>
+   <div class="lp-marq" aria-hidden="true"><div class="lp-marq-in">
+    <span>Faturamento do dia</span><span>Lucro operacional</span><span>Bruto por hora</span><span>Líquido por hora</span><span>Bruto por km</span><span>Metas com percentual real</span><span>Combustível e despesas</span><span>Manutenção</span><span>Relatórios</span><span>Ranking anônimo</span>
+    <span>Faturamento do dia</span><span>Lucro operacional</span><span>Bruto por hora</span><span>Líquido por hora</span><span>Bruto por km</span><span>Metas com percentual real</span><span>Combustível e despesas</span><span>Manutenção</span><span>Relatórios</span><span>Ranking anônimo</span>
+   </div></div>
   </section>
 
   <section class="lp-sec" id="como-funciona" aria-labelledby="cf-h">
@@ -738,7 +845,7 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
    <div class="lp-w lp-rk">
     <div><span class="lp-k">Ranking</span><h2 class="lp-h2" id="rk-h">Veja sua posição sem expor seus números</h2>
      <ul class="lp-list"><li><b>Critério claro:</b> lucro operacional do período (faturamento − combustível, passes e outros gastos) ou, se preferir, faturamento.</li><li><b>Períodos:</b> hoje, últimos 7 dias ou mês atual.</li><li><b>Privacidade:</b> aparecem só a posição, um apelido e o valor do critério. Nada de nome, e-mail, veículo ou lançamentos. Você pode sair do ranking quando quiser.</li><li><b>Sem atalhos:</b> a posição é calculada no servidor a partir dos registros; ninguém edita a própria colocação.</li></ul>
-     <a class="lp-btn" href="#criar-conta" data-track="cta_ranking">Conhecer o ranking</a></div>
+     <a class="lp-btn lp-mag" href="#criar-conta" data-track="cta_ranking">Conhecer o ranking<svg class="lp-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="lp-card lp-rkdemo lp-rv" aria-label="Exemplo ilustrativo de ranking com dados fictícios"><div class="lp-rkhead"><b>Lucro operacional · 7 dias</b><span class="lp-tag">Exemplo ilustrativo · dados fictícios</span></div>
      <ol><li><b>1º</b><span>Motorista #A7F2</span><em>R$ 1.284,50</em></li><li><b>2º</b><span>Noturno do ABC</span><em>R$ 1.102,30</em></li><li class="me"><b>3º</b><span>Você</span><em>R$ 968,90</em></li><li><b>3º</b><span>Motorista #19C4</span><em>R$ 968,90</em></li><li><b>5º</b><span>Rota Leste</span><em>R$ 811,00</em></li></ol>
      <p>Empates dividem a posição: depois de dois 3º lugares vem o 5º.</p></div>
@@ -749,7 +856,7 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
    <div class="lp-w lp-freebox lp-rv"><span class="lp-k">Gratuito</span><h2 class="lp-h2" id="fr-h">Seu dinheiro merece organização. Não mais uma mensalidade.</h2>
     <p>O NESC foi pensado para ajudar motoristas de aplicativo a acompanhar seus números sem adicionar uma assinatura mensal à rotina. Não há plano pago nem cobrança dentro do NESC.</p>
     <p class="lp-fine">As taxas, passes e pacotes da Uber e da 99 continuam sendo cobrados por elas, como sempre. Para usar o NESC você só precisa de internet.</p>
-    <a class="lp-btn lg" href="#criar-conta" data-track="cta_signup">Começar gratuitamente</a></div>
+    <a class="lp-btn lg lp-mag" href="#criar-conta" data-track="cta_signup">Começar gratuitamente<svg class="lp-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
   </section>
 
   <section class="lp-sec" id="faq" aria-labelledby="faq-h">
@@ -769,7 +876,7 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
   <section class="lp-sec lp-final" aria-labelledby="fi-h">
    <div class="lp-w lp-finalbox lp-rv"><h2 class="lp-h2" id="fi-h">Comece a entender para onde vai o dinheiro das suas corridas.</h2>
     <p>Organize seus ganhos, acompanhe seus gastos e tenha uma visão mais clara da sua rotina financeira.</p>
-    <a class="lp-btn lg" href="#criar-conta" data-track="cta_signup">Criar minha conta grátis</a><a class="lp-link" href="#entrar" data-track="cta_login">Já tenho uma conta. Entrar.</a></div>
+    <a class="lp-btn lg lp-mag" href="#criar-conta" data-track="cta_signup">Criar minha conta grátis<svg class="lp-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="lp-link" href="#entrar" data-track="cta_login">Já tenho uma conta. Entrar.</a></div>
   </section>
  </div>
  <footer class="lp-foot"><div class="lp-w lp-footrow">
@@ -777,6 +884,7 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
   <nav aria-label="Rodapé"><a href="#como-funciona" data-lpgo="como-funciona">Como funciona</a><a href="#funcionalidades" data-lpgo="funcionalidades">Funcionalidades</a><a href="#ranking-lp" data-lpgo="ranking-lp">Ranking</a><a href="#faq" data-lpgo="faq">Perguntas frequentes</a></nav>
   <nav aria-label="Conta"><a href="#entrar" data-track="cta_login">Entrar</a><a href="#criar-conta" data-track="cta_signup">Criar conta</a></nav>
  </div><div class="lp-w lp-copy">© 2026 NESC</div></footer>
+ <div class="lp-sticky" id="lp-sticky" aria-hidden="true"><div><b>100% gratuito</b><span>Sem cartão de crédito</span></div><a class="lp-btn" href="#criar-conta" data-track="cta_signup" tabindex="-1">Criar conta grátis<svg class="lp-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
 </div>
 <div id="boot" aria-hidden="true"><img src="/icon-192.png" alt="" width="56" height="56"></div>
 
@@ -3085,6 +3193,40 @@ const TILT={tx:0,ty:0,x:0,y:0,raf:0,
     ph.style.setProperty('--ry',(this.x*9).toFixed(2)+'deg');ph.style.setProperty('--rx',(-this.y*7).toFixed(2)+'deg');ph.style.setProperty('--gx',(30+this.x*35).toFixed(1)+'%');ph.style.setProperty('--gy',(20+this.y*30).toFixed(1)+'%');sh.style.setProperty('--sx',(-this.x*14).toFixed(1)+'px');
     if(Math.abs(this.tx-this.x)+Math.abs(this.ty-this.y)>.002)this.raf=requestAnimationFrame(step);else this.raf=0};this.raf=requestAnimationFrame(step)}};
 
+/* ============ PÁGINA INICIAL: movimento e hover ============
+   Revelação em cascata, barra de progresso da leitura, cabeçalho que se firma ao rolar, contadores, luz que segue o
+   mouse nos cards (com inclinação sutil), botões magnéticos e a barra fixa de cadastro no celular (aparece depois da
+   primeira dobra e some perto da chamada final). Com "reduzir movimento", fica só o estado final, sem animação. */
+const LPX={b:0,tk:0,
+  bind(){if(this.b)return;this.b=1;const L=$('#landing'),fine=matchMedia('(hover:hover) and (pointer:fine)');
+    const n=new Map();document.querySelectorAll('#landing .lp-rv').forEach(el=>{const p=el.parentElement,i=n.get(p)||0;n.set(p,i+1);el.style.setProperty('--rd',Math.min(i*.08,.4)+'s');
+      el.addEventListener('transitionend',()=>el.classList.add('lp-did'),{once:true})});
+    L.addEventListener('scroll',()=>this.queue(),{passive:true});addEventListener('resize',()=>this.queue());
+    const cio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){cio.unobserve(e.target);this.count(e.target)}}),{root:L,threshold:.6});
+    document.querySelectorAll('#landing [data-count]').forEach(b=>{if(!RM.matches)b.textContent=(b.dataset.pre||'')+'0'+(b.dataset.suf||'');cio.observe(b)});
+    if(!fine.matches)return;
+    document.querySelectorAll('#landing .lp-card,#landing .lp-steps li,#landing .lp-stat').forEach(c=>{
+      c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+        c.style.setProperty('--mx',(x*100).toFixed(1)+'%');c.style.setProperty('--my',(y*100).toFixed(1)+'%');
+        if(!RM.matches){c.style.setProperty('--ry',((x-.5)*5).toFixed(2)+'deg');c.style.setProperty('--rx',((.5-y)*5).toFixed(2)+'deg')}});
+      c.addEventListener('pointerleave',()=>{c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg')})});
+    document.querySelectorAll('#landing .lp-mag').forEach(b=>{
+      b.addEventListener('pointermove',e=>{if(RM.matches)return;const r=b.getBoundingClientRect();b.style.setProperty('--bx',((e.clientX-r.left-r.width/2)*.16).toFixed(1)+'px');b.style.setProperty('--by',((e.clientY-r.top-r.height/2)*.26).toFixed(1)+'px')});
+      b.addEventListener('pointerleave',()=>{b.style.setProperty('--bx','0px');b.style.setProperty('--by','0px')})});
+    if(RM.matches)return;
+    const g=document.createElement('i');g.className='lp-cur';g.setAttribute('aria-hidden','true');L.prepend(g);let tx=null,ty=0,x=0,y=0,raf=0;
+    const step=()=>{x+=(tx-x)*.14;y+=(ty-y)*.14;g.style.transform=`translate3d(${(x-260).toFixed(1)}px,${(y-260).toFixed(1)}px,0)`;raf=Math.abs(tx-x)+Math.abs(ty-y)>.5?requestAnimationFrame(step):0};
+    L.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;if(tx===null){x=e.clientX;y=e.clientY}tx=e.clientX;ty=e.clientY;g.classList.add('on');if(!raf)raf=requestAnimationFrame(step)},{passive:true});
+    L.addEventListener('pointerleave',()=>g.classList.remove('on'))},
+  queue(){if(!this.tk)this.tk=requestAnimationFrame(()=>{this.tk=0;this.upd()})},
+  upd(){const L=$('#landing');if(!L||L.hidden)return;const st=L.scrollTop,mx=L.scrollHeight-L.clientHeight;
+    $('#lp-prog').style.setProperty('--p',mx>0?Math.min(1,st/mx).toFixed(4):'0');$('#lp-top').classList.toggle('sc',st>8);
+    const c=$('#landing .lp-ctas').getBoundingClientRect(),f=$('#landing .lp-finalbox').getBoundingClientRect(),on=innerWidth<=900&&c.bottom<0&&f.top>innerHeight*.8,sb=$('#lp-sticky');
+    if(sb.classList.contains('on')!==on){sb.classList.toggle('on',on);sb.setAttribute('aria-hidden',on?'false':'true');sb.querySelector('a').tabIndex=on?0:-1;document.body.classList.toggle('lp-bar',on)}},
+  off(){const sb=$('#lp-sticky');if(sb){sb.classList.remove('on');sb.setAttribute('aria-hidden','true');sb.querySelector('a').tabIndex=-1}document.body.classList.remove('lp-bar')},
+  count(b){const to=+b.dataset.count||0,pre=b.dataset.pre||'',suf=b.dataset.suf||'',fmt=v=>pre+v+suf;if(RM.matches||!to){b.textContent=fmt(to);return}
+    const t0=performance.now(),D=1300,tick=t=>{const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);b.textContent=fmt(Math.round(to*e));if(k<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)}};
+
 /* ============ CELULAR: demonstração do NESC ============
    Estado isolado (não toca em db, Store ou Supabase). A matemática segue o app: lucro operacional =
    faturamento − despesas da demonstração; meta = faturamento ÷ meta × 100 (sem teto no número). */
@@ -3094,10 +3236,10 @@ const LP={on:false,tm:[],scene:'',lock:'',idx:0,st:null,io:null,rv:null,
   later(fn,ms){if(!this.on)return;const id=setTimeout(()=>{this.tm=this.tm.filter(x=>x!==id);if(this.on)fn()},RM.matches?Math.min(ms,60):ms);this.tm.push(id)},
   clear(){this.tm.forEach(clearTimeout);this.tm=[]},
   inc(){return r2(this.st.uber+this.st.n99)},op(){return r2(this.inc()-this.st.exp)},
-  start(){if(this.on)return;this.on=true;if(!this.st)this.st=this.base();LPFX.init();LPFX.kick();TILT.bind();this.observe();
+  start(){if(this.on)return;this.on=true;if(!this.st)this.st=this.base();LPFX.init();LPFX.kick();TILT.bind();this.observe();LPX.bind();LPX.upd();
     document.querySelectorAll('.lp-ic[data-ic]').forEach(i=>{if(!i.innerHTML){const k=i.dataset.ic;i.innerHTML=k==='uber'?'<span class="idn uber" style="width:18px;height:18px"></span>':k==='uber2'?'<span style="display:flex;gap:4px"><span class="idn uber"></span><span class="idn n99"></span></span>':ICON(k)}});
     this.go(this.lock||'dash')},
-  stop(){this.on=false;this.clear()},
+  stop(){this.on=false;this.clear();LPX.off()},
   observe(){if(this.io)return;const root=$('#landing');
     this.rv=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');this.rv.unobserve(e.target)}}),{root,threshold:.15});document.querySelectorAll('.lp-rv').forEach(el=>this.rv.observe(el));
     const vis=new Map();this.io=new IntersectionObserver(es=>{es.forEach(e=>vis.set(e.target,e.intersectionRatio));let best=null,br=0;vis.forEach((r,el)=>{if(r>br){br=r;best=el}});
