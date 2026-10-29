@@ -18,3 +18,9 @@ for (const file of rootFiles) {
     }
   }
 }
+
+await mkdir("www/fonts", { recursive: true });
+for (const file of ["sora.woff2", "inter.woff2", "LICENSE-sora.txt", "LICENSE-inter.txt"]) {
+  await copyFile(`fonts/${file}`, `www/fonts/${file}`);
+  console.log(`Copied fonts/${file} to www/fonts/`);
+}
