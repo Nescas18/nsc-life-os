@@ -1,4 +1,4 @@
-// Celular: revisão de horas e relatórios, executados no index.html real em um Chromium (Playwright).
+// Celular: revisão de horas, relatórios e gráfico de faturamento diário, executados no index.html real em um Chromium (Playwright).
 // Larguras 320, 375, 390 e 430 px (celular) e 1280 px (computador). Tudo em modo local, sem Supabase de produção.
 // Uso: node tests/mobile.spec.mjs
 import http from "node:http";
@@ -186,6 +186,106 @@ await test("7. Nenhuma aba gera rolagem horizontal da página em 320 px", async 
       document.querySelectorAll("#view *").forEach((e) => { const r = e.getBoundingClientRect(); if (r.width && (r.right > vw + .5 || r.left < -.5) && !inScroller(e) && !e.closest("thead,.sr-only")) out.push(t + ": " + e.tagName + "." + String(e.className).slice(0, 20)); }); }
     return [...new Set(out)]; });
   assert(!bad.length, bad.join(", "));
+});
+
+/* ---------- gráfico de faturamento diário (barras) ---------- */
+/* últimos 29 dias: T-2 sem registro, T-4 folga confirmada, T-5 só jornada (R$ 0,00), demais com Uber e 99 */
+const CV = [401.75, 426.8, 51, 405.48, 405.29, 409.96, 600, 1266.48, 312.1];
+function chartSeed() {
+  const tx = [], jr = []; let k = 0; const id = () => "g" + k++;
+  for (let i = 0; i < 29; i++) { const d = addD(T, -i);
+    if (i === 2 || i === 4) continue;
+    if (i === 5) { jr.push({ id: id(), d, app: "uber", v: 2, min: 120, hrsOk: true }); continue; }
+    const v = CV[i % CV.length]; tx.push({ id: id(), d, type: "in", app: "uber", v: Math.round(v * 62) / 100, at: 1 }); tx.push({ id: id(), d, type: "in", app: "n99", v: Math.round(v * 38) / 100, at: 1 }); }
+  return { cfg: { pass: { uber: { on: false }, n99: { on: false } } }, tx, jr, off: { [addD(T, -4)]: { v: true, at: 1 } }, vehicle: { brand: "X", model: "Y", custom: true } };
+}
+const openChart = async (w, per = "w", app = "tot") => { const o = await open(w, { tab: "hoje", data: chartSeed() }); await o.page.evaluate(([p, a]) => { hper = p; cap = a; render(); }, [per, app]); await o.page.waitForTimeout(1500); return o; };
+/* colisões: valor × valor e valor × barra de outra coluna */
+const chartIssues = (page) => page.evaluate(() => { const bs = [...document.querySelectorAll("#dchart .bc")], out = [];
+  const R = bs.map((b) => b.querySelector(".val").getBoundingClientRect()), BR = bs.map((b) => { const x = b.querySelector(".bar,.mk"); return x ? x.getBoundingClientRect() : null; });
+  const hit = (a, c) => a.width && c.width && a.left < c.right - .5 && a.right > c.left + .5 && a.top < c.bottom - .5 && a.bottom > c.top + .5;
+  for (let i = 0; i < bs.length; i++) for (let j = 0; j < bs.length; j++) { if (i === j) continue; if (hit(R[i], R[j])) out.push(`valor ${i}×${j}`); if (BR[j] && hit(R[i], BR[j])) out.push(`valor ${i}×barra ${j}`); }
+  if (document.documentElement.scrollWidth > innerWidth) out.push("rolagem horizontal da página");
+  return [...new Set(out)]; });
+
+await test("8. Gráfico: barras com o faturamento bruto real de cada dia; R$ 0,00 só em dia registrado; sem registro e folga diferenciados; Total = Uber + 99", async (keep) => {
+  const { ctx, page } = await openChart(1280); keep(ctx);
+  const r = await page.evaluate(() => { const el = document.getElementById("dchart"), f = el.dataset.f, t = el.dataset.t;
+    return { lines: el.querySelectorAll("svg path").length, cols: [...el.querySelectorAll(".bc")].map((b) => [b.className.match(/s-(\w+)/)[1], b.querySelector(".val").textContent, !!b.querySelector(".bar")]),
+      head: el.querySelector(".bch-k b").textContent, cs: brl(CS(f, t).inc), f, t }; });
+  assert(r.lines === 0, "ainda há linhas no gráfico");
+  assert(r.head === r.cs, `total do gráfico ${r.head} ≠ faturamento do período ${r.cs}`);
+  const exp = []; for (let i = 6; i >= 0; i--) { const v = CV[i % CV.length], u = Math.round(v * 62) / 100, n = Math.round(v * 38) / 100;
+    exp.push(i === 2 ? ["none", "—", false] : i === 4 ? ["off", "folga", false] : i === 5 ? ["zero", "R$ 0,00", true] : ["val", "R$ " + (u + n).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), true]); }
+  const norm = (x) => JSON.stringify(x).replace(/ /g, " ");
+  assert(norm(r.cols) === norm(exp), "colunas: " + norm(r.cols) + " ≠ " + norm(exp));
+  // Uber e 99 separados somam o total do dia (nada contado duas vezes)
+  const s = await page.evaluate(() => { const el = document.getElementById("dchart"), f = el.dataset.f, t = el.dataset.t, out = {};
+    for (const a of ["tot", "uber", "n99"]) { cap = a; drawChart(); out[a] = [...el.querySelectorAll(".bc")].map((b) => b.querySelector(".val").textContent); out[a + "H"] = el.querySelector(".bch-k b").textContent; }
+    out.u = brl(AS("uber", f, t).inc); out.n = brl(AS("n99", f, t).inc); cap = "tot"; drawChart(); return out; });
+  assert(s.uberH === s.u && s.n99H === s.n, `totais por app: ${s.uberH}/${s.u} · ${s.n99H}/${s.n}`);
+  const num = (x) => +String(x).replace(/[^\d,]/g, "").replace(",", ".") || 0;
+  s.tot.forEach((v, i) => { if (/\d/.test(v) && /\d/.test(s.uber[i]) && /\d/.test(s.n99[i])) assert(Math.abs(num(v) - num(s.uber[i]) - num(s.n99[i])) < .005, `dia ${i}: ${v} ≠ ${s.uber[i]} + ${s.n99[i]}`); });
+  // o dia só com jornada é R$ 0,00 na Uber (jornada da Uber) e "—" na 99 (nada registrado para a 99)
+  assert(/0,00/.test(s.uber[1]) && s.n99[1] === "—", "jornada só da Uber: " + s.uber[1] + " / " + s.n99[1]);
+});
+await test("9. Gráfico no celular (320–430 px): 7 dias sem rolagem lateral, valores legíveis e sem colisão; no mês, rola só dentro do gráfico a partir do dia mais recente", async (keep) => {
+  for (const w of MOBILE) {
+    const { ctx, page } = await openChart(w); keep(ctx);
+    const iss = await chartIssues(page); assert(!iss.length, `${w}px 7 dias: ` + iss.join(" | "));
+    const r = await page.evaluate(() => { const sc = document.querySelector("#dchart .bch-sc"), v = document.querySelector("#dchart .bc .val"); return { scroll: sc.scrollWidth > sc.clientWidth + 1, fs: parseFloat(getComputedStyle(v).fontSize), dl: parseFloat(getComputedStyle(document.querySelector("#dchart .bc .dl")).fontSize) }; });
+    assert(!r.scroll && r.fs >= 10 && r.dl >= 10, `${w}px 7 dias: ` + JSON.stringify(r));
+    await page.evaluate(() => { hper = "m"; render(); }); await page.waitForTimeout(1200);
+    const m = await page.evaluate(() => { const sc = document.querySelector("#dchart .bch-sc"), bs = [...document.querySelectorAll("#dchart .bc")], last = bs[bs.length - 1].getBoundingClientRect(), S = sc.getBoundingClientRect(); return { n: bs.length, scroll: sc.scrollWidth > sc.clientWidth + 1, lastVisible: last.right <= S.right + 1 && last.left >= S.left - 1, page: document.documentElement.scrollWidth <= innerWidth }; });
+    assert(m.n >= 27 && m.scroll && m.lastVisible && m.page, `${w}px mês: ` + JSON.stringify(m));
+    const im = await chartIssues(page); assert(!im.length, `${w}px mês: ` + im.join(" | "));
+  }
+});
+await test("10. Gráfico no computador: 'R$' acima das barras nos 7 dias; no mês, sem rolagem e com os valores exatos na vertical, sem colisão", async (keep) => {
+  const { ctx, page } = await openChart(1280); keep(ctx);
+  const a = await page.evaluate(() => [...document.querySelectorAll("#dchart .bc.s-val .val")].map((v) => v.textContent));
+  assert(a.length && a.every((v) => /^R\$\s/.test(v)), "valores sem R$: " + a);
+  await page.evaluate(() => { hper = "m"; render(); }); await page.waitForTimeout(1500);
+  const r = await page.evaluate(() => { const sc = document.querySelector("#dchart .bch-sc"), b = document.querySelector("#dchart .bch"), v = document.querySelector("#dchart .bc.s-val .val"); return { scroll: sc.scrollWidth > sc.clientWidth + 1, vlab: b.classList.contains("vlab"), tr: getComputedStyle(v).transform, fill: getComputedStyle(v).webkitTextFillColor, text: v.textContent }; });
+  assert(!r.scroll && r.vlab && r.tr !== "none" && !/rgba\(0, 0, 0, 0\)|transparent/.test(r.fill) && /\d,\d{2}$/.test(r.text), "mês no computador: " + JSON.stringify(r));
+  const iss = await chartIssues(page); assert(!iss.length, iss.join(" | "));
+});
+await test("11. Filtro Total/Uber/99 redesenha só o gráfico com as cores do app; toque numa barra mostra data completa e valor; toque fora fecha", async (keep) => {
+  const { ctx, page } = await openChart(390); keep(ctx);
+  await page.evaluate(() => { window.__mark = 1; document.getElementById("view").dataset.mark = "1"; });
+  for (const [a, c] of [["uber", "rgb(207, 207, 213)"], ["n99", "rgb(239, 207, 18)"], ["tot", "rgb(236, 196, 99)"]]) {
+    await page.tap(`#dchart [data-cap="${a}"]`); await page.waitForTimeout(100);
+    const r = await page.evaluate(() => ({ app: document.querySelector("#dchart .bch").dataset.app, on: document.querySelector("#dchart [data-cap].on").dataset.cap, c1: getComputedStyle(document.querySelector("#dchart .bch")).getPropertyValue("--c1").trim(), same: document.getElementById("view").dataset.mark === "1" && window.__mark === 1 }));
+    assert(r.app === a && r.on === a && r.same, `filtro ${a}: ` + JSON.stringify(r));
+    const col = await page.evaluate(() => { const b = document.querySelector("#dchart .bc.s-val:not(.top) .bar"); return getComputedStyle(b).backgroundImage; });
+    assert(col.includes(c), `cor das barras em ${a}: ${col}`);
+  }
+  await page.tap("#dchart .bc.s-val >> nth=-1"); await page.waitForTimeout(80);
+  const tip = await page.evaluate(() => { const t = document.querySelector("#dchart .ctip.on"); if (!t) return null; const r = t.getBoundingClientRect(), el = document.getElementById("dchart").getBoundingClientRect(); return { txt: t.textContent, inside: r.left >= el.left - .5 && r.right <= el.right + .5 }; });
+  assert(tip && /\d{1,2} de \w+ de 2026/.test(tip.txt) && /Faturamento bruto/.test(tip.txt) && /R\$/.test(tip.txt) && tip.inside, "tooltip: " + JSON.stringify(tip));
+  await page.touchscreen.tap(20, 120); await page.waitForTimeout(80);
+  assert(!(await page.$("#dchart .ctip.on")), "o tooltip não fechou com toque fora");
+  // dia sem registro explica que não é zero
+  await page.tap("#dchart .bc.s-none"); const t2 = await page.textContent("#dchart .ctip.on");
+  assert(/Sem registro/.test(t2) && /não é R\$ 0,00/.test(t2), "tooltip de dia sem registro: " + t2);
+});
+await test("12. Comparação com o período anterior só com dados suficientes; animação só quando os dados mudam e nunca com movimento reduzido", async (keep) => {
+  const { ctx, page } = await openChart(1280); keep(ctx);
+  const c = await page.evaluate(() => document.querySelector("#dchart .bch-m").textContent);
+  assert(/[▲▼] [\d,]+% vs 7 dias anteriores/.test(c), "comparação ausente com dados suficientes: " + c);
+  const few = await page.evaluate(() => { const keepTx = db.tx; db.tx = db.tx.filter((x) => x.d >= addD(TODAY(), -8)); render(); const t = document.querySelector("#dchart .bch-m").textContent; db.tx = keepTx; render(); return t; });
+  assert(!/%/.test(few), "comparou com período anterior sem dados suficientes: " + few);
+  const an = await page.evaluate(() => { const a = document.querySelector("#dchart .bch").classList.contains("anim"); dispatchEvent(new Event("resize")); return a; });
+  await page.waitForTimeout(300);
+  const after = await page.evaluate(() => document.querySelector("#dchart .bch").classList.contains("anim"));
+  assert(after === false, "reanimou ao redimensionar (sem mudança nos dados)");
+  const ctx2 = await browser.newContext({ viewport: { width: 390, height: 800 }, reducedMotion: "reduce", isMobile: true, hasTouch: true }); keep(ctx2);
+  await ctx2.route(/cdnjs|cdn\.jsdelivr\.net/, (r) => r.abort());
+  const p2 = await ctx2.newPage(); await p2.clock.setFixedTime(new Date(T + "T15:00:00-03:00"));
+  await p2.addInitScript((s) => { localStorage.setItem("nsc_session", JSON.stringify({ email: "m@n.local", name: "Ana" })); localStorage.setItem("nsc_db_m@n.local", JSON.stringify(s)); }, chartSeed());
+  await p2.goto(BASE); await p2.waitForTimeout(700);
+  const rm = await p2.evaluate(() => ({ cls: document.querySelector("#dchart .bch").className, an: getComputedStyle(document.querySelector("#dchart .bar")).animationName }));
+  assert(!/anim/.test(rm.cls) && rm.an === "none", "movimento reduzido ignorado: " + JSON.stringify(rm));
 });
 
 await browser.close(); server.close();

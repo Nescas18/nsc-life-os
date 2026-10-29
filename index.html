@@ -445,13 +445,44 @@ form[data-etype="fuel"] [data-nofuel]{display:none}form[data-etype] [data-show]{
 .err:empty{min-height:0;margin:0}
 .auth-h{font-size:1.15rem;font-weight:640;letter-spacing:-.02em;margin-bottom:6px}
 .chart-box{position:relative;min-height:170px}
-.cscroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;touch-action:pan-x pan-y;overscroll-behavior-x:contain}
-.chart-box svg{display:block;max-width:none}
-.chart-box svg:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:6px}
-.cleg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.78rem;color:var(--tx2);margin:0 0 10px}.cleg span{display:inline-flex;align-items:center;gap:7px}
-.cleg i{display:inline-block;width:18px;height:0;border-top:2px solid}.cleg i.d{border-top-style:dashed}.cleg i.t{border-top-width:3px}.cleg .cl-off{color:var(--mut)}.cleg i.o{width:8px;height:8px;border:0;border-radius:2px;background:#6b6b74}.cleg i.e{width:8px;height:8px;border:1.4px solid #55555e;border-radius:50%}
 .ctip{position:absolute;top:0;pointer-events:none;background:#121215;border:1px solid var(--line2);border-radius:10px;padding:9px 11px;font-size:.78rem;line-height:1.5;min-width:150px;box-shadow:0 12px 30px rgba(0,0,0,.5);opacity:0;transition:opacity .15s;z-index:2;font-variant-numeric:tabular-nums}
-.ctip.on{opacity:1}.ctip b{display:block;font-size:.8rem;margin-bottom:3px;color:var(--tx)}.ctip div{display:flex;justify-content:space-between;gap:12px;color:var(--tx2)}.ctip div span{display:inline-flex;align-items:center;gap:6px}
+.ctip.on{opacity:1}
+/* gráfico de barras do resumo: faturamento bruto por dia. Dourado = total; Uber e 99 com as cores do app.
+   O melhor dia fica num tom mais claro; sem sombras fortes nem gradientes exagerados. */
+.bch-h{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:4px 12px;margin:0 0 12px}.bch-h .bch-m{grid-column:1/-1}
+.bch-k{min-width:0}.bch-k small{display:block;font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}
+.bch-k b{display:block;margin:3px 0 2px;font-size:1.5rem;font-weight:680;letter-spacing:-.02em;line-height:1.15;color:var(--tx);font-variant-numeric:tabular-nums}
+.bch-m{font-size:.78rem;color:var(--tx2)}.bch-m .pos{color:var(--ok)}.bch-m .neg{color:var(--bad)}.bch-h .seg button{padding:6px 11px;font-size:.78rem;min-height:32px}
+.bch{--c1:#ecc463;--c2:#b78b31;--t1:#fbe3a0;--t2:#e9bd56}
+.bch[data-app=uber]{--c1:#cfcfd5;--c2:#9b9ba3;--t1:#ffffff;--t2:#e6e6ec}
+.bch[data-app=n99]{--c1:#efcf12;--c2:#b99d00;--t1:#fff27e;--t2:#ffd400}
+.bch-sc{margin:0 -8px;padding:0 8px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;overscroll-behavior-x:contain;touch-action:pan-x pan-y}
+.bch.scr .bc{flex:0 0 auto}.bch.scr .bch-sc{-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent)} /* bordas esmaecidas: há mais dias para o lado */
+.bch-row{display:flex;align-items:stretch;min-width:100%}
+.bc{flex:1 1 0;display:flex;flex-direction:column;align-items:stretch;min-width:0;padding:0;border:0;border-radius:10px;background:none;color:inherit;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .18s}
+.bc:hover,.bc.sel{background:rgba(255,255,255,.04)}.bc:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.bc .pl{position:relative;display:block;height:calc(var(--ph) + 22px);border-bottom:1px solid var(--line2)}
+.bc .bar{position:absolute;bottom:0;left:calc(50% - var(--bw) / 2);width:var(--bw);height:var(--h);border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,var(--c1),var(--c2));transform-origin:50% 100%;transition:filter .18s}
+.bc.top .bar{background:linear-gradient(180deg,var(--t1),var(--t2))}
+.bc:hover .bar,.bc.sel .bar{filter:brightness(1.13)}
+.bc.s-zero .bar{border-radius:1px;opacity:.6}
+.bc .val{position:absolute;left:0;right:0;bottom:calc(var(--h) + 6px);text-align:center;font-size:var(--fs,11px);font-weight:650;line-height:1;color:var(--tx);white-space:nowrap;font-variant-numeric:tabular-nums}
+.bc.top .val{color:var(--t1)}
+.bch.vlab .pl{height:calc(var(--ph) + 64px)}.bch.vlab .bc.s-none .val,.bch.vlab .bc.s-off .val{left:0;right:0;transform:none}.bch.vlab .val{left:50%;right:auto;transform-origin:0 100%;transform:rotate(-90deg) translateY(50%)} /* período longo no computador: valor na vertical */.bc.s-none .val,.bc.s-off .val{bottom:14px;color:var(--faint);font-weight:500}
+.bc .mk{position:absolute;bottom:0;left:calc(50% - 4px);width:8px;height:8px}.bc .mk.nr{bottom:1px;border:1.4px dashed #5c5c66;border-radius:50%}.bc .mk.off{border-radius:2px;background:#5f5f68}
+.bc .dl{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 4px;font-size:10.5px;line-height:1.15;color:var(--mut);white-space:nowrap;font-variant-numeric:tabular-nums}
+.bc .dl b{font-weight:650;letter-spacing:.05em;color:var(--tx2)}.bc.s-none .dl b,.bc.s-off .dl b{color:var(--faint)}
+.bc.hl .dl b{color:var(--gold-hi)}.bc.hl{background:rgba(226,178,80,.06)}
+.bch-leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:.76rem;color:var(--tx2)}
+.bch-leg span{display:inline-flex;align-items:center;gap:7px}.bch-leg .mu{color:var(--mut)}
+.bch-leg i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c1)}.bch-leg i.lz{width:12px;height:2px;border-radius:1px;background:var(--c2);opacity:.8}
+.bch-leg i.ln{background:none;border:1.4px dashed #5c5c66}.bch-leg i.lo{border-radius:2px;background:#5f5f68}
+#dchart .ctip .tsub{display:block;color:var(--mut);font-size:.74rem}#dchart .ctip .tg{color:var(--gold-hi)}
+@keyframes bchin{from{transform:scaleY(0)}}@keyframes bchfade{from{opacity:0}}
+.bch.anim .bar{animation:bchin .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 28ms)}
+.bch.anim .val{animation:bchfade .35s ease both;animation-delay:calc(var(--i) * 28ms + .38s)}
+@media(prefers-reduced-motion:reduce){.bch .bar,.bch .val{animation:none!important}.bc,.bc .bar{transition:none}}
+.ctip b{display:block;font-size:.8rem;margin-bottom:3px;color:var(--tx)}.ctip div{display:flex;justify-content:space-between;gap:12px;color:var(--tx2)}.ctip div span{display:inline-flex;align-items:center;gap:6px}
 .cempty{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:22px 0 8px;color:var(--mut);font-size:.9rem;line-height:1.5}
 .qa{display:flex;flex-wrap:wrap;gap:8px}.qa .btn{display:inline-flex;align-items:center;gap:8px;flex:0 1 auto;max-width:100%;white-space:normal;text-align:left;line-height:1.3}
 .gl-orb{width:100%;height:100%;display:grid;place-items:center}.gl-orb::before{content:'';width:62%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#2a2416,#08080a 70%);box-shadow:0 0 40px rgba(226,178,80,.2),0 0 0 1px rgba(226,178,80,.18)}
@@ -2093,45 +2124,74 @@ function expForm(a,d,inModal,pre){const en=energyKind(),c=cfg(),et=(pre&&pre.typ
    ${Object.keys(vis).length?`<div class="f" data-show="maint"><label>Vincular a manutenção já registrada (opcional)</label><select name="visit"><option value="">Não vincular</option>${Object.entries(vis).map(([k,g])=>`<option value="${k}">${fmtD(g[0].d)} · ${g.map(m=>COMP[m.comp]?COMP[m.comp][0]:m.comp).join(', ')} · ${brl(g.reduce((s,m)=>s+mcost(m),0))}</option>`).join('')}</select><small class="sub">Use se o serviço foi registrado na manutenção sem gerar despesa, para não contar duas vezes.</small></div>`:''}
    <div class="err" data-err></div><button class="btn">Salvar gasto</button></form>`}
 
-/* ============ GRÁFICO DO RESUMO (SVG, sem biblioteca) ============
-   Faturamento diário real. Total = dourado, contínuo e mais grosso; Uber = cinza claro com círculos; 99 = amarelo
-   tracejado com losangos. Só há ponto em dia com registro daquele app; segmentos retos ligam apenas dias seguidos
-   com registro (lacuna = sem registro, nunca R$ 0,00 inventado). Folga confirmada aparece como marca cinza na base.
-   Muitos dias no celular: o gráfico rola na horizontal, começando pelo dia mais recente. */
+/* ============ GRÁFICO DO RESUMO: barras diárias (HTML/CSS, sem biblioteca) ============
+   Faturamento BRUTO por dia (receitas registradas, a mesma soma de sempre; nunca lucro). Total = dourado; Uber e 99
+   com as cores do app. Cada dia é uma coluna: valor exato acima, barra proporcional, dia da semana e data abaixo.
+   Estados de um dia, sem inventar valores:
+   - val:  há ganho registrado → mostra o valor;
+   - zero: há jornada registrada (horas, km ou viagens) mas nenhum ganho → R$ 0,00 com marca rente à base;
+   - off:  folga confirmada pelo usuário → "folga";
+   - none: nada registrado → "—" (não é R$ 0,00).
+   Cada coluna tem largura mínima para o valor caber; se não couber tudo, o gráfico rola na horizontal, só ele. */
+let cap='tot'; // aplicativo exibido no gráfico: tot (Uber + 99), uber ou n99
 function chartData(f,t){const days=[];for(let d=f;d<=t;d=addD(d,1))days.push(d);
   const by={};db.tx.forEach(x=>{if(x.type==='in'&&inR(x.d,f,t)&&APPS[appOf(x)]){const o=by[x.d]=by[x.d]||{uber:0,n99:0,hu:false,hn:false};const c=Math.round((+x.v||0)*100);if(appOf(x)==='uber'){o.uber+=c;o.hu=true}else{o.n99+=c;o.hn=true}}});
-  return days.map(d=>{const o=by[d];return o?{d,uber:o.uber/100,n99:o.n99/100,tot:(o.uber+o.n99)/100,hu:o.hu,hn:o.hn,has:true,off:false}:{d,uber:0,n99:0,tot:0,hu:false,hn:false,has:false,off:isOff(d)}})}
-function niceMax(v){if(v<=0)return 100;const e=Math.pow(10,Math.floor(Math.log10(v))),m=v/e;return(m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*e}
-const brlS=v=>v>=1000?'R$ '+num(v/1000,v%1000?1:0)+' mil':'R$ '+num(v,0);
-const SER=[['tot','Total','var(--tot)','',3,'has'],['uber','Uber','var(--uber)','',2,'hu'],['n99','99','var(--n99s)','6 4',2,'hn']];
-function drawChart(){const el=$('#dchart');if(!el)return;const f=el.dataset.f,t=el.dataset.t,hl=el.dataset.hl,D=chartData(f,t),n=D.length;
-  const leg=`<div class="cleg" aria-hidden="true"><span><i class="t" style="border-color:var(--tot)"></i>Total</span><span><i style="border-color:var(--uber)"></i>Uber</span><span><i class="d" style="border-color:var(--n99s)"></i>99</span><span class="cl-off"><i class="o"></i>Folga confirmada</span><span class="cl-off"><i class="e"></i>Sem registro</span></div>`;
+  const jw={};db.jr.forEach(j=>{if(inR(j.d,f,t)&&hasAct(j)){const o=jw[j.d]=jw[j.d]||{};o[j.app==='n99'?'jn':j.app==='uber'?'ju':'jx']=true}}); // jornadas com atividade (para "registrado com R$ 0,00")
+  return days.map(d=>{const o=by[d],w=jw[d]||{},J={ju:!!w.ju,jn:!!w.jn,jx:!!w.jx};return o?{d,uber:o.uber/100,n99:o.n99/100,tot:(o.uber+o.n99)/100,hu:o.hu,hn:o.hn,has:true,off:false,...J}:{d,uber:0,n99:0,tot:0,hu:false,hn:false,has:false,off:isOff(d),...J}})}
+/* um dia visto pelo filtro escolhido (o mesmo valor nunca entra duas vezes: Total = Uber + 99 de cada lançamento) */
+const capDay=(x,k)=>{const inc=k==='tot'?x.has:k==='uber'?x.hu:x.hn,jor=k==='tot'?x.ju||x.jn||x.jx:k==='uber'?x.ju:x.jn;return{x,d:x.d,v:inc?(k==='tot'?x.tot:x[k]):0,st:inc?'val':jor?'zero':(!x.has&&x.off)?'off':'none'}};
+const longD=d=>{const x=pd(d).toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});return x.charAt(0).toUpperCase()+x.slice(1)}; // data completa do tooltip
+const capSum=V=>Math.round(V.reduce((s,v)=>s+Math.round(v.v*100),0))/100;
+function drawChart(){const el=$('#dchart');if(!el)return;const f=el.dataset.f,t=el.dataset.t,hl=el.dataset.hl,k=cap,A=k==='tot'?null:APPS[k];
   if(Cloud.on&&/conectando/.test(Store.sync)){el.innerHTML=`<div class="cempty">Carregando seus registros…</div>`;return}
-  if(!D.some(x=>x.has)){el.innerHTML=`<div class="cempty"><span>Nenhum ganho registrado entre ${fmtD(f)} e ${fmtD(t)}. Quando você registrar, a evolução diária aparece aqui.</span><button type="button" class="btn sm" data-addrec>+ Registrar ganho</button></div>`;return}
-  const vw=Math.max(240,el.clientWidth),mob=vw<520,L=mob?46:58,R=mob?14:20,step0=mob?30:44,W=Math.max(vw,L+R+(n-1)*step0+16),H=mob?190:220,Tp=14,B=30,iw=W-L-R,ih=H-Tp-B,mx=niceMax(Math.max(...D.map(x=>x.tot)));
-  const X=i=>L+(n===1?iw/2:i*iw/(n-1)),Y=v=>Tp+ih-(v/mx)*ih,lstep=Math.max(1,Math.ceil(n/Math.max(2,Math.floor(iw/(mob?44:58)))));
-  const grid=[0,.25,.5,.75,1].map(k=>`<line x1="${L}" x2="${W-R}" y1="${Y(mx*k)}" y2="${Y(mx*k)}" stroke="rgba(255,255,255,${k?.055:.16})"/>${k%.5===0?`<text x="${L-8}" y="${Y(mx*k)+4}" text-anchor="end" fill="var(--mut)" font-size="${mob?10:11}">${brlS(mx*k)}</text>`:''}`).join('');
-  const xl=D.map((x,i)=>(n-1-i)%lstep===0?`<text x="${X(i)}" y="${H-10}" text-anchor="middle" fill="${x.d===hl?'var(--tx)':x.has?'var(--tx2)':'var(--faint)'}" font-size="${mob?10:11}" ${x.d===hl?'font-weight="650"':''}>${x.d===TODAY()?'Hoje':fmtD(x.d).slice(0,5)}</text>`:'').join('');
-  const hi=hl?D.findIndex(x=>x.d===hl):-1,band=hi>=0?`<rect x="${X(hi)-14}" y="${Tp-6}" width="28" height="${ih+6}" rx="8" fill="rgba(226,178,80,.07)" stroke="rgba(226,178,80,.18)"/>`:'';
-  const seg_=(k,flag)=>{let d='',prev=false;D.forEach((x,i)=>{if(x[flag]){d+=(prev?'L':'M')+X(i).toFixed(1)+','+Y(x[k]).toFixed(1);prev=true}else prev=false});return d};
-  const mk=(k,flag,c,i)=>D.map((x,j)=>!x[flag]?'':k==='n99'?`<rect x="${X(j)-3.6}" y="${Y(x[k])-3.6}" width="7.2" height="7.2" transform="rotate(45 ${X(j)} ${Y(x[k])})" fill="${c}" stroke="#0b0b0d" stroke-width="1.5"/>`:`<circle cx="${X(j)}" cy="${Y(x[k])}" r="${k==='tot'?4.2:3.3}" fill="${c}" stroke="#0b0b0d" stroke-width="1.5"/>`).join('');
-  const lines=SER.slice().reverse().map(([k,,c,dash,w,flag])=>`<path d="${seg_(k,flag)}" fill="none" stroke="${c}" stroke-width="${w}" ${dash?`stroke-dasharray="${dash}"`:''} stroke-linecap="round" stroke-linejoin="round"/>${mk(k,flag,c)}`).join('');
-  const base=D.map((x,i)=>x.has?'':x.off?`<rect x="${X(i)-4}" y="${Y(0)-4}" width="8" height="8" rx="2" fill="#6b6b74"/>`:`<circle cx="${X(i)}" cy="${Y(0)}" r="3" fill="none" stroke="#55555e" stroke-width="1.4"/>`).join('');
-  const tbl=`<div class="sr-only"><table><caption>Faturamento diário de ${fmtD(f)} a ${fmtD(t)}</caption><tr><th>Dia</th><th>Uber</th><th>99</th><th>Total</th></tr>${D.map(x=>`<tr><td>${fmtD(x.d)}</td>${x.has?`<td>${x.hu?brl(x.uber):'sem registro'}</td><td>${x.hn?brl(x.n99):'sem registro'}</td><td>${brl(x.tot)}</td>`:`<td colspan="3">${x.off?'folga confirmada':'sem registro'}</td>`}</tr>`).join('')}</table></div>`;
-  el.innerHTML=leg+`<div class="cscroll"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" tabindex="0" aria-label="Faturamento diário de ${fmtD(f)} a ${fmtD(t)}. Use as setas para percorrer os dias.">
-   ${band}${grid}${base}${lines}${xl}<g class="cx" style="display:none"><line y1="${Tp}" y2="${Tp+ih}" stroke="rgba(255,255,255,.28)" stroke-dasharray="3 3"/></g>
-   <rect class="hit" x="${L-10}" y="0" width="${iw+20}" height="${H}" fill="transparent"/></svg></div><div class="ctip" aria-hidden="true"></div>`+tbl;
-  const sc=el.querySelector('.cscroll'),svg=el.querySelector('svg'),cx=svg.querySelector('.cx'),tip=el.querySelector('.ctip');let cur=-1;
-  if(W>vw)sc.scrollLeft=W; // começa mostrando os dias mais recentes
-  const show=i=>{cur=Math.max(0,Math.min(n-1,i));const x=D[cur],px=X(cur);cx.style.display='';const ln=cx.querySelector('line');ln.setAttribute('x1',px);ln.setAttribute('x2',px);
-    const row=(c,cls,nm,v)=>`<div><span><span class="idn ${cls}"></span>${nm}</span>${v}</div>`;
-    tip.innerHTML=`<b>${x.d===TODAY()?'Hoje · ':''}${WD[pd(x.d).getDay()]} ${fmtD(x.d)}</b>`+(x.has?row('','tot','Total',brl(x.tot))+row('','uber','Uber',x.hu?brl(x.uber):'sem registro')+row('','n99','99',x.hn?brl(x.n99):'sem registro'):`<div style="color:var(--mut)">${x.off?'Folga confirmada por você':'Sem registro neste dia (não é R$ 0,00 confirmado)'}</div>`);
-    tip.classList.add('on');const tw=tip.offsetWidth,rel=px-sc.scrollLeft;let lx=rel+14;if(lx+tw>el.clientWidth)lx=rel-tw-14;tip.style.left=Math.max(0,Math.min(el.clientWidth-tw,lx))+'px';tip.style.top=(sc.offsetTop+6)+'px'};
-  const hide=()=>{cx.style.display='none';tip.classList.remove('on')};
-  const at=e=>{const b=svg.getBoundingClientRect(),x=e.clientX-b.left;return n===1?0:Math.round((x-L)/(iw/(n-1)))};
-  svg.addEventListener('pointermove',e=>show(at(e)));svg.addEventListener('pointerdown',e=>show(at(e)));svg.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')hide()});sc.addEventListener('scroll',hide,{passive:true});
-  svg.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();show(cur<0?n-1:cur+(e.key==='ArrowRight'?1:-1))}else if(e.key==='Escape')hide()});
-  svg.addEventListener('blur',hide)}
+  const V=chartData(f,t).map(x=>capDay(x,k)),n=V.length,reg=V.filter(v=>v.st==='val'||v.st==='zero');
+  const pick=seg('cap',k,{tot:'Total',uber:'Uber',n99:'99'}),lbl=f===addD(t,-6)?'7 dias':'este mês';
+  if(!reg.length){el.innerHTML=`<div class="bch-h"><div class="bch-k"><small>Faturamento bruto · ${lbl}</small></div>${pick}</div><div class="cempty"><span>Nenhum ganho${A?' da '+A.n:''} registrado entre ${fmtD(f)} e ${fmtD(t)}. Quando você registrar, cada dia aparece aqui como uma barra.</span><button type="button" class="btn sm" data-addrec>+ Registrar ganho</button></div>`;return}
+  /* topo: total do período, comparação com o período anterior de mesmo tamanho (só com dados suficientes) e dias com registro */
+  const sum=capSum(reg),P=chartData(addD(f,-n),addD(f,-1)).map(x=>capDay(x,k)),preg=P.filter(v=>v.st==='val'||v.st==='zero'),psum=capSum(preg);
+  const cmp=reg.length>=3&&preg.length>=3&&psum>0?(sum-psum)/psum*100:null,plbl=n===7?'7 dias anteriores':`${n} dias anteriores`;
+  /* largura das colunas: o maior valor precisa caber (com "R$" se houver espaço; senão só o número, com aviso na legenda) */
+  const mob=innerWidth<=900,avail=Math.max(200,el.clientWidth+16),ff=getComputedStyle(el).fontFamily,cv=(drawChart.cv=drawChart.cv||document.createElement('canvas')).getContext('2d'); // +16: o gráfico usa a margem interna do cartão
+  const money=v=>num(v,2),ph=mob?148:176,mx=Math.max(...reg.map(v=>v.v)),top=mx>0?mx:null;
+  const H=V.map(v=>v.st==='val'&&mx>0?Math.max(3,Math.round(v.v/mx*ph)):v.st==='zero'?2:0),LY=V.map((v,i)=>v.st==='val'||v.st==='zero'?H[i]:14); // altura de cada barra e de cada rótulo
+  const txt=(v,r)=>v.st==='off'?'folga':v.st==='none'?'—':(r?'R$ ':'')+money(v.v),wds=(r,fs)=>{cv.font=`650 ${fs}px ${ff}`;return V.map(v=>cv.measureText(txt(v,r)).width)};
+  /* cabe? cada valor na própria coluna; um valor mais largo só pode invadir as vizinhas se estiver bem acima delas
+     (vizinhos ao menos 16 px mais baixos); valores lado a lado na mesma altura nunca se tocam */
+  const fits=(r,fs,pad,cw)=>{const w=wds(r,fs),gap=(cw-Math.min(44,Math.max(14,cw*.56)))/2-2;if(cw<36)return false; // gap: folga lateral entre a borda da coluna e a barra
+    for(let i=0;i<n;i++){if(w[i]+pad<=cw)continue;const over=(w[i]+pad-cw)/2;if(over>Math.min(cw*.45,(i===0||i===n-1)?8:99))return false;
+      for(const j of[i-1,i+1])if(j>=0&&j<n&&LY[j]+16>LY[i]&&over>gap)return false}
+    for(let i=1;i<n;i++)if(Math.abs(LY[i]-LY[i-1])<16&&(w[i]+w[i-1])/2+pad>cw)return false;return true};
+  /* 1º: valores com "R$"; 2º: só o número (a legenda avisa que é R$); 3º: fonte meio ponto menor. O que couber primeiro. */
+  const fs0=mob?10.5:11,opts=[[true,fs0,10],[false,fs0,6],[false,10,4]];let useR=false,fs=fs0,colW=avail/n,rot=false,ok=false;
+  for(const[r,f_,pad]of opts)if(fits(r,f_,pad,avail/n)){useR=r;fs=f_;ok=true;break}
+  if(!ok){if(!mob&&avail/n>=20)rot=true; // computador, período longo: valor na vertical acima da barra, sem rolagem
+    else colW=Math.max(Math.max(...wds(false,fs0))+8,36)} // celular: largura mínima legível e rolagem só dentro do gráfico
+  const scroll=colW*n>avail+1,tiny=colW<34,bw=Math.round(Math.min(44,Math.max(rot?8:14,colW*.56)));
+  const lab=v=>txt(v,useR);
+  const sig=[f,t,k,V.map(v=>v.st+v.v).join()].join('|'),anim=el._sig!==sig&&!RM.matches;el._sig=sig; // anima só quando os dados mudam (não ao redimensionar)
+  if(document.fonts&&document.fonts.status!=='loaded'&&!drawChart.fw){drawChart.fw=1;document.fonts.ready.then(()=>{if($('#dchart'))drawChart()})} // larguras medidas com a fonte final do app
+  const cols=V.map((v,i)=>{const h=v.st==='val'&&mx>0?Math.max(3,Math.round(v.v/mx*ph)):v.st==='zero'?2:0,d=pd(v.d),wd=tiny?DOW[d.getDay()].charAt(0):v.d===TODAY()?'HOJE':DOW[d.getDay()].toUpperCase();
+    return`<button type="button" class="bc s-${v.st}${v.st==='val'&&v.v===top?' top':''}${v.d===hl?' hl':''}" data-i="${i}" style="--i:${Math.min(i,24)};--h:${h}px;${scroll?'width:'+colW+'px':''}" aria-label="${longD(v.d)}: ${v.st==='val'||v.st==='zero'?brl(v.v):v.st==='off'?'folga confirmada':'sem registro'}">
+      <span class="pl">${h?'<i class="bar"></i>':v.st==='off'?'<i class="mk off"></i>':v.st==='none'?'<i class="mk nr"></i>':''}<span class="val">${lab(v)}</span></span><span class="dl"><b>${wd}</b>${tiny?fmtD(v.d).slice(0,2):fmtD(v.d).slice(0,5)}</span></button>`}).join('');
+  const has=s=>V.some(v=>v.st===s);
+  const leg=`<div class="bch-leg"><span><i class="lg"></i>Faturamento bruto por dia${useR?'':' (em R$)'}</span>${has('zero')?'<span><i class="lz"></i>R$ 0,00 = jornada sem ganho</span>':''}${has('none')?'<span class="mu"><i class="ln"></i>Sem registro</span>':''}${has('off')?'<span class="mu"><i class="lo"></i>Folga</span>':''}</div>`;
+  const tbl=`<div class="sr-only"><table><caption>Faturamento bruto diário${A?' da '+A.n:''} de ${fmtD(f)} a ${fmtD(t)}</caption><tr><th>Dia</th><th>Faturamento bruto</th></tr>${V.map(v=>`<tr><td>${fmtD(v.d)}</td><td>${v.st==='val'||v.st==='zero'?brl(v.v):v.st==='off'?'folga confirmada':'sem registro'}</td></tr>`).join('')}</table></div>`;
+  el.innerHTML=`<div class="bch-h"><div class="bch-k"><small>Faturamento bruto · ${lbl}${A?' · '+A.n:''}</small><b>${brl(sum)}</b></div>${pick}<span class="bch-m">${cmp!=null?`<span class="${cmp>=0?'pos':'neg'}">${cmp>=0?'▲':'▼'} ${num(Math.abs(cmp),1)}%</span> vs ${plbl} · `:''}${reg.length} ${reg.length===1?'dia':'dias'} com registro</span></div>
+   <div class="bch${anim?' anim':''}${rot?' vlab':''}${scroll?' scr':''}" data-app="${k}" style="--ph:${ph}px;--bw:${bw}px;--fs:${fs}px"><div class="bch-sc"><div class="bch-row" style="${scroll?'width:'+Math.ceil(colW*n)+'px':''}">${cols}</div></div>${leg}</div><div class="ctip" aria-hidden="true"></div>`+tbl;
+  const sc=el.querySelector('.bch-sc'),tip=el.querySelector('.ctip'),bs=[...el.querySelectorAll('.bc')];let sel=-1;
+  if(scroll)sc.scrollLeft=sc.scrollWidth; // começa nos dias mais recentes
+  const show=i=>{const v=V[i],b=bs[i],x=v.x,d=pd(v.d),parts=k==='tot'&&v.st==='val'?[x.hu?'Uber '+brl(x.uber):'',x.hn?'99 '+brl(x.n99):''].filter(Boolean):[];
+    bs.forEach((c,j)=>c.classList.toggle('sel',j===i));
+    tip.innerHTML=`<b>${v.d===TODAY()?'Hoje · ':''}${longD(v.d)}</b>`+(v.st==='val'?`<div><span>Faturamento bruto</span>${brl(v.v)}</div>${parts.length>1?`<div class="tsub">${parts.join(' · ')}</div>`:''}${v.v===top&&reg.length>1?'<div class="tsub tg">Melhor dia do período</div>':''}`
+      :v.st==='zero'?`<div><span>Faturamento bruto</span>${brl(0)}</div><div class="tsub">Jornada registrada, sem ganho lançado</div>`:`<div class="tsub">${v.st==='off'?'Folga confirmada por você':'Sem registro neste dia (não é R$ 0,00)'}</div>`);
+    tip.classList.add('on');const br=b.getBoundingClientRect(),eb=el.getBoundingClientRect(),w=tip.offsetWidth,cx=br.left+br.width/2-eb.left,pl=b.querySelector('.pl').getBoundingClientRect();
+    tip.style.left=Math.max(0,Math.min(el.clientWidth-w,cx-w/2))+'px';tip.style.top=Math.max(0,pl.top-eb.top-tip.offsetHeight-6)+'px'};
+  const hide=()=>{sel=-1;bs.forEach(c=>c.classList.remove('sel'));tip.classList.remove('on')};
+  bs.forEach((b,i)=>{b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')show(i)});b.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'){if(sel>=0)show(sel);else hide()}});
+    b.addEventListener('click',()=>{if(sel===i){hide();return}sel=i;show(i)});b.addEventListener('focus',()=>{if(b.matches(':focus-visible')){sel=i;show(i)}}); // foco por teclado abre; toque/clique alterna
+    b.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const j=Math.max(0,Math.min(n-1,i+(e.key==='ArrowRight'?1:-1)));bs[j].focus();bs[j].scrollIntoView({block:'nearest',inline:'nearest'})}else if(e.key==='Escape'){hide();b.blur()}})});
+  sc.addEventListener('scroll',()=>{if(sel>=0)show(sel)},{passive:true});
+  if(!drawChart.out){drawChart.out=1;document.addEventListener('pointerdown',e=>{const c=$('#dchart');if(c&&!e.target.closest('#dchart .bc')){const tp=c.querySelector('.ctip.on');if(tp){tp.classList.remove('on');c.querySelectorAll('.bc.sel').forEach(b=>b.classList.remove('sel'))}}},true)}}
 let chartRT;let navW=innerWidth<=900;addEventListener('resize',()=>{clearTimeout(chartRT);chartRT=setTimeout(()=>{if(!user)return;if(tab==='hoje'&&$('#dchart'))drawChart();const m=innerWidth<=900;if(m!==navW){navW=m;$('#app').classList.remove('navx');renderNav()}},150)});
 
 const V={
@@ -2823,6 +2883,7 @@ document.addEventListener('click',e=>{
   const pdb=T.closest('[data-pday]');if(pdb){const n=+pdb.dataset.pday,cur=pday||TODAY();setPday(n===0?TODAY():addD(cur,n));render();return}
   const fp=T.closest('[data-fper]');if(fp){fper=fp.dataset.fper;render();return}
   const hp=T.closest('[data-hper]');if(hp){hper=hp.dataset.hper;render();return}
+  const ca=T.closest('[data-cap]');if(ca){cap=ca.dataset.cap;drawChart();return} // gráfico: Total, Uber ou 99 (redesenha só o gráfico)
   const rp=T.closest('[data-rper]');if(rp){rper=rp.dataset.rper;render();return}
   const rmt=T.closest('[data-rmet]');if(rmt){rmet=rmt.dataset.rmet;render();return}
   if(T.closest('[data-rkretry]')){const[f,t]=range(rper);RK.key='';loadRanking(f,t,true);render();return}
