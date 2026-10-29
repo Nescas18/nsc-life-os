@@ -132,17 +132,18 @@ await test("Sem rolagem horizontal em 8 larguras (login, todas as áreas e modal
   return WIDTHS.join(", ") + " px";
 });
 
-await test("Gráfico do resumo: linhas, tooltip ao passar o mouse e estado vazio", async (keep) => {
+await test("Gráfico do resumo: barras diárias, valor acima de cada barra, tooltip com a data completa e estado vazio", async (keep) => {
   const ctx = await ctxFor(keep, { viewport: { width: 1280, height: 900 } });
   const { page } = await loggedPage(ctx);
-  const n = await page.locator("#dchart svg path").count();
-  assert(n >= 3, "esperava ao menos 3 linhas, encontrou " + n);
-  await page.locator("#dchart svg").scrollIntoViewIfNeeded();
-  const box = await page.locator("#dchart svg").boundingBox();
-  await page.mouse.move(box.x + box.width - 60, box.y + box.height / 2);
+  const r = await page.evaluate(() => ({ lines: document.querySelectorAll("#dchart svg path").length, cols: document.querySelectorAll("#dchart .bc").length, bars: document.querySelectorAll("#dchart .bc .bar").length }));
+  assert(r.lines === 0 && r.cols === 7 && r.bars >= 1, "esperava 7 colunas de barras e nenhuma linha: " + JSON.stringify(r));
+  const last = page.locator("#dchart .bc").last();
+  await last.scrollIntoViewIfNeeded();
+  assert(/278,50/.test(await last.locator(".val").textContent()), "valor acima da barra de hoje: " + (await last.locator(".val").textContent()));
+  await last.hover();
   const tip = await page.evaluate(() => document.querySelector("#dchart .ctip.on")?.textContent || "");
-  assert(tip.includes("26/10/2026") && tip.includes("278,50"), "tooltip: " + tip);
-  await page.evaluate(() => { db.tx = []; render(); });
+  assert(tip.includes("26 de outubro de 2026") && tip.includes("278,50"), "tooltip: " + tip);
+  await page.evaluate(() => { db.tx = []; db.jr = []; render(); });
   assert(await page.isVisible("#dchart .cempty"), "estado vazio não apareceu");
   await page.click('[data-hper="m"]');
   assert((await page.textContent("#rs-h")).includes("mês"), "período mês");
