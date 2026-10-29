@@ -567,6 +567,97 @@ await test("Cores: Início e Relatórios seguem a mesma regra do resultado", asy
   if (!f.some((c) => /res-even/.test(c))) throw new Error("Relatórios não usa a regra: " + f);
 });
 
+/* ============ AUDITORIA: bruto/líquido por hora, bruto por km, origem do km, hodômetro removido ============ */
+// indicadores de um app num período, como a tela os calcula (AS = mesma engine do dashboard/histórico/relatórios)
+const ind = (page, a, f, t) => page.evaluate(([a, f, t]) => { const s = AS(a, f, t);
+  return { inc: s.inc, op: s.op, opCost: s.opCost, min: s.min, hr: s.hr, km: s.km, kmKnown: s.kmKnown,
+    brutoH: s.hr > 0 ? s.inc / s.hr : null, liqH: s.hr > 0 ? s.op / s.hr : null, brutoKm: s.km > 0 ? s.inc / s.km : null }; }, [a, f, t || f]);
+const jrr = (o) => Object.assign({ id: Math.random().toString(36).slice(2), v: 2, app: "uber", periods: [], trips: null, km: null, at: 1 }, o);
+
+await test("Auditoria A: 270 faturamento, 129 despesas, 6h26min → lucro 141, bruto/h ≈ 41,97, líquido/h ≈ 21,92", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 270 }), tx({ d: T, type: "other", app: "veic", v: 129 })], jr: [jrr({ d: T, min: 386 })] });
+  const r = await ind(o.page, "uber", T, T);
+  if (!near(r.min, 386) || !near(r.hr, 6.4333, 0.001)) throw new Error("6h26min deveria dar 386 min / 6,4333 h: " + JSON.stringify(r));
+  if (!near(r.op, 141)) throw new Error("lucro operacional deveria ser 141: " + r.op);
+  if (!near(r.brutoH, 41.9689, 0.01)) throw new Error("bruto/h deveria ser ≈ 41,97: " + r.brutoH);
+  if (!near(r.liqH, 21.9171, 0.01)) throw new Error("líquido/h deveria ser ≈ 21,92: " + r.liqH);
+});
+await test("Auditoria B: 270 faturamento e 170 km válidos → bruto/km ≈ 1,59", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 270 })], jr: [jrr({ d: T, min: 0, km: 170, kmSrc: "total" })] });
+  const r = await ind(o.page, "uber", T, T);
+  if (!r.kmKnown || !near(r.brutoKm, 1.5882, 0.005)) throw new Error("bruto/km deveria ser ≈ 1,59: " + JSON.stringify(r));
+});
+await test("Auditoria C: sem horas → não calcula por hora (estado neutro)", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 270 })], jr: [] });
+  const r = await ind(o.page, "uber", T, T);
+  if (r.hr !== 0 || r.brutoH !== null || r.liqH !== null) throw new Error("sem horas não pode calcular por hora: " + JSON.stringify(r));
+  // a tela mostra '—', nunca um valor
+  await o.page.evaluate(() => { tab = "uber"; pday = null; render(); });
+  const shown = await o.page.evaluate(() => [...document.querySelectorAll("#view .kpi")].filter((k) => /por hora/.test(k.querySelector("h5").textContent)).map((k) => k.querySelector(".v").textContent.trim()));
+  if (!shown.length || !shown.every((v) => v === "—")) throw new Error("KPIs por hora deveriam mostrar '—': " + JSON.stringify(shown));
+});
+await test("Auditoria D: sem km válido → não exibe bruto/km fictício (nem quando há horas e faturamento)", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 270 })], jr: [jrr({ d: T, min: 300, km: null })] });
+  const r = await ind(o.page, "uber", T, T);
+  if (r.kmKnown || r.km !== 0 || r.brutoKm !== null) throw new Error("sem km não pode ter bruto/km: " + JSON.stringify(r));
+  await o.page.evaluate(() => { tab = "uber"; pday = null; render(); });
+  const shown = await o.page.evaluate(() => { const k = [...document.querySelectorAll("#view .kpi")].find((k) => /Bruto por km/.test(k.querySelector("h5").textContent)); return { v: k.querySelector(".v").textContent.trim(), sub: (k.querySelector(".sub") || {}).textContent || "" }; });
+  if (shown.v !== "—" || !/informe o total de km/.test(shown.sub)) throw new Error("bruto/km deveria ser '—' com instrução: " + JSON.stringify(shown));
+});
+await test("Auditoria E: registros em datas diferentes não se misturam (faturamento de um dia não casa com despesa/km de outro)", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: "2026-10-20", type: "in", app: "uber", v: 270 }), tx({ d: "2026-10-25", type: "other", app: "veic", v: 129 })], jr: [jrr({ d: "2026-10-20", min: 386, km: 170, kmSrc: "total" })] });
+  const d20 = await ind(o.page, "uber", "2026-10-20", "2026-10-20"), d25 = await ind(o.page, "uber", "2026-10-25", "2026-10-25");
+  if (!near(d20.inc, 270) || !near(d20.op, 270) || !near(d20.brutoKm, 1.5882, 0.005)) throw new Error("dia 20 não deveria sofrer a despesa do dia 25: " + JSON.stringify(d20));
+  // no dia 25 a Uber não rodou: a despesa geral do veículo não é atribuída a ela (shareOf = 0) e aparece no consolidado
+  if (!near(d25.inc, 0) || !near(d25.op, 0)) throw new Error("dia 25 sem atividade da Uber: " + JSON.stringify(d25));
+  const c25 = await o.page.evaluate(() => { const s = CS("2026-10-25", "2026-10-25"); return { inc: s.inc, opCost: s.opCost, op: s.op }; });
+  if (!near(c25.inc, 0) || !near(c25.opCost, 129) || !near(c25.op, -129)) throw new Error("consolidado do dia 25 só tem a despesa: " + JSON.stringify(c25));
+  // só o período que contém AMBOS junta tudo
+  const both = await ind(o.page, "uber", "2026-10-20", "2026-10-25");
+  if (!near(both.inc, 270) || !near(both.op, 141)) throw new Error("período completo: 270 − 129 = 141: " + JSON.stringify(both));
+});
+await test("Auditoria F: duração 6h30min = 6,5 h (não 6,30); 6h26min = 6,4333 h", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  const r = await o.page.evaluate(() => ({ h630: durMin("6", "30").min, h626: durMin("6", "26").min, min75: durMin("6", "75") }));
+  if (r.h630 !== 390 || r.h626 !== 386) throw new Error("conversão h/min errada: " + JSON.stringify(r));
+  if (r.min75.ok !== false) throw new Error("75 minutos deveria ser recusado (usar 1h15): " + JSON.stringify(r.min75));
+});
+await test("Auditoria G: registro antigo sem hodômetro preserva o financeiro; indicador de km fica indisponível", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  // jornada antiga só com horas, sem km; faturamento intacto
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 270 }), tx({ d: T, type: "fuel", app: "veic", v: 90, unit: "L", qty: 15 })], jr: [jrr({ d: T, min: 360, km: null })] });
+  const r = await ind(o.page, "uber", T, T);
+  if (!near(r.inc, 270) || !near(r.opCost, 90) || !near(r.op, 180)) throw new Error("financeiro do registro antigo deveria ficar intacto: " + JSON.stringify(r));
+  if (r.brutoKm !== null) throw new Error("sem km válido, bruto/km indisponível: " + r.brutoKm);
+  if (!near(r.brutoH, 45) || !near(r.liqH, 30)) throw new Error("por hora segue válido (270/6, 180/6): " + JSON.stringify(r));
+});
+await test("Auditoria H: hodômetro de jornada removido da interface; registro antigo (kmSrc 'odo') mantém o km já calculado", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, vehicle: { brand: "Fiat", model: "Argo", custom: true, energy: "flex", odo: 70000, odoD: "2026-10-20" }, tx: [tx({ d: T, type: "in", app: "uber", v: 270 })], jr: [{ id: "jold", v: 2, d: T, app: "uber", min: 300, periods: [], trips: null, km: 170, kmSrc: "odo", odoIni: 70000, odoFim: 70170, at: 1 }] });
+  await o.page.evaluate((d) => { tab = "uber"; pday = d; lm = "jr"; render(); }, T);
+  const form = await o.page.evaluate(() => { const r = document.querySelector("#reg");
+    return { opts: [...r.querySelectorAll("input[name=kmMode]")].map((i) => i.value), hasHod: /Hod[óo]metro/i.test(r.innerHTML), hasIniFim: !!r.querySelector("[name=odoIni],[name=odoFim]"), kmPrefill: (r.querySelector("[name=km]") || {}).value }; });
+  if (form.hasHod || form.hasIniFim) throw new Error("hodômetro ainda aparece no formulário: " + JSON.stringify(form));
+  if (JSON.stringify(form.opts) !== JSON.stringify(["none", "total"])) throw new Error("opções de km deveriam ser só none/total: " + JSON.stringify(form.opts));
+  if (form.kmPrefill !== "170") throw new Error("km do registro antigo deveria ser preservado no campo: " + form.kmPrefill);
+  const r = await ind(o.page, "uber", T, T);
+  if (!near(r.brutoKm, 1.5882, 0.005)) throw new Error("km antigo preservado deveria dar bruto/km 1,59: " + JSON.stringify(r));
+  const odo = await o.page.evaluate(() => odoNow().km);
+  if (odo !== 70170) throw new Error("estimativa de km do veículo (manutenção) deveria seguir funcionando: " + odo);
+});
+await test("Auditoria I: distância das corridas importadas (kmTrips) nunca vira distância total no bruto/km", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  // jornada importada da Uber: km=null, kmTrips=120 (só distância com passageiro)
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 270 })], jr: [jrr({ d: T, min: 300, km: null, kmTrips: 120, src: "uber_api" })] });
+  const r = await ind(o.page, "uber", T, T);
+  if (r.kmKnown || r.km !== 0 || r.brutoKm !== null) throw new Error("kmTrips não pode alimentar o bruto/km: " + JSON.stringify(r));
+});
+
 await browser.close();
 server.close();
 let fail = 0;
