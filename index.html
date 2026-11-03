@@ -760,7 +760,7 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
   <div class="left-panel">
    <div class="auth-wrap">
     <a class="auth-back" href="#" id="auth-back">← Voltar para o início</a>
-    <div class="brand-row"><img class="brand-mark" src="/icon-192.png" width="44" height="44" alt="" /><h1 class="brand-title">NESC</h1></div>
+    <div class="brand-row"><svg class="brand-mark" viewBox="0 0 40 40" width="44" height="44" role="img" aria-label="NESC"><rect width="40" height="40" rx="12" fill="#EDBE5A"/><path d="M12 29V12.5L26 27.5M26 29V11M21.5 15.5L26 11l4.5 4.5" fill="none" stroke="#0a0907" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg><h1 class="brand-title">NESC</h1></div>
     <p class="brand-line">Um só lugar para<br><span class="rot" id="rot">seus ganhos na Uber</span></p>
     <p class="brand-subtitle">Ganhos, custos, metas e rotina com cálculos que você consegue conferir.</p>
     <div class="auth-card">
@@ -2670,7 +2670,7 @@ function navState(){try{return localStorage.getItem('nesc_nav')==='c'}catch(e){r
 function renderNav(){const mob=innerWidth<=900,app=$('#app'),open=app.classList.contains('navx'),col=!mob&&app.classList.contains('navc');let i=0;
   const btn=t=>`<button class="nav ${t[0]===tab?'on':''}" data-go="${t[0]}" ${t[0]===tab?'aria-current="page"':''} title="${t[2]}" style="--i:${i++}"><span class="ni">${ICON(t[1])}</span><span class="nl">${t[2]}</span><span class="ns" aria-hidden="true">${t[4]}</span></button>`;
   const tg=mob?(open?['navclose','Fechar menu']:['navmenu','Abrir menu']):(col?['navout','Expandir menu']:['navin','Recolher menu']),cur=TABS.find(t=>t[0]===tab);
-  $('#nav').innerHTML=`<div class="navtop"><div class="logo"><img src="/icon-192.png" alt="" width="28" height="28"><b>NESC</b></div><span class="navcur" aria-hidden="true">${cur?cur[2]:''}</span><button type="button" class="navtog" data-navtog aria-label="${tg[1]}" aria-expanded="${mob?open:!col}" aria-controls="nav" title="${tg[1]}">${ICON(tg[0])}</button></div>`+
+  $('#nav').innerHTML=`<div class="navtop"><div class="logo"><svg viewBox="0 0 40 40" width="28" height="28" role="img" aria-label="NESC"><rect width="40" height="40" rx="12" fill="#EDBE5A"/><path d="M12 29V12.5L26 27.5M26 29V11M21.5 15.5L26 11l4.5 4.5" fill="none" stroke="#0a0907" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg><b>NESC</b></div><span class="navcur" aria-hidden="true">${cur?cur[2]:''}</span><button type="button" class="navtog" data-navtog aria-label="${tg[1]}" aria-expanded="${mob?open:!col}" aria-controls="nav" title="${tg[1]}">${ICON(tg[0])}</button></div>`+
    `<div class="navlist"${mob&&!open?' inert':''}>`+TABS.filter(t=>t[3]).map(btn).join('')+`<div class="navsep" role="presentation" style="--i:${i++}"><b>Mais ferramentas</b></div>`+TABS.filter(t=>!t[3]).map(btn).join('')+
    `<div class="spacer"></div><div class="user" style="--i:${i++}"><b>${esc(user.name)}</b><button data-go="config">Conta e dados</button> · <button data-logout>Sair</button><span class="sync" id="sync">Dados: ${Store.sync}</span></div></div>`;
 }
