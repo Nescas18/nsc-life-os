@@ -542,6 +542,7 @@ input,select,textarea{font-size:16px}
 /* ============ LANDING ============ */
 body.boot #auth,body.boot #canvas-container,body.boot #landing{visibility:hidden}
 #boot{position:fixed;inset:0;z-index:50;display:none;place-items:center;background:var(--bg)}body.boot #boot{display:grid}#boot img{border-radius:14px;opacity:.85;animation:bootp 1.4s ease-in-out infinite}@keyframes bootp{50%{opacity:.4}}
+#landing:not([hidden]){position:fixed;inset:0;z-index:6}#lpframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#0a0907}
 .lp{position:fixed;inset:0;z-index:6;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;color:var(--tx);
  background:radial-gradient(ellipse 70% 50% at 80% 0%,rgba(170,120,36,.22),transparent 60%),radial-gradient(ellipse 60% 40% at 0% 45%,rgba(120,84,24,.14),transparent 60%),radial-gradient(ellipse 80% 40% at 50% 100%,rgba(140,98,30,.12),transparent 60%),linear-gradient(180deg,#0c0a06 0%,#060606 35%,#050505 100%)}
 .lp[hidden]{display:none}
@@ -750,142 +751,7 @@ window.NSC_CONFIG=Object.assign({supabaseUrl:'',supabaseAnonKey:'',aiEndpoint:''
 <!-- ============ LANDING PAGE PÚBLICA ============
      Primeira tela para visitantes sem sessão. "Entrar" e "Criar conta grátis" abrem o login/cadastro já existentes
      (#entrar e #criar-conta). O celular mostra uma DEMONSTRAÇÃO isolada: nada aqui lê ou grava dados de contas. -->
-<div id="landing" class="lp" hidden>
- <canvas id="lpfx" aria-hidden="true"></canvas>
- <header class="lp-h" id="lp-top">
-  <i class="lp-prog" id="lp-prog" aria-hidden="true"></i>
-  <div class="lp-w lp-hrow">
-   <a class="lp-logo" href="#" data-lpgo="lp-top" aria-label="NESC, início"><img src="/icon-192.png" alt="" width="32" height="32"><b>NESC</b></a>
-   <nav class="lp-nav" id="lp-nav" aria-label="Seções da página">
-    <a href="#" data-lpgo="lp-top">Início</a><a href="#como-funciona" data-lpgo="como-funciona" data-track="cta_how">Como funciona</a><a href="#funcionalidades" data-lpgo="funcionalidades">Funcionalidades</a><a href="#ranking-lp" data-lpgo="ranking-lp" data-track="cta_ranking">Ranking</a><a href="#faq" data-lpgo="faq">Perguntas frequentes</a>
-    <div class="lp-navcta"><a class="lp-btn ghost" href="#entrar" data-track="cta_login">Entrar</a><a class="lp-btn" href="#criar-conta" data-track="cta_signup">Criar conta grátis</a></div>
-   </nav>
-   <div class="lp-hact"><a class="lp-btn ghost lp-hide-m" href="#entrar" data-track="cta_login">Entrar</a><a class="lp-btn" href="#criar-conta" data-track="cta_signup">Criar conta<span class="lp-hide-xs"> grátis</span></a>
-    <button type="button" class="lp-burger" id="lp-burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="lp-nav"><span></span><span></span><span></span></button></div>
-  </div>
- </header>
- <div class="lp-main" role="main">
-  <section class="lp-w lp-split" aria-label="Apresentação">
-   <div class="lp-left">
-    <div class="lp-hero" data-scene="auto">
-     <span class="lp-free"><i aria-hidden="true"></i>100% gratuito · sem mensalidade</span>
-     <h1><span class="lp-ln"><span>Você dirige. </span></span><span class="lp-ln"><span class="lp-gold">O NESC organiza seus números.</span></span></h1>
-     <p class="lp-lead">Controle financeiro 100% gratuito para motoristas de Uber e 99.</p>
-     <p class="lp-sub">Registre seus ganhos, acompanhe suas despesas, veja seu lucro e organize suas metas em um só lugar. Sem mensalidade para usar o NESC.</p>
-     <div class="lp-ctas"><a class="lp-btn lg lp-mag" href="#criar-conta" data-track="cta_signup">Criar conta grátis<svg class="lp-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="lp-btn ghost lg" href="#como-funciona" data-lpgo="como-funciona" data-track="cta_how">Ver como funciona</a></div>
-     <ul class="lp-trust"><li>Sem cartão de crédito</li><li>Uber e 99 no mesmo lugar</li><li>Funciona no celular e no computador</li></ul>
-    </div>
-    <div class="lp-story">
-     <article class="lp-step" data-scene="reg"><span class="lp-k">Ganhos</span><h2>Registre o ganho do dia em segundos</h2><p>Escolha Uber ou 99, digite o valor e pronto: o faturamento do dia e a divisão por aplicativo atualizam na hora.</p></article>
-     <article class="lp-step" data-scene="exp"><span class="lp-k">Despesas</span><h2>Cada gasto desconta do lucro, na hora</h2><p>Combustível, alimentação, lavagem, manutenção. O lucro operacional mostra o que sobrou de verdade, com a conta aberta para conferir.</p></article>
-     <article class="lp-step" data-scene="meta"><span class="lp-k">Metas</span><h2>Metas com o percentual real</h2><p>Defina a meta de faturamento, lucro ou economia e acompanhe o progresso do dia. Passou da meta? O NESC mostra quanto passou.</p></article>
-     <article class="lp-step" data-scene="hist"><span class="lp-k">Histórico</span><h2>Tudo organizado para consultar depois</h2><p>Ganhos, despesas e manutenções em uma lista com filtros por período, aplicativo e categoria.</p></article>
-     <article class="lp-step" data-scene="rank"><span class="lp-k">Ranking</span><h2>Compare seu resultado, sem expor seus dados</h2><p>Classificação por lucro operacional ou faturamento do período, com apelido. Ninguém vê seus lançamentos.</p></article>
-    </div>
-   </div>
-   <div class="lp-right" id="lp-right">
-    <div class="lp-stick">
-     <div class="ph" id="ph" aria-label="Demonstração do aplicativo NESC em um celular (dados fictícios)" role="img">
-      <div class="ph-tilt" id="ph-tilt">
-       <div class="ph-back" aria-hidden="true"></div>
-       <div class="ph-frame"><i class="ph-btn b1"></i><i class="ph-btn b2"></i><i class="ph-btn b3"></i>
-        <div class="ph-screen"><div class="ph-island"></div><div class="ph-status"><span>9:41</span><span class="ph-sig"><i></i><i></i><i></i></span></div>
-         <div class="ph-app" id="phapp" aria-hidden="true"></div>
-         <div class="ph-demo">Demonstração · dados fictícios</div></div>
-        <div class="ph-glare" id="ph-glare"></div>
-       </div>
-      </div>
-      <div class="ph-shadow" id="ph-shadow"></div>
-     </div>
-    </div>
-   </div>
-  </section>
-
-  <section class="lp-stats" aria-label="O NESC em números">
-   <div class="lp-w lp-statrow">
-    <div class="lp-stat lp-rv"><b data-count="0" data-pre="R$ ">R$ 0</b><span>de mensalidade, para sempre</span></div>
-    <div class="lp-stat lp-rv"><b data-count="2">2</b><span>apps no mesmo painel: Uber e 99</span></div>
-    <div class="lp-stat lp-rv"><b data-count="5">5</b><span>passos para começar a usar</span></div>
-    <div class="lp-stat lp-rv"><b data-count="100" data-suf="%">100%</b><span>dos cálculos abertos para conferir</span></div>
-   </div>
-   <div class="lp-marq" aria-hidden="true"><div class="lp-marq-in">
-    <span>Faturamento do dia</span><span>Lucro operacional</span><span>Bruto por hora</span><span>Líquido por hora</span><span>Bruto por km</span><span>Metas com percentual real</span><span>Combustível e despesas</span><span>Manutenção</span><span>Relatórios</span><span>Ranking anônimo</span>
-    <span>Faturamento do dia</span><span>Lucro operacional</span><span>Bruto por hora</span><span>Líquido por hora</span><span>Bruto por km</span><span>Metas com percentual real</span><span>Combustível e despesas</span><span>Manutenção</span><span>Relatórios</span><span>Ranking anônimo</span>
-   </div></div>
-  </section>
-
-  <section class="lp-sec" id="como-funciona" aria-labelledby="cf-h">
-   <div class="lp-w"><span class="lp-k">Como funciona</span><h2 class="lp-h2" id="cf-h">Cinco passos, nenhum mistério</h2>
-    <ol class="lp-steps">
-     <li class="lp-rv"><span class="lp-n">01</span><i class="lp-ic" data-ic="conta"></i><h3>Crie sua conta</h3><p>Cadastro com nome, e-mail e senha. Depois, se quiser, cadastre o veículo para calcular o custo por km.</p></li>
-     <li class="lp-rv"><span class="lp-n">02</span><i class="lp-ic" data-ic="uber"></i><h3>Registre seus ganhos</h3><p>Informe o valor recebido na Uber e na 99 ao fim do expediente. O registro é manual e leva segundos.</p></li>
-     <li class="lp-rv"><span class="lp-n">03</span><i class="lp-ic" data-ic="despesas"></i><h3>Registre suas despesas</h3><p>Combustível, manutenção e outros custos entram no cálculo do seu resultado.</p></li>
-     <li class="lp-rv"><span class="lp-n">04</span><i class="lp-ic" data-ic="financas"></i><h3>Acompanhe seus resultados</h3><p>Faturamento, despesas, lucro operacional, histórico e metas, por dia, semana ou mês.</p></li>
-     <li class="lp-rv"><span class="lp-n">05</span><i class="lp-ic" data-ic="metas"></i><h3>Organize sua rotina</h3><p>Use seus números para definir metas, reservar dinheiro para a parcela e lembrar da manutenção.</p></li>
-    </ol></div>
-  </section>
-
-  <section class="lp-sec" id="funcionalidades" aria-labelledby="fn-h">
-   <div class="lp-w"><span class="lp-k">Funcionalidades</span><h2 class="lp-h2" id="fn-h">O que você encontra no NESC</h2>
-    <div class="lp-feat-main">
-     <div class="lp-card big lp-rv"><i class="lp-ic" data-ic="hoje"></i><h3>Painel financeiro</h3><p>Faturamento, despesas, lucro operacional e meta do dia em uma tela, com gráfico diário feito só com o que você registrou.</p></div>
-     <div class="lp-card big lp-rv"><i class="lp-ic" data-ic="uber2"></i><h3>Uber e 99 separados</h3><p>Ganhos, jornada, quilometragem e passes de cada aplicativo, com o resultado de cada um.</p></div>
-     <div class="lp-card big lp-rv"><i class="lp-ic" data-ic="despesas"></i><h3>Despesas e lucro</h3><p>Cada gasto entra na conta do lucro operacional. A composição dos custos fica aberta para conferir.</p></div>
-    </div>
-    <div class="lp-feat-mini">
-     <div class="lp-card lp-rv"><i class="lp-ic" data-ic="historico"></i><h3>Histórico</h3><p>Registros antigos com filtros, busca e ordenação.</p></div>
-     <div class="lp-card lp-rv"><i class="lp-ic" data-ic="metas"></i><h3>Metas</h3><p>Faturamento, lucro, limite de despesas e economia.</p></div>
-     <div class="lp-card lp-rv"><i class="lp-ic" data-ic="manutencao"></i><h3>Manutenção</h3><p>Serviços, custos, quilometragem e próximas revisões.</p></div>
-     <div class="lp-card lp-rv"><i class="lp-ic" data-ic="financas"></i><h3>Relatórios</h3><p>Comparação com o período anterior, contas a pagar e reservas.</p></div>
-     <div class="lp-card lp-rv"><i class="lp-ic" data-ic="ranking"></i><h3>Ranking</h3><p>Sua posição por lucro operacional ou faturamento.</p></div>
-    </div></div>
-  </section>
-
-  <section class="lp-sec" id="ranking-lp" aria-labelledby="rk-h">
-   <div class="lp-w lp-rk">
-    <div><span class="lp-k">Ranking</span><h2 class="lp-h2" id="rk-h">Veja sua posição sem expor seus números</h2>
-     <ul class="lp-list"><li><b>Critério claro:</b> lucro operacional do período (faturamento − combustível, passes e outros gastos) ou, se preferir, faturamento.</li><li><b>Períodos:</b> hoje, últimos 7 dias ou mês atual.</li><li><b>Privacidade:</b> aparecem só a posição, um apelido e o valor do critério. Nada de nome, e-mail, veículo ou lançamentos. Você pode sair do ranking quando quiser.</li><li><b>Sem atalhos:</b> a posição é calculada no servidor a partir dos registros; ninguém edita a própria colocação.</li></ul>
-     <a class="lp-btn lp-mag" href="#criar-conta" data-track="cta_ranking">Conhecer o ranking<svg class="lp-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-    <div class="lp-card lp-rkdemo lp-rv" aria-label="Exemplo ilustrativo de ranking com dados fictícios"><div class="lp-rkhead"><b>Lucro operacional · 7 dias</b><span class="lp-tag">Exemplo ilustrativo · dados fictícios</span></div>
-     <ol><li><b>1º</b><span>Motorista #A7F2</span><em>R$ 1.284,50</em></li><li><b>2º</b><span>Noturno do ABC</span><em>R$ 1.102,30</em></li><li class="me"><b>3º</b><span>Você</span><em>R$ 968,90</em></li><li><b>3º</b><span>Motorista #19C4</span><em>R$ 968,90</em></li><li><b>5º</b><span>Rota Leste</span><em>R$ 811,00</em></li></ol>
-     <p>Empates dividem a posição: depois de dois 3º lugares vem o 5º.</p></div>
-   </div>
-  </section>
-
-  <section class="lp-sec lp-free-sec" aria-labelledby="fr-h">
-   <div class="lp-w lp-freebox lp-rv"><span class="lp-k">Gratuito</span><h2 class="lp-h2" id="fr-h">Seu dinheiro merece organização. Não mais uma mensalidade.</h2>
-    <p>O NESC foi pensado para ajudar motoristas de aplicativo a acompanhar seus números sem adicionar uma assinatura mensal à rotina. Não há plano pago nem cobrança dentro do NESC.</p>
-    <p class="lp-fine">As taxas, passes e pacotes da Uber e da 99 continuam sendo cobrados por elas, como sempre. Para usar o NESC você só precisa de internet.</p>
-    <a class="lp-btn lg lp-mag" href="#criar-conta" data-track="cta_signup">Começar gratuitamente<svg class="lp-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-  </section>
-
-  <section class="lp-sec" id="faq" aria-labelledby="faq-h">
-   <div class="lp-w lp-faq"><span class="lp-k">Dúvidas</span><h2 class="lp-h2" id="faq-h">Perguntas frequentes</h2>
-    <details><summary>O NESC é gratuito?</summary><p>Sim. Não há mensalidade, plano pago ou cobrança dentro do NESC. As taxas e pacotes da Uber e da 99 continuam sendo cobrados por elas.</p></details>
-    <details><summary>O NESC funciona para Uber e 99?</summary><p>Sim. Você registra os ganhos de cada aplicativo separadamente e vê o resultado de cada um e o total. O registro é manual: o NESC não importa dados automaticamente das plataformas.</p></details>
-    <details><summary>Posso registrar minhas despesas?</summary><p>Sim: combustível ou recarga, manutenção e outros gastos, como alimentação e lavagem. Gastos gerais do veículo são divididos entre Uber e 99.</p></details>
-    <details><summary>Como acompanho meu lucro operacional?</summary><p>Na tela Início e em Relatórios. Lucro operacional = faturamento − combustível/energia − passes rateados − outros gastos. Manutenção e custos fixos (como a parcela do carro) aparecem no "resultado completo".</p></details>
-    <details><summary>Posso consultar registros antigos?</summary><p>Sim, na aba Histórico, com filtros por período, tipo, aplicativo e categoria, busca e ordenação.</p></details>
-    <details><summary>Como funcionam as metas?</summary><p>Você define uma meta de faturamento, lucro operacional, limite de despesas, economia ou pagamento de uma conta. O percentual é o realizado dividido pela meta: se passar da meta, o NESC mostra quanto passou.</p></details>
-    <details><summary>Como funciona o ranking?</summary><p>Ele ordena os participantes pelo lucro operacional (ou pelo faturamento) de hoje, dos últimos 7 dias ou do mês. O cálculo é feito no servidor a partir dos registros. Aparecem só posição, apelido e o valor do critério.</p></details>
-    <details><summary>Como recupero minha senha?</summary><p>Na tela de entrada, toque em "Esqueceu a senha?" e informe seu e-mail. Você recebe um link para criar uma nova senha.</p></details>
-    <details><summary>Meus dados financeiros ficam públicos?</summary><p>Não. Seus lançamentos só podem ser lidos pela sua conta. No ranking aparecem apenas posição, apelido e o valor do critério do período, e você pode escolher não participar.</p></details>
-   </div>
-  </section>
-
-  <section class="lp-sec lp-final" aria-labelledby="fi-h">
-   <div class="lp-w lp-finalbox lp-rv"><h2 class="lp-h2" id="fi-h">Comece a entender para onde vai o dinheiro das suas corridas.</h2>
-    <p>Organize seus ganhos, acompanhe seus gastos e tenha uma visão mais clara da sua rotina financeira.</p>
-    <a class="lp-btn lg lp-mag" href="#criar-conta" data-track="cta_signup">Criar minha conta grátis<svg class="lp-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="lp-link" href="#entrar" data-track="cta_login">Já tenho uma conta. Entrar.</a></div>
-  </section>
- </div>
- <footer class="lp-foot"><div class="lp-w lp-footrow">
-  <div><a class="lp-logo" href="#" data-lpgo="lp-top"><img src="/icon-192.png" alt="" width="28" height="28"><b>NESC</b></a><p>Controle financeiro gratuito para motoristas de Uber e 99.</p><p class="lp-fine">Esta página registra apenas contagens anônimas de cliques (sem cookies e sem dados pessoais). Não use o celular enquanto dirige.</p></div>
-  <nav aria-label="Rodapé"><a href="#como-funciona" data-lpgo="como-funciona">Como funciona</a><a href="#funcionalidades" data-lpgo="funcionalidades">Funcionalidades</a><a href="#ranking-lp" data-lpgo="ranking-lp">Ranking</a><a href="#faq" data-lpgo="faq">Perguntas frequentes</a></nav>
-  <nav aria-label="Conta"><a href="#entrar" data-track="cta_login">Entrar</a><a href="#criar-conta" data-track="cta_signup">Criar conta</a></nav>
- </div><div class="lp-w lp-copy">© 2026 NESC</div></footer>
- <div class="lp-sticky" id="lp-sticky" aria-hidden="true"><div><b>100% gratuito</b><span>Sem cartão de crédito</span></div><a class="lp-btn" href="#criar-conta" data-track="cta_signup" tabindex="-1">Criar conta grátis<svg class="lp-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-</div>
+<div id="landing" hidden><iframe id="lpframe" title="NESC — início" src="/home.html" loading="eager"></iframe></div>
 <div id="boot" aria-hidden="true"><img src="/icon-192.png" alt="" width="56" height="56"></div>
 
 <div id="canvas-container"></div>
@@ -3160,10 +3026,21 @@ function track(ev,src){try{if(!TRACK_EV.includes(ev)||!C.supabaseUrl||!C.supabas
 const IN_APP=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())||matchMedia('(display-mode: standalone)').matches;
 const AUTH_ROUTES={'#entrar':'login','#criar-conta':'register','#recuperar-senha':'recover'};
 function showAuth(mode,msg,info){$('#auth-back').style.display=IN_APP?'none':'';$('#landing').hidden=true;LP.stop();$('#auth').style.display='';container.style.display='';document.body.classList.remove('boot');initLogin();switchTab(mode,msg,info)}
-function showLanding(){$('#auth').style.display='none';container.style.display='none';const l=$('#landing');const was=l.hidden;l.hidden=false;document.body.classList.remove('boot');LP.start();Bot.landing();
+function showLanding(){$('#auth').style.display='none';container.style.display='none';const l=$('#landing');const was=l.hidden;l.hidden=false;document.body.classList.remove('boot');Bot.landing();
   if(was){try{if(!sessionStorage.getItem('nesc_lv')){sessionStorage.setItem('nesc_lv','1');track('landing_view',document.referrer?new URL(document.referrer).hostname:'direto')}}catch(e){}}}
 function route(){if(user||RECOV)return;const m=AUTH_ROUTES[location.hash];if(m)showAuth(m);else if(IN_APP)showAuth('login');else showLanding()}
 addEventListener('hashchange',route);
+/* nova home (iframe /home.html): recebe os cliques de Entrar/Criar conta e abre o fluxo existente */
+addEventListener('message',function(e){try{
+  if(e.origin!==location.origin)return;
+  var fr=$('#lpframe'); if(!fr||e.source!==fr.contentWindow)return;
+  var d=e.data; if(!d||!d.nesc_home)return;
+  if(d.type==='auth'){var m={register:'register',login:'login',recover:'recover'}[d.mode]; if(!m)return;
+    if(m==='register')track('cta_signup','home'); else if(m==='login')track('cta_login','home');
+    var h={register:'#criar-conta',login:'#entrar',recover:'#recuperar-senha'}[m];
+    if(location.hash===h)route(); else location.hash=h;
+  } else if(d.type==='track'){track(d.ev,'home');}
+}catch(_){}}); 
 
 /* ============ LANDING: menu, rolagem, revelação, fundo ============ */
 function Particles(sel,active){return{c:null,x:null,ps:[],spr:null,raf:0,last:0,w:0,h:0,
