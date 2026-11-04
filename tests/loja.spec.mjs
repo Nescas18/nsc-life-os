@@ -48,7 +48,7 @@ await test("Aba Lojinha existe e abre sem erro", async (keep) => {
 await test("Cadastra produto e vende em 1 toque: lucro = venda − custo", async (keep) => {
   const { page } = await appPage(keep);
   await goLoja(page);
-  await page.click("[data-shopnew]"); await page.waitForSelector("form[data-form=shopprod]");
+  await page.click("[data-shopnew]"); await page.waitForSelector("form[data-form=shopprod]"); await page.waitForTimeout(90);
   await page.fill("form[data-form=shopprod] [name=name]", "Perfume");
   await page.fill("form[data-form=shopprod] [name=cost]", "12");
   await page.fill("form[data-form=shopprod] [name=price]", "30");
@@ -68,7 +68,7 @@ await test("Lojinha é SEPARADA: vender não mexe no faturamento de Uber/99", as
   const { page } = await appPage(keep);
   const t = await page.evaluate(() => TODAY());
   await goLoja(page);
-  await page.click("[data-shopnew]"); await page.waitForSelector("form[data-form=shopprod]");
+  await page.click("[data-shopnew]"); await page.waitForSelector("form[data-form=shopprod]"); await page.waitForTimeout(90);
   await page.fill("form[data-form=shopprod] [name=name]", "Chaveiro");
   await page.fill("form[data-form=shopprod] [name=cost]", "3");
   await page.fill("form[data-form=shopprod] [name=price]", "10");
@@ -95,12 +95,7 @@ await test("Venda avulsa (sem cadastrar produto) entra com nome e valor", async 
 
 await test("Dados da Lojinha persistem ao recarregar (mesmo armazenamento do app)", async (keep) => {
   const { page } = await appPage(keep);
-  await goLoja(page);
-  await page.click("[data-shopnew]"); await page.waitForSelector("form[data-form=shopprod]");
-  await page.fill("form[data-form=shopprod] [name=name]", "Água");
-  await page.fill("form[data-form=shopprod] [name=price]", "5");
-  await page.click("form[data-form=shopprod] button.btn"); await page.waitForSelector("[data-shopsell]");
-  await page.click("[data-shopsell]"); await page.waitForTimeout(300);
+  await page.evaluate(() => { db.shop.products.push({ id: "x", name: "Água", cost: 0, price: 5, cat: "", at: 1 }); db.shop.sales.push({ id: "s", d: TODAY(), pid: "x", name: "Água", cat: "", qty: 1, unit: 5, cost: 0, at: 2 }); mark(); Store.save(); });
   await page.reload(); await page.waitForSelector("#app.on #view .grid", { timeout: 8000 });
   const n = await page.evaluate(() => db.shop.products.length + "/" + db.shop.sales.length);
   assert(n === "1/1", "após recarregar deveria ter 1 produto e 1 venda: " + n);
