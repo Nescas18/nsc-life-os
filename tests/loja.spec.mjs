@@ -82,7 +82,7 @@ await test("Lojinha é SEPARADA: vender não mexe no faturamento de Uber/99", as
 await test("Venda avulsa (sem cadastrar produto) entra com nome e valor", async (keep) => {
   const { page } = await appPage(keep);
   await goLoja(page);
-  await page.click("[data-shopsale]"); await page.waitForSelector("form[data-form=shopsale]");
+  await page.click("[data-shopsale]"); await page.waitForSelector("form[data-form=shopsale]"); await page.waitForTimeout(90);
   // sem produtos cadastrados, o form já está em modo avulso (pid hidden)
   await page.fill("form[data-form=shopsale] [name=aname]", "Bala");
   await page.fill("form[data-form=shopsale] [name=aval]", "2");
@@ -99,6 +99,41 @@ await test("Dados da Lojinha persistem ao recarregar (mesmo armazenamento do app
   await page.reload(); await page.waitForSelector("#app.on #view .grid", { timeout: 8000 });
   const n = await page.evaluate(() => db.shop.products.length + "/" + db.shop.sales.length);
   assert(n === "1/1", "após recarregar deveria ter 1 produto e 1 venda: " + n);
+});
+
+await test("Estoque baixa ao vender e volta ao desfazer; produtos sem estoque não são afetados", async (keep) => {
+  const { page } = await appPage(keep);
+  await page.evaluate(() => { db.shop.products.push({ id: "p1", name: "Perfume", cost: 12, price: 30, cat: "", stock: 5, at: 1 }); db.shop.products.push({ id: "p2", name: "Avulso", cost: 1, price: 3, cat: "", at: 2 }); mark(); Store.save(); });
+  await goLoja(page);
+  await page.click('[data-shopsell="p1"]'); await page.waitForTimeout(200);
+  let st = await page.evaluate(() => db.shop.products.find((x) => x.id === "p1").stock);
+  assert(st === 4, "venda deveria baixar o estoque para 4: " + st);
+  // desfazer pela ação do toast
+  await page.click("#toast [data-undo], #toast button"); await page.waitForTimeout(200);
+  st = await page.evaluate(() => ({ stock: db.shop.products.find((x) => x.id === "p1").stock, sales: db.shop.sales.length }));
+  assert(st.stock === 5 && st.sales === 0, "desfazer deveria devolver o estoque e remover a venda: " + JSON.stringify(st));
+  // produto sem estoque controlado continua sem a propriedade após vender
+  await page.click('[data-shopsell="p2"]'); await page.waitForTimeout(200);
+  const p2 = await page.evaluate(() => ({ hasStock: typeof db.shop.products.find((x) => x.id === "p2").stock }));
+  assert(p2.hasStock === "undefined", "produto sem estoque não deveria ganhar controle de estoque: " + JSON.stringify(p2));
+  return "estoque 5→4→5; avulso sem estoque";
+});
+
+await test("Parados: produtos cadastrados que menos saíram aparecem no topo, com os de 0 venda marcados", async (keep) => {
+  const { page } = await appPage(keep);
+  const t = await page.evaluate(() => TODAY());
+  await page.evaluate((t) => {
+    db.shop.products.push({ id: "a", name: "Campeão", cost: 1, price: 5, cat: "", stock: 10, at: 1 });
+    db.shop.products.push({ id: "b", name: "Encalhado", cost: 2, price: 8, cat: "", stock: 4, at: 2 });
+    for (let i = 0; i < 3; i++) db.shop.sales.push({ id: "v" + i, d: t, pid: "a", name: "Campeão", cat: "", qty: 1, unit: 5, cost: 1, at: 10 + i });
+    mark(); Store.save();
+  }, t);
+  const slow = await page.evaluate((t) => shopSlow(t.slice(0, 8) + "01", t).map((x) => ({ name: x.name, qty: x.qty })), t);
+  assert(slow[0].name === "Encalhado" && slow[0].qty === 0, "o mais parado deveria ser Encalhado com 0: " + JSON.stringify(slow));
+  assert(slow[1].name === "Campeão" && slow[1].qty === 3, "o campeão deveria vir depois com 3: " + JSON.stringify(slow));
+  const stk = await page.evaluate(() => shopStock());
+  assert(stk.un === 14 && stk.tracked === 2, "resumo de estoque: 14 unidades em 2 produtos: " + JSON.stringify(stk));
+  return "parados ok · estoque " + stk.un;
 });
 
 await browser.close();

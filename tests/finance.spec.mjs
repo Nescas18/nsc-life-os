@@ -676,6 +676,24 @@ await test("Km soma: jornada à noite acrescenta à do dia (62 + 67 = 129); corr
   return "62 + 67 = 129; correção = 200";
 });
 
+await test("Gráfico do Início: no Total, a lojinha soma por cima (roxo) e o dia só de lojinha aparece", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 200 })], jr: [], shop: { products: [{ id: "p1", name: "Perfume", cost: 10, price: 30, cat: "", at: 1 }], sales: [{ id: "s1", d: T, pid: "p1", name: "Perfume", cat: "", qty: 2, unit: 30, cost: 10, at: 2 }, { id: "s2", d: "2026-10-25", pid: "p1", name: "Perfume", cat: "", qty: 1, unit: 30, cost: 10, at: 3 }] } });
+  const r = await o.page.evaluate((T) => {
+    cap = "tot"; const V = chartData(addD(T, -6), T).map((x) => capDay(x, "tot"));
+    const today = V.find((v) => v.d === T), prev = V.find((v) => v.d === addD(T, -1));
+    const uberOnly = chartData(addD(T, -6), T).map((x) => capDay(x, "uber")).find((v) => v.d === T);
+    return { today: { v: today.v, app: today.app, shop: today.shop, st: today.st }, prev: { v: prev.v, shop: prev.shop, st: prev.st }, uberShop: uberOnly.shop };
+  }, T);
+  // hoje: app 200 + lojinha 60 = 260, com shop 60
+  if (!(near(r.today.v, 260) && near(r.today.app, 200) && near(r.today.shop, 60))) throw new Error("dia com app+lojinha errado: " + JSON.stringify(r.today));
+  // ontem: só lojinha 30 → aparece como 'val' mesmo sem corrida
+  if (!(near(r.prev.v, 30) && near(r.prev.shop, 30) && r.prev.st === "val")) throw new Error("dia só de lojinha deveria aparecer: " + JSON.stringify(r.prev));
+  // no filtro Uber, a lojinha não entra
+  if (r.uberShop !== 0) throw new Error("lojinha não pode entrar no filtro de um app só: " + JSON.stringify(r));
+  return "Total 260 (200 app + 60 loja); só-loja 30 visível; Uber sem loja";
+});
+
 await browser.close();
 server.close();
 let fail = 0;
