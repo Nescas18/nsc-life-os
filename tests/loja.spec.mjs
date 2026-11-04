@@ -41,7 +41,7 @@ await test("Aba Lojinha existe e abre sem erro", async (keep) => {
   const { page, errs } = await appPage(keep);
   assert(await page.evaluate(() => TABS.some((t) => t[0] === "loja")), "aba loja não está nas TABS");
   await goLoja(page);
-  assert(await page.evaluate(() => !!document.querySelector("#view .shop-note")), "a aba Lojinha não renderizou");
+  assert(await page.evaluate(() => !!document.querySelector("#view .shhero [data-shopsale]")), "a aba Lojinha não renderizou");
   assert(!errs.length, errs.join(" | "));
 });
 
