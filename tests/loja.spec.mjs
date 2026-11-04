@@ -133,7 +133,13 @@ await test("Parados: produtos cadastrados que menos saíram aparecem no topo, co
   assert(slow[1].name === "Campeão" && slow[1].qty === 3, "o campeão deveria vir depois com 3: " + JSON.stringify(slow));
   const stk = await page.evaluate(() => shopStock());
   assert(stk.un === 14 && stk.tracked === 2, "resumo de estoque: 14 unidades em 2 produtos: " + JSON.stringify(stk));
-  return "parados ok · estoque " + stk.un;
+  // limiar: só conta 'última unidade' quando sobra 1; 2 ou mais não alarma
+  const thr = await page.evaluate(() => {
+    db.shop.products = [{ id: "c2", name: "Dois", cost: 1, price: 2, stock: 2, at: 1 }, { id: "c1", name: "Um", cost: 1, price: 2, stock: 1, at: 2 }, { id: "c0", name: "Zero", cost: 1, price: 2, stock: 0, at: 3 }];
+    return shopStock();
+  });
+  assert(thr.low === 1 && thr.out === 1, "com estoques 2,1,0 → última unidade=1 e esgotados=1 (2 não alarma): " + JSON.stringify(thr));
+  return "parados ok · última unidade só com 1";
 });
 
 await browser.close();
