@@ -58,7 +58,7 @@
 --bg:#040405;--surface:#0b0b0d;--surface2:#111114;--panel:rgba(255,255,255,.032);--panel2:rgba(255,255,255,.06);--line:rgba(255,255,255,.085);--line2:rgba(255,255,255,.14);
 --tx:#f5f5f4;--tx2:#c9c9cf;--mut:#8b8b94;--faint:#5c5c66;
 --gold:#e2b250;--gold-hi:#f6dc9a;--gold-lo:#a87a2a;--gold-a:rgba(226,178,80,.13);--gold-line:rgba(226,178,80,.38);
---ac:#e4e4e7;--ok:#5fc48e;--bad:#ef6f66;--warn:#e9a84b;--cost:#f2a254;--uber:#e9e9ee;--n99:#ffd400;--n99s:#f4e04d;--tot:#e2b250;--app:var(--gold);
+--ac:#e4e4e7;--ok:#5fc48e;--bad:#ef6f66;--warn:#e9a84b;--cost:#f2a254;--shop:#a98bf0;--shop-hi:#c4aefb;--uber:#e9e9ee;--n99:#ffd400;--n99s:#f4e04d;--tot:#e2b250;--app:var(--gold);
 --r-sm:9px;--r:12px;--r-lg:16px;--ease:cubic-bezier(.2,.7,.2,1);--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);color-scheme:dark;box-sizing:border-box}
 html{scroll-padding-top:var(--sat)}
 *{box-sizing:border-box;margin:0;padding:0;font-family:inherit}
@@ -197,7 +197,7 @@ aside{width:244px;flex-shrink:0;border-right:1px solid var(--line);padding:calc(
 .nav:hover{color:var(--tx);background:var(--panel)}
 .nav.on{color:var(--tx);background:var(--panel2);box-shadow:inset 2px 0 0 var(--gold)}.nav.on .ni{color:var(--gold)}
 .ni{display:inline-grid;place-items:center;width:20px;height:20px;flex:0 0 20px;color:inherit}.ni svg{width:19px;height:19px}
-.idn{display:inline-block;width:14px;height:14px;border-radius:4px;flex:0 0 14px;vertical-align:-1px}.idn.uber{background:#000;box-shadow:inset 0 0 0 1.6px var(--uber)}.idn.n99{background:var(--n99)}.idn.lg{width:20px;height:20px;border-radius:6px;flex-basis:20px}.idn.tot{background:var(--tot)}
+.idn{display:inline-block;width:14px;height:14px;border-radius:4px;flex:0 0 14px;vertical-align:-1px}.idn.uber{background:#000;box-shadow:inset 0 0 0 1.6px var(--uber)}.idn.n99{background:var(--n99)}.idn.lg{width:20px;height:20px;border-radius:6px;flex-basis:20px}.idn.tot{background:var(--tot)}.idn.shop{background:var(--shop)}
 .nav.more{display:none}
 .spacer{flex:1;min-height:12px}
 .user{padding:12px;font-size:.82rem;color:var(--mut);border-top:1px solid var(--line)}
@@ -237,9 +237,12 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;padding:calc(30px + var(--sat)) 36
 .msub-bar{height:8px;border-radius:5px;background:var(--panel2);overflow:hidden;margin:8px 0 6px}.msub-bar i{display:block;height:100%;border-radius:5px;transition:width .6s var(--ease)}
 .msub-f{font-size:.78rem;font-variant-numeric:tabular-nums}.msub .lnk{margin-top:6px;display:inline-block}
 .shop-note{font-size:.86rem;color:var(--tx2);border:1px dashed var(--gold-line);background:var(--gold-a);border-radius:var(--r-lg);padding:12px 14px}.shop-note b{color:var(--gold-hi)}
-.shks{display:flex;flex-wrap:wrap;gap:10px}.shk{flex:1 1 120px;min-width:108px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}.shk small{display:block;color:var(--mut);font-size:.72rem;margin-bottom:4px}.shk b{font-size:1.25rem;font-variant-numeric:tabular-nums;font-family:var(--fm)}.shk b.neg{color:var(--bad)}.shk b.gold{color:var(--gold-hi)}
+.shks{display:flex;flex-wrap:wrap;gap:10px}.shk{flex:1 1 120px;min-width:108px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}.shk small{display:block;color:var(--mut);font-size:.72rem;margin-bottom:4px}.shk b{font-size:1.25rem;font-variant-numeric:tabular-nums;font-family:var(--fm)}.shk b.neg{color:var(--bad)}.shk b.gold{color:var(--gold-hi)}.shk b.warn{color:var(--warn)}
 .shtop{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}.shtop li{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;font-size:.9rem}.shtop li b{color:var(--gold)}.shtop li em{color:var(--mut);font-style:normal;font-size:.8rem;font-variant-numeric:tabular-nums}
-.shprods{display:flex;flex-direction:column;gap:8px}.shprod{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}.shprod .g b{display:block}.shprod .g small{color:var(--mut);font-size:.78rem}.shprod .row{display:flex;gap:6px;flex-wrap:wrap}
+.shprods{display:flex;flex-direction:column;gap:8px}.shprod{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}.shprod .g{min-width:0}.shprod .g b{display:block}.shprod .g small{color:var(--mut);font-size:.78rem}.shprod .row{display:flex;gap:6px;flex-wrap:wrap}
+.shprod-st{margin-top:3px;font-size:.76rem}.shsub{color:var(--mut)}.shsub b{color:var(--tx2)}
+.shbadge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.72rem;font-weight:600;line-height:1.5}.shbadge.low{background:rgba(233,168,75,.14);color:var(--warn);border:1px solid rgba(233,168,75,.35)}.shbadge.out{background:rgba(239,111,102,.14);color:var(--bad);border:1px solid rgba(239,111,102,.35)}
+.shslow{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}.shslow li{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line)}.shslow li:last-child{border:none}.shslow li .g{flex:1;min-width:0}.shslow li small{display:block;color:var(--mut);font-size:.76rem}.shslow li .shq{color:var(--mut);font-style:normal;font-size:.82rem;font-variant-numeric:tabular-nums}
 .shempty{text-align:center;padding:22px 16px;border:1px dashed var(--line2);border-radius:var(--r-lg)}.shempty .sub{max-width:380px;margin:6px auto 14px}
 .shsales{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}.shsales li{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line)}.shsales li>div{flex:1;min-width:0}.shsales li small{display:block;color:var(--mut);font-size:.76rem}.shsales li .gold{color:var(--gold-hi);font-variant-numeric:tabular-nums;font-family:var(--fm)}
 .remind{display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap;padding:14px 16px;border:1px solid var(--gold-line);background:linear-gradient(90deg,rgba(226,178,80,.1),rgba(226,178,80,.02));border-radius:var(--r-lg)}
@@ -255,6 +258,30 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;padding:calc(30px + var(--sat)) 36
 .pos{color:var(--ok)}.neg{color:var(--bad)}.wrn{color:var(--warn)}
 .res-pos{color:var(--ok)}.res-neg{color:var(--bad)}.res-even{color:var(--gold-hi)}
 .v-fat{color:var(--tx)}.v-cost{color:var(--cost)}
+/* Indicação / Pix R$ 1.000 — layout em flex, à prova de sobreposição */
+.rkside{display:flex;flex-direction:column;gap:14px;align-self:start}
+.sharec{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:16px;border:1px solid var(--gold-line);background:linear-gradient(135deg,rgba(226,178,80,.15),rgba(168,122,42,.06) 50%,rgba(13,13,14,.55));box-shadow:0 0 0 1px rgba(226,178,80,.07) inset,0 12px 34px -20px rgba(226,178,80,.55)}
+.sharec>*{position:relative;z-index:1}
+.sharec .shine{position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(115deg,transparent 42%,rgba(255,244,214,.2) 48%,rgba(255,255,255,.07) 52%,transparent 58%);background-size:260% 100%;background-position:170% 0;animation:shcSweep 6s ease-in-out infinite}
+@keyframes shcSweep{0%,60%{background-position:170% 0}80%,100%{background-position:-70% 0}}
+.sharec-main{min-width:0}
+.sharec-head{display:flex;align-items:center;gap:12px}
+.pixico{width:44px;height:44px;flex:none;filter:drop-shadow(0 0 7px rgba(226,178,80,.5));animation:pixPulse 3.4s ease-in-out infinite}
+@keyframes pixPulse{0%,100%{filter:drop-shadow(0 0 5px rgba(226,178,80,.38))}50%{filter:drop-shadow(0 0 12px rgba(246,220,154,.7))}}
+.sharec-ht{display:flex;flex-direction:column;gap:1px;min-width:0}
+.sharec-tag{font-size:.64rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--gold-hi);line-height:1.2}
+.sharec-amt{font-family:var(--fd);font-size:1.32rem;font-weight:700;line-height:1.1;letter-spacing:-.01em;background:linear-gradient(120deg,#fbe7bd,#e2b250 55%,#f6dc9a);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--gold-hi)}
+.sharec-txt{font-size:.85rem;color:var(--tx2);margin:11px 0 0;line-height:1.55}
+.sharec-actions{display:flex;flex-direction:column;gap:8px}
+.sharec-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.2;text-align:center}
+.sharec-alt{width:100%;display:flex;align-items:center;justify-content:center;line-height:1.2}
+.sharec-side .pixico{width:40px;height:40px}.sharec-side .sharec-amt{font-size:1.2rem}
+/* Banner (Início): lado a lado em telas largas, empilhado no celular */
+@media(min-width:720px){.sharec-banner{flex-direction:row;align-items:center;gap:26px}
+ .sharec-banner .sharec-main{flex:1 1 auto}
+ .sharec-banner .sharec-actions{flex:0 0 auto;width:260px;max-width:40%}
+ .sharec-banner .sharec-txt{margin-top:8px}}
+@media(prefers-reduced-motion:reduce){.sharec .shine,.pixico{animation:none}}
 .tag.rt-pos{color:var(--ok);border-color:rgba(95,196,142,.4)}.tag.rt-neg{color:var(--bad);border-color:rgba(239,111,102,.4)}.tag.rt-even{color:var(--gold-hi);border-color:var(--gold-line)}
 .resd .it{gap:10px}.resd .it b{font-variant-numeric:tabular-nums;font-family:var(--fm);white-space:nowrap}.resd .tag{flex:0 0 auto;min-width:76px;text-align:center}
 .bar{height:6px;border-radius:6px;background:var(--panel2);overflow:hidden;margin-top:14px}
@@ -479,6 +506,7 @@ form[data-etype="fuel"] [data-nofuel]{display:none}form[data-etype] [data-show]{
 .rs .rs-main{background:linear-gradient(160deg,rgba(226,178,80,.09),rgba(255,255,255,.02) 60%);border-color:rgba(226,178,80,.22)}
 .rs .rs-main b{font-size:1.9rem}
 .rs-split{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:.82rem;color:var(--tx2);font-variant-numeric:tabular-nums;font-family:var(--fm)}.rs-split span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.rs-tot{display:block;margin-top:8px;font-size:.78rem;color:var(--tx2)}.rs-tot b{color:var(--tx);font-family:var(--fm)}.rs-tot .lnk{margin-left:4px}
 .rs .gl .bar{margin-top:8px}
 .big.pos,.rs b.pos,.kpi .v .pos{color:var(--gold-hi)}
 .err:empty{min-height:0;margin:0}
@@ -503,6 +531,9 @@ form[data-etype="fuel"] [data-nofuel]{display:none}form[data-etype] [data-show]{
 .bc .pl{position:relative;display:block;height:calc(var(--ph) + 22px);border-bottom:1px solid var(--line2)}
 .bc .bar{position:absolute;bottom:0;left:calc(50% - var(--bw) / 2);width:var(--bw);height:var(--h);border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,var(--c1),var(--c2));transform-origin:50% 100%;transition:filter .18s}
 .bc.top .bar{background:linear-gradient(180deg,var(--t1),var(--t2))}
+.bc .bshop{position:absolute;left:calc(50% - var(--bw) / 2);width:var(--bw);bottom:calc(var(--h) - var(--sh));height:var(--sh);border-radius:7px 7px 0 0;background:linear-gradient(180deg,var(--shop-hi),var(--shop));box-shadow:0 0 10px -2px rgba(169,139,240,.5)}
+.bc:hover .bshop,.bc.sel .bshop{filter:brightness(1.1)}
+.bch-leg i.lp{background:var(--shop)}
 .bc:hover .bar,.bc.sel .bar{filter:brightness(1.13)}
 .bc.s-zero .bar{border-radius:1px;opacity:.6}
 .bc .val{position:absolute;left:0;right:0;bottom:calc(var(--h) + 6px);text-align:center;font-size:var(--fs,11px);font-weight:650;line-height:1;color:var(--tx);white-space:nowrap;font-variant-numeric:tabular-nums;font-family:var(--fm)}
@@ -516,7 +547,7 @@ form[data-etype="fuel"] [data-nofuel]{display:none}form[data-etype] [data-show]{
 .bch-leg span{display:inline-flex;align-items:center;gap:7px}.bch-leg .mu{color:var(--mut)}
 .bch-leg i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c1)}.bch-leg i.lz{width:12px;height:2px;border-radius:1px;background:var(--c2);opacity:.8}
 .bch-leg i.ln{background:none;border:1.4px dashed #5c5c66}.bch-leg i.lo{border-radius:2px;background:#5f5f68}
-#dchart .ctip .tsub{display:block;color:var(--mut);font-size:.74rem}#dchart .ctip .tg{color:var(--gold-hi)}
+#dchart .ctip .tsub{display:block;color:var(--mut);font-size:.74rem}#dchart .ctip .tg{color:var(--gold-hi)}#dchart .ctip .tshop{color:var(--shop-hi);font-weight:600}
 @keyframes bchin{from{transform:scaleY(0)}}@keyframes bchfade{from{opacity:0}}
 .bch.anim .bar{animation:bchin .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 28ms)}
 .bch.anim .val{animation:bchfade .35s ease both;animation-delay:calc(var(--i) * 28ms + .38s)}
@@ -1478,7 +1509,7 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 let tt,lastSig='',lastT=0;
 const APPS={uber:{n:'Uber',i:'🚗',c:'#e5534b'},n99:{n:'99',i:'🚕',c:'#f5c518'}},PASS_CATALOG={uber:[{id:'time24',label:'Passe por tempo · 24h',price:29,days:1},{id:'time72',label:'Passe por tempo · 72h',price:77,days:3},{id:'earn196',label:'Passe de ganhos · R$ 196',price:32,days:1},{id:'earn552',label:'Passe de ganhos · R$ 552',price:85,days:1}],n99:[{id:'time1',label:'Pacote de tempo · 1 dia ilimitado',price:28.99,days:1},{id:'time3',label:'Pacote de tempo · 3 dias ilimitado',price:74.99,days:3},{id:'earn200',label:'Pacote de ganhos · R$ 200 (180 dias)',price:27.99,days:180},{id:'earn600',label:'Pacote de ganhos · R$ 600 (180 dias)',price:69.99,days:180}]},appOf=t=>t.app||'uber';
 const APPN=a=>APPS[a]?APPS[a].n:'Geral';
-let lm='in',pday=null,fper='m',fFrom='',fTo='',rper='m',hper='d';
+let lm='in',pday=null,fper='m',fFrom='',fTo='',rper='m',hper='d',lper='m';
 const pd=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
 const addD=(s,n)=>{const d=pd(s);d.setDate(d.getDate()+n);return iso(d)};
 const dDiff=(a,b)=>Math.round((pd(b)-pd(a))/864e5);
@@ -2157,9 +2188,10 @@ let cap='tot'; // aplicativo exibido no gráfico: tot (Uber + 99), uber ou n99
 function chartData(f,t){const days=[];for(let d=f;d<=t;d=addD(d,1))days.push(d);
   const by={};db.tx.forEach(x=>{if(x.type==='in'&&inR(x.d,f,t)&&APPS[appOf(x)]){const o=by[x.d]=by[x.d]||{uber:0,n99:0,hu:false,hn:false};const c=Math.round((+x.v||0)*100);if(appOf(x)==='uber'){o.uber+=c;o.hu=true}else{o.n99+=c;o.hn=true}}});
   const jw={};db.jr.forEach(j=>{if(inR(j.d,f,t)&&hasAct(j)){const o=jw[j.d]=jw[j.d]||{};o[j.app==='n99'?'jn':j.app==='uber'?'ju':'jx']=true}}); // jornadas com atividade (para "registrado com R$ 0,00")
-  return days.map(d=>{const o=by[d],w=jw[d]||{},J={ju:!!w.ju,jn:!!w.jn,jx:!!w.jx};return o?{d,uber:o.uber/100,n99:o.n99/100,tot:(o.uber+o.n99)/100,hu:o.hu,hn:o.hn,has:true,off:false,...J}:{d,uber:0,n99:0,tot:0,hu:false,hn:false,has:false,off:isOff(d),...J}})}
+  const sh={};db.shop.sales.forEach(s=>{if(inR(s.d,f,t)){sh[s.d]=(sh[s.d]||0)+Math.round((+s.qty||0)*(+s.unit||0)*100)}}); // vendas da lojinha por dia (centavos)
+  return days.map(d=>{const o=by[d],w=jw[d]||{},J={ju:!!w.ju,jn:!!w.jn,jx:!!w.jx},shop=(sh[d]||0)/100;return o?{d,uber:o.uber/100,n99:o.n99/100,tot:(o.uber+o.n99)/100,hu:o.hu,hn:o.hn,has:true,off:false,shop,...J}:{d,uber:0,n99:0,tot:0,hu:false,hn:false,has:false,off:isOff(d),shop,...J}})}
 /* um dia visto pelo filtro escolhido (o mesmo valor nunca entra duas vezes: Total = Uber + 99 de cada lançamento) */
-const capDay=(x,k)=>{const inc=k==='tot'?x.has:k==='uber'?x.hu:x.hn,jor=k==='tot'?x.ju||x.jn||x.jx:k==='uber'?x.ju:x.jn;return{x,d:x.d,v:inc?(k==='tot'?x.tot:x[k]):0,st:inc?'val':jor?'zero':(!x.has&&x.off)?'off':'none'}};
+const capDay=(x,k)=>{const appInc=k==='tot'?x.has:k==='uber'?x.hu:x.hn,jor=k==='tot'?x.ju||x.jn||x.jx:k==='uber'?x.ju:x.jn,shop=k==='tot'?(+x.shop||0):0,app=appInc?(k==='tot'?x.tot:x[k]):0,hasAny=appInc||shop>0;return{x,d:x.d,v:r2(app+shop),app:r2(app),shop:r2(shop),st:hasAny?'val':jor?'zero':(!x.has&&x.off)?'off':'none'}};
 const longD=d=>{const x=pd(d).toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});return x.charAt(0).toUpperCase()+x.slice(1)}; // data completa do tooltip
 const capSum=V=>Math.round(V.reduce((s,v)=>s+Math.round(v.v*100),0))/100;
 function drawChart(){const el=$('#dchart');if(!el)return;const f=el.dataset.f,t=el.dataset.t,hl=el.dataset.hl,k=cap,A=k==='tot'?null:APPS[k];
@@ -2190,19 +2222,19 @@ function drawChart(){const el=$('#dchart');if(!el)return;const f=el.dataset.f,t=
   const lab=v=>txt(v,useR);
   const sig=[f,t,k,V.map(v=>v.st+v.v).join()].join('|'),anim=el._sig!==sig&&!RM.matches;el._sig=sig; // anima só quando os dados mudam (não ao redimensionar)
   if(document.fonts&&document.fonts.status!=='loaded'&&!drawChart.fw){drawChart.fw=1;document.fonts.ready.then(()=>{if($('#dchart'))drawChart()})} // larguras medidas com a fonte final do app
-  const cols=V.map((v,i)=>{const h=v.st==='val'&&mx>0?Math.max(3,Math.round(v.v/mx*ph)):v.st==='zero'?2:0,d=pd(v.d),wd=tiny?DOW[d.getDay()].charAt(0):v.d===TODAY()?'HOJE':DOW[d.getDay()].toUpperCase();
-    return`<button type="button" class="bc s-${v.st}${v.st==='val'&&v.v===top?' top':''}${v.d===hl?' hl':''}" data-i="${i}" style="--i:${Math.min(i,24)};--h:${h}px;${scroll?'width:'+colW+'px':''}" aria-label="${longD(v.d)}: ${v.st==='val'||v.st==='zero'?brl(v.v):v.st==='off'?'folga confirmada':'sem registro'}">
-      <span class="pl">${h?'<i class="bar"></i>':v.st==='off'?'<i class="mk off"></i>':v.st==='none'?'<i class="mk nr"></i>':''}<span class="val">${lab(v)}</span></span><span class="dl"><b>${wd}</b>${tiny?fmtD(v.d).slice(0,2):fmtD(v.d).slice(0,5)}</span></button>`}).join('');
-  const has=s=>V.some(v=>v.st===s);
-  const leg=`<div class="bch-leg"><span><i class="lg"></i>Faturamento bruto por dia${useR?'':' (em R$)'}</span>${has('zero')?'<span><i class="lz"></i>R$ 0,00 = jornada sem ganho</span>':''}${has('none')?'<span class="mu"><i class="ln"></i>Sem registro</span>':''}${has('off')?'<span class="mu"><i class="lo"></i>Folga</span>':''}</div>`;
+  const cols=V.map((v,i)=>{const h=v.st==='val'&&mx>0?Math.max(3,Math.round(v.v/mx*ph)):v.st==='zero'?2:0,hs=v.st==='val'&&v.shop>0&&mx>0?Math.min(h,Math.max(3,Math.round(v.shop/mx*ph))):0,d=pd(v.d),wd=tiny?DOW[d.getDay()].charAt(0):v.d===TODAY()?'HOJE':DOW[d.getDay()].toUpperCase();
+    return`<button type="button" class="bc s-${v.st}${v.st==='val'&&v.v===top?' top':''}${hs?' hasshop':''}${v.d===hl?' hl':''}" data-i="${i}" style="--i:${Math.min(i,24)};--h:${h}px;--sh:${hs}px;${scroll?'width:'+colW+'px':''}" aria-label="${longD(v.d)}: ${v.st==='val'||v.st==='zero'?brl(v.v):v.st==='off'?'folga confirmada':'sem registro'}${v.shop>0?' (inclui '+brl(v.shop)+' da lojinha)':''}">
+      <span class="pl">${h?'<i class="bar"></i>'+(hs?'<i class="bshop"></i>':''):v.st==='off'?'<i class="mk off"></i>':v.st==='none'?'<i class="mk nr"></i>':''}<span class="val">${lab(v)}</span></span><span class="dl"><b>${wd}</b>${tiny?fmtD(v.d).slice(0,2):fmtD(v.d).slice(0,5)}</span></button>`}).join('');
+  const has=s=>V.some(v=>v.st===s),hasShop=k==='tot'&&V.some(v=>v.shop>0);
+  const leg=`<div class="bch-leg"><span><i class="lg"></i>${hasShop?'Uber + 99':'Faturamento bruto por dia'}${useR?'':' (em R$)'}</span>${hasShop?'<span><i class="lp"></i>Vendas da lojinha</span>':''}${has('zero')?'<span><i class="lz"></i>R$ 0,00 = jornada sem ganho</span>':''}${has('none')?'<span class="mu"><i class="ln"></i>Sem registro</span>':''}${has('off')?'<span class="mu"><i class="lo"></i>Folga</span>':''}</div>`;
   const tbl=`<div class="sr-only"><table><caption>Faturamento bruto diário${A?' da '+A.n:''} de ${fmtD(f)} a ${fmtD(t)}</caption><tr><th>Dia</th><th>Faturamento bruto</th></tr>${V.map(v=>`<tr><td>${fmtD(v.d)}</td><td>${v.st==='val'||v.st==='zero'?brl(v.v):v.st==='off'?'folga confirmada':'sem registro'}</td></tr>`).join('')}</table></div>`;
   el.innerHTML=`<div class="bch-h"><div class="bch-k"><small>Faturamento bruto · ${lbl}${A?' · '+A.n:''}</small><b>${brl(sum)}</b></div>${pick}<span class="bch-m">${cmp!=null?`<span class="${cmp>=0?'pos':'neg'}">${cmp>=0?'▲':'▼'} ${num(Math.abs(cmp),1)}%</span> vs ${plbl} · `:''}${reg.length} ${reg.length===1?'dia':'dias'} com registro</span></div>
    <div class="bch${anim?' anim':''}${rot?' vlab':''}${scroll?' scr':''}" data-app="${k}" style="--ph:${ph}px;--bw:${bw}px;--fs:${fs}px"><div class="bch-sc"><div class="bch-row" style="${scroll?'width:'+Math.ceil(colW*n)+'px':''}">${cols}</div></div>${leg}</div><div class="ctip" aria-hidden="true"></div>`+tbl;
   const sc=el.querySelector('.bch-sc'),tip=el.querySelector('.ctip'),bs=[...el.querySelectorAll('.bc')];let sel=-1;
   if(scroll)sc.scrollLeft=sc.scrollWidth; // começa nos dias mais recentes
-  const show=i=>{const v=V[i],b=bs[i],x=v.x,d=pd(v.d),parts=k==='tot'&&v.st==='val'?[x.hu?'Uber '+brl(x.uber):'',x.hn?'99 '+brl(x.n99):''].filter(Boolean):[];
+  const show=i=>{const v=V[i],b=bs[i],x=v.x,d=pd(v.d),parts=k==='tot'&&v.st==='val'?[x.hu?'Uber '+brl(x.uber):'',x.hn?'99 '+brl(x.n99):'',v.shop>0?'<b class="tshop">Lojinha '+brl(v.shop)+'</b>':''].filter(Boolean):[];
     bs.forEach((c,j)=>c.classList.toggle('sel',j===i));
-    tip.innerHTML=`<b>${v.d===TODAY()?'Hoje · ':''}${longD(v.d)}</b>`+(v.st==='val'?`<div><span>Faturamento bruto</span>${brl(v.v)}</div>${parts.length>1?`<div class="tsub">${parts.join(' · ')}</div>`:''}${v.v===top&&reg.length>1?'<div class="tsub tg">Melhor dia do período</div>':''}`
+    tip.innerHTML=`<b>${v.d===TODAY()?'Hoje · ':''}${longD(v.d)}</b>`+(v.st==='val'?`<div><span>${v.shop>0?'Total do dia':'Faturamento bruto'}</span>${brl(v.v)}</div>${parts.length>1||v.shop>0?`<div class="tsub">${parts.join(' · ')}</div>`:''}${v.v===top&&reg.length>1?'<div class="tsub tg">Melhor dia do período</div>':''}`
       :v.st==='zero'?`<div><span>Faturamento bruto</span>${brl(0)}</div><div class="tsub">Jornada registrada, sem ganho lançado</div>`:`<div class="tsub">${v.st==='off'?'Folga confirmada por você':'Sem registro neste dia (não é R$ 0,00)'}</div>`);
     tip.classList.add('on');const br=b.getBoundingClientRect(),eb=el.getBoundingClientRect(),w=tip.offsetWidth,cx=br.left+br.width/2-eb.left,pl=b.querySelector('.pl').getBoundingClientRect();
     tip.style.left=Math.max(0,Math.min(el.clientWidth-w,cx-w/2))+'px';tip.style.top=Math.max(0,pl.top-eb.top-tip.offsetHeight-6)+'px'};
@@ -2226,12 +2258,23 @@ function shopTopCat(f,to){const ss=db.shop.sales.filter(x=>x.d>=f&&x.d<=to),pm={
 function shopTop(f,to,by){const ss=db.shop.sales.filter(x=>x.d>=f&&x.d<=to),m={};
   for(const x of ss){const k=x.pid||('a:'+x.name),q=+x.qty||0,u=+x.unit||0,c=+x.cost||0;(m[k]=m[k]||{name:x.name,qty:0,inc:0,profit:0});m[k].qty+=q;m[k].inc+=q*u;m[k].profit+=q*(u-c)}
   return Object.values(m).map(o=>({name:o.name,qty:o.qty,inc:r2(o.inc),profit:r2(o.profit)})).sort((a,b)=>by==='qty'?b.qty-a.qty||b.profit-a.profit:b.profit-a.profit).slice(0,5)}
+// Produtos cadastrados que menos saíram no período (o que está "parado"); conta só produtos do catálogo.
+function shopSlow(f,to){const sold={};db.shop.sales.filter(x=>x.d>=f&&x.d<=to&&x.pid).forEach(x=>{sold[x.pid]=(sold[x.pid]||0)+(+x.qty||0)});
+  return db.shop.products.map(p=>({id:p.id,name:p.name,qty:sold[p.id]||0,stock:typeof p.stock==='number'?p.stock:null})).sort((a,b)=>a.qty-b.qty||(b.stock||0)-(a.stock||0))}
+// Resumo de estoque: unidades e custo parado dos produtos que controlam estoque.
+function shopStock(){let un=0,val=0,low=0,out=0,tracked=0;db.shop.products.forEach(p=>{if(typeof p.stock==='number'){tracked++;un+=p.stock;val+=p.stock*(+p.cost||0);if(p.stock===0)out++;else if(p.stock<=2)low++}});return{un,val:r2(val),low,out,tracked}}
+function openShopStock(pid){const p=db.shop.products.find(x=>x.id===pid);if(!p)return;const cur=typeof p.stock==='number'?p.stock:0;
+  modal(`<h2>Repor estoque</h2><form data-form="shopstock" novalidate><input type="hidden" name="id" value="${p.id}">
+  <p class="note" style="margin-top:0"><b>${esc(p.name)}</b> · em estoque agora: <b>${cur}</b> un.</p>
+  <div class="f"><label>Quantas unidades você comprou / quer somar</label><input name="add" inputmode="numeric" autocomplete="off" placeholder="Ex.: 10" autofocus><small class="fhint">Use um número negativo para corrigir para baixo (ex.: −2).</small></div>
+  <div class="err" data-err></div><div class="row wrap"><button class="btn">Atualizar estoque</button>${mclose}</div></form>`)}
 function openShopProd(pid){const p=pid&&db.shop.products.find(x=>x.id===pid);
   modal(`<h2>${p?'Editar produto':'Novo produto'}</h2><form data-form="shopprod" novalidate><input type="hidden" name="id" value="${p?p.id:''}">
   <div class="f"><label>Nome do produto</label><input name="name" autocomplete="off" required placeholder="Ex.: Perfume Fresh" value="${p?esc(p.name):''}"></div>
   <div class="f"><label>Tipo / categoria (opcional)</label><input name="cat" autocomplete="off" placeholder="Ex.: Perfume, Chaveiro, Bala" value="${p&&p.cat?esc(p.cat):''}"><small class="fhint">Agrupa no painel “O que mais vende por tipo”. Use o mesmo tipo para produtos parecidos.</small></div>
   <div class="row wrap"><div class="f"><label>Quanto você paga (custo) · R$</label><input name="cost" inputmode="decimal" autocomplete="off" placeholder="Ex.: 12" value="${p&&p.cost?num(p.cost,2):''}"></div>
   <div class="f"><label>Por quanto vende · R$</label><input name="price" inputmode="decimal" autocomplete="off" required placeholder="Ex.: 30" value="${p?num(p.price,2):''}"></div></div>
+  <div class="f"><div class="lblrow"><label>Quantos você tem em estoque (opcional)</label>${tip('Para que serve o estoque','<p>Informe quantas unidades você tem agora. A cada venda o NESC baixa do estoque automaticamente e avisa quando estiver acabando.</p><p>Deixe em branco se não quiser controlar o estoque desse produto.</p>')}</div><input name="stock" inputmode="numeric" autocomplete="off" placeholder="Ex.: 10" value="${p&&typeof p.stock==='number'?p.stock:''}"></div>
   <p class="note" style="margin-top:0">Cadastre uma vez só. Depois é só tocar em “Vender” a cada venda.</p>
   <div class="err" data-err></div><div class="row wrap"><button class="btn">Salvar produto</button>${mclose}</div></form>`)}
 function openShopSale(){const P=db.shop.products;
@@ -2242,24 +2285,30 @@ function openShopSale(){const P=db.shop.products;
   <div class="err" data-err></div><div class="row wrap"><button class="btn">Registrar venda</button>${mclose}</div></form>`);
   const fm=$('#mbox form');if(fm){const sel=fm.querySelector('[name=pid]'),av=fm.querySelector('[data-avulso]');if(sel&&av)sel.addEventListener('change',()=>{av.hidden=!!sel.value})}}
 const V={
-loja(){const t=TODAY(),mf=t.slice(0,8)+'01',P=db.shop.products,dS=shopStats(t,t),mS=shopStats(mf,t),topQ=shopTop(mf,t,'qty');
+loja(){const t=TODAY(),mf=t.slice(0,8)+'01',P=db.shop.products,dS=shopStats(t,t);
+  const [pf,pt]=lper==='w'?[addD(t,-6),t]:[mf,t],plbl=lper==='w'?'últimos 7 dias':'este mês';
+  const pS=shopStats(pf,pt),topQ=shopTop(pf,pt,'qty'),slow=shopSlow(pf,pt),stk=shopStock();
   const recent=[...db.shop.sales].sort((a,b)=>(b.at||0)-(a.at||0)).slice(0,8);
   const tile=(l,v,c)=>`<div class="shk"><small>${l}</small><b class="${c||''}">${v}</b></div>`;
+  const stText=p=>typeof p.stock!=='number'?'<span class="shsub">estoque não controlado</span>':p.stock===0?'<span class="shbadge out">esgotado</span>':p.stock<=2?`<span class="shbadge low">só ${p.stock} em estoque</span>`:`<span class="shsub">em estoque: <b>${p.stock}</b></span>`;
   return `<div class="grid">
-   <div class="c s12 shop-note">A Lojinha é <b>separada</b> do faturamento de Uber e 99. Aqui entra só o que você vende dentro do carro — o lucro não se mistura com o das corridas.</div>
+   <div class="c s12 shop-note">A Lojinha é <b>separada</b> do faturamento de Uber e 99. Aqui entra só o que você vende dentro do carro. No <b>Início</b>, o gráfico do dia soma a lojinha por cima, na cor <b style="color:var(--shop-hi)">roxa</b>, pra você ver quanto veio das vendas e quanto veio das corridas.</div>
    <section class="c s12"><div class="mhead"><h3 style="margin:0">Hoje</h3><button type="button" class="btn sm" data-shopsale><span class="ni">${ICON('plus')}</span>Registrar venda</button></div>
     <div class="shks">${tile('Faturamento',brl(dS.inc))}${tile('Custo',brl(dS.cst),'neg')}${tile('Lucro',brl(dS.profit),'gold')}${tile('Itens vendidos',String(dS.qty))}</div></section>
-   <section class="c s6"><h3>Este mês</h3><div class="shks">${tile('Faturamento',brl(mS.inc))}${tile('Custo',brl(mS.cst),'neg')}${tile('Lucro',brl(mS.profit),'gold')}</div></section>
-   <section class="c s6"><h3>Campeões do mês</h3>${topQ.length?`<ol class="shtop">${topQ.map((x,i)=>`<li><b>${i+1}º</b><span>${esc(x.name)}</span><em>${x.qty}× · lucro ${brl(x.profit)}</em></li>`).join('')}</ol>`:'<p class="sub">Registre vendas para ver o que mais sai e o que dá mais lucro.</p>'}</section>
+   <section class="c s12"><div class="mhead"><h3 style="margin:0">Desempenho</h3>${seg('lper',lper,{w:'7 dias',m:'Este mês'})}</div>
+    <div class="shks">${tile('Faturamento',brl(pS.inc))}${tile('Custo',brl(pS.cst),'neg')}${tile('Lucro',brl(pS.profit),'gold')}${tile('Itens vendidos',String(pS.qty))}</div></section>
+   <section class="c s6"><h3>Mais vendidos <span class="sub">· ${plbl}</span></h3>${topQ.length?`<ol class="shtop">${topQ.map((x,i)=>`<li><b>${i+1}º</b><span>${esc(x.name)}</span><em>${x.qty}× · lucro ${brl(x.profit)}</em></li>`).join('')}</ol>`:'<p class="sub">Registre vendas para ver o que mais sai e o que dá mais lucro.</p>'}</section>
+   <section class="c s6"><h3>Parados <span class="sub">· o que menos saiu · ${plbl}</span></h3>${slow.length?`<ul class="shslow">${slow.slice(0,6).map(x=>`<li><div class="g"><b>${esc(x.name)}</b><small>${x.qty===0?'não vendeu neste período':x.qty+'× no período'}${x.stock!=null?' · '+(x.stock===0?'sem estoque':'estoque '+x.stock):''}</small></div>${x.qty===0?'<span class="shbadge low">parado</span>':`<em class="shq">${x.qty}×</em>`}</li>`).join('')}</ul><p class="sub" style="margin-top:8px">Quem fica no topo da lista é o que menos está saindo — vale uma promoção ou tirar do carro.</p>`:'<p class="sub">Cadastre produtos para ver o que está encalhado.</p>'}</section>
+   ${stk.tracked?`<section class="c s12"><h3>Estoque <span class="sub">· só produtos com estoque informado</span></h3><div class="shks">${tile('Unidades guardadas',String(stk.un))}${tile('Custo parado',brl(stk.val),'neg')}${tile('Acabando (≤2)',String(stk.low),stk.low?'warn':'')}${tile('Esgotados',String(stk.out),stk.out?'neg':'')}</div></section>`:''}
    <section class="c s12"><div class="mhead"><h3 style="margin:0">Seus produtos</h3><button type="button" class="btn ghost sm" data-shopnew><span class="ni">${ICON('plus')}</span>Novo produto</button></div>
-    ${P.length?`<div class="shprods">${P.map(x=>`<div class="shprod"><div class="g"><b>${esc(x.name)}</b><small>custo ${brl(x.cost)} · vende ${brl(x.price)} · lucro ${brl(r2(x.price-x.cost))}</small></div><div class="row"><button type="button" class="btn sm" data-shopsell="${x.id}">Vender 1</button><button type="button" class="btn ghost sm" data-shopedit="${x.id}">Editar</button><button type="button" class="btn ghost sm" data-shopdel="${x.id}">Excluir</button></div></div>`).join('')}</div>`:`<div class="shempty"><p><b>Cadastre seu primeiro produto.</b></p><p class="sub">Você informa o nome, quanto paga e por quanto vende — uma vez só. Depois é só tocar em “Vender” a cada venda, sem redigitar preço.</p><button type="button" class="btn" data-shopnew>Cadastrar produto</button></div>`}
+    ${P.length?`<div class="shprods">${P.map(x=>`<div class="shprod"><div class="g"><b>${esc(x.name)}</b><small>custo ${brl(x.cost)} · vende ${brl(x.price)} · lucro ${brl(r2(x.price-x.cost))}</small><div class="shprod-st">${stText(x)}</div></div><div class="row"><button type="button" class="btn sm" data-shopsell="${x.id}">Vender 1</button><button type="button" class="btn ghost sm" data-shopstock="${x.id}">Estoque</button><button type="button" class="btn ghost sm" data-shopedit="${x.id}">Editar</button><button type="button" class="btn ghost sm" data-shopdel="${x.id}">Excluir</button></div></div>`).join('')}</div>`:`<div class="shempty"><p><b>Cadastre seu primeiro produto.</b></p><p class="sub">Você informa o nome, quanto paga, por quanto vende e, se quiser, quantos tem em estoque — uma vez só. Depois é só tocar em “Vender” a cada venda.</p><button type="button" class="btn" data-shopnew>Cadastrar produto</button></div>`}
    </section>
-   ${(()=>{const tc=shopTopCat(mf,t);const show=tc.rows.length>1||(tc.rows[0]&&tc.rows[0].cat!=='Sem tipo');return show?`<section class="c s12"><h3>O que mais vende <span class="sub">· por tipo · este mês</span></h3><div class="shcats">${tc.rows.map(r=>`<div class="shcat"><div class="shcat-h"><b>${esc(r.cat)}</b><span>${r.qty}× · ${r.pct}% · lucro ${brl(r.profit)}</span></div><div class="shcat-bar"><i style="width:${Math.max(4,r.pct)}%"></i></div></div>`).join('')}</div></section>`:''})()}
+   ${(()=>{const tc=shopTopCat(pf,pt);const show=tc.rows.length>1||(tc.rows[0]&&tc.rows[0].cat!=='Sem tipo');return show?`<section class="c s12"><h3>O que mais vende <span class="sub">· por tipo · ${plbl}</span></h3><div class="shcats">${tc.rows.map(r=>`<div class="shcat"><div class="shcat-h"><b>${esc(r.cat)}</b><span>${r.qty}× · ${r.pct}% · lucro ${brl(r.profit)}</span></div><div class="shcat-bar"><i style="width:${Math.max(4,r.pct)}%"></i></div></div>`).join('')}</div></section>`:''})()}
    ${recent.length?`<section class="c s12"><h3>Vendas recentes</h3><ul class="shsales">${recent.map(x=>`<li><div><b>${esc(x.name)}</b><small>${fmtD(x.d)} · ${x.qty}× · lucro ${brl(r2(x.qty*(x.unit-x.cost)))}</small></div><span class="gold">${brl(r2(x.qty*x.unit))}</span><button type="button" class="btn ghost sm" data-shopdelsale="${x.id}">Excluir</button></li>`).join('')}</ul></section>`:''}
   </div>`},
 
 hoje(){
-  const t=TODAY(),[f,to]=range(hper),cs=CS(f,to),u=AS('uber',f,to),n=AS('n99',f,to),gd=dailyGoals(),g=+cfg().goal||0,ct=CS(t,t),gp=goalPct(ct.inc,g),N=cs.wd.size;
+  const t=TODAY(),[f,to]=range(hper),cs=CS(f,to),u=AS('uber',f,to),n=AS('n99',f,to),shP=shopStats(f,to),gd=dailyGoals(),g=+cfg().goal||0,ct=CS(t,t),gp=goalPct(ct.inc,g),N=cs.wd.size;
   const lg=db.goals.find(x=>x.kind==='fin'&&x.metric==='lucro'&&x.per==='dia'),lp=lg?goalPct(ct.op,+lg.target):null;
   const up=billOccs(t,addD(t,7)).filter(o=>o.rem>0).slice(0,5),lbl={d:'do dia',w:'dos últimos 7 dias',m:'do mês'}[hper],pend=pendingDays(7),wp=workPattern();
   const [cf,cto]=hper==='m'?[f,to]:[addD(t,-6),t],dayName=d=>d===addD(t,-1)?'ontem':WD[pd(d).getDay()].toLowerCase()+', '+fmtD(d).slice(0,5);
@@ -2270,7 +2319,7 @@ hoje(){
   ${remind}
   <section class="c s12 resumo" aria-labelledby="rs-h"><div class="mhead"><h3 id="rs-h" style="margin:0">Resumo ${lbl}</h3>${seg('hper',hper,{d:'Hoje',w:'7 dias',m:'Mês'})}</div>
    <div class="rs">
-    <div class="rs-main"><small>Faturamento ${hper==='d'?'de hoje':'no período'} · Uber + 99</small><b class="v-fat">${brl(cs.inc)}</b><div class="rs-split"><span><span class="idn uber" aria-hidden="true"></span>Uber ${brl(u.inc)}</span><span><span class="idn n99" aria-hidden="true"></span>99 ${brl(n.inc)}</span></div></div>
+    <div class="rs-main"><small>Faturamento ${hper==='d'?'de hoje':'no período'} · Uber + 99</small><b class="v-fat">${brl(cs.inc)}</b><div class="rs-split"><span><span class="idn uber" aria-hidden="true"></span>Uber ${brl(u.inc)}</span><span><span class="idn n99" aria-hidden="true"></span>99 ${brl(n.inc)}</span>${shP.inc>0?`<span><span class="idn shop" aria-hidden="true"></span>Lojinha ${brl(shP.inc)}</span>`:''}</div>${shP.inc>0?`<small class="rs-tot">Total com a lojinha: <b>${brl(r2(cs.inc+shP.inc))}</b> <button type="button" class="lnk" data-go="loja">ver lojinha</button></small>`:''}</div>
     <div><small>Despesas lançadas</small><b class="v-cost">${brl(cs.expTot)}</b><small style="margin:6px 0 0">combustível, manutenção, outros e passes</small></div>
     <div><small>Lucro operacional ${tip('Lucro operacional',`<p>Faturamento − despesas registradas: ${fuelTerm().toLowerCase()}, passes divididos pelos dias trabalhados e outros gastos.</p><p>Manutenção e custos fixos ficam no resultado completo, em Relatórios. Estimativas por km nunca entram nessa conta.</p>`)}</small><b class="${resCls(cs.op,cs.inc)}">${brl(cs.op)}</b><small style="margin:6px 0 0">${fuelTerm()} ${emTag(cs.emode)}</small>${estLine(cs)}</div>
     <div class="gl"><small>Meta de faturamento de hoje</small>${gp.has?`<b>${pctTxt(gp.pct)}${gp.over?' <span class="pill">superada</span>':''}</b><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(gp.bar)}" aria-label="Atingimento da meta de faturamento"><i style="width:${gp.bar}%;background:${gColor(gp.pct/100)}"></i></div><small style="margin:6px 0 0">Realizado ${brl(ct.inc)} de ${brl(g)} · ${gp.hit?(gp.over?'superou em '+brl(r2(ct.inc-g)):'meta alcançada'):'faltam '+brl(r2(g-ct.inc))}</small>`:`<b>—</b><small style="margin:6px 0 0"><button type="button" class="lnk" data-go="metas">Definir meta de faturamento</button></small>`}
@@ -2279,6 +2328,7 @@ hoje(){
    ${hper!=='d'&&N?`<p class="sub" style="margin:-4px 0 14px">${N} dia(s) trabalhado(s) · média de ${brl(cs.wdInc/N)} por dia trabalhado</p>`:''}
    <div class="chart-box" id="dchart" data-f="${cf}" data-t="${cto}" data-hl="${hper==='d'?t:''}"></div>
   </section>
+  <div class="s12">${shareCard('banner')}</div>
   <div class="c s3 k2"><h3>Caixa de hoje</h3><div class="big ${net(t)>0?'pos':net(t)<0?'neg':''}">${brl(net(t))}</div><div class="sub">Entradas menos gastos lançados hoje</div></div>
   <div class="c s3 k2"><h3>Rotina de hoje</h3><div class="big">${goalsDone()}/${gd.length}</div><div class="sub">${gd.length?'metas de rotina concluídas':'<button type="button" class="lnk" data-go="metas">Criar meta de rotina</button>'}</div></div>
   <div class="c s6"><h3>Contas dos próximos 7 dias</h3>${up.length?up.map(x=>`<div class="alert"><div class="g">${esc(x.b.name)}<small style="display:block;color:var(--mut)">${fmtD(x.o)} · ${brl(x.rem)}</small></div><button class="btn" data-paybtn="${x.b.id}|${x.o}">Pagar</button></div>`).join(''):empt('Nenhuma conta nos próximos 7 dias.')}</div>
@@ -2455,12 +2505,15 @@ ranking(){const[f,t]=range(rper),c=cfg(),out=c.rankOut===true,mine=CS(f,t),myAct
   <div class="c s8"><h3>${Cloud.on?'Classificação':'Ranking local deste dispositivo'} por ${RMET[rmet].toLowerCase()}</h3>
    <div class="scope"><b>Critério:</b> ${rmet==='lucro'?'lucro operacional do período = faturamento − combustível/energia − passes rateados − outros gastos (a mesma conta do Início e de Relatórios)':'faturamento bruto registrado no período (Uber + 99)'}. Empates dividem a posição. ${Cloud.on?'Calculado no servidor a partir dos registros salvos de cada conta; ninguém consegue editar a própria posição. Valores são os declarados por cada motorista.':'Inclui só contas deste aparelho que ativaram o compartilhamento.'}</div>
    ${myMsg?`<p class="sub" style="margin:0 0 10px">${myMsg}</p>`:''}${list}</div>
-  <form class="c s4" data-form="rank" novalidate><h3>Sua participação</h3>
+  <div class="s4 rkside">
+   <form class="c" data-form="rank" novalidate><h3>Sua participação</h3>
    <p class="sub" style="margin:-6px 0 12px">No ranking aparecem só a posição, o apelido e o valor do critério escolhido. Nunca seu nome, e-mail, veículo, despesas ou lançamentos.</p>
    <div class="f"><label for="rk-nick">Apelido público (opcional)</label><input id="rk-nick" name="nick" maxlength="24" value="${esc(c.rankNick||'')}" placeholder="Sem apelido: Motorista #XXXX" autocomplete="off"></div>
    <label class="chkl"><input type="checkbox" name="part" value="1" ${out?'':'checked'}> Participar da classificação</label>
    ${!Cloud.on?`<label class="chkl"><input type="checkbox" data-rankshare ${c.rankShare===true?'checked':''}> Compartilhar com outras contas deste dispositivo</label>`:''}
    <div class="err" data-err></div><button class="btn">Salvar participação</button></form>
+   ${shareCard('side')}
+  </div>
   </div>`},
 metas(){const c=cfg(),fin=db.goals.filter(g=>g.kind==='fin'),dg=db.goals.filter(g=>g.kind==='dia'),lg=db.goals.filter(g=>g.kind==='longo');
   const row=g=>g.kind==='dia'
@@ -2748,6 +2801,32 @@ const TABINFO={hoje:['Confira seus ganhos, despesas, lucro e metas em um só lug
   ranking:['Compare seu lucro operacional com o de outros participantes no mesmo período.','','']};
 /* ícones de traço (sem emoji); Uber e 99 usam o identificador de cor da marca, sem repetir o nome */
 const SVGI=d=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
+/* ======= Indicação (indique e concorra a R$ 1.000 no Pix) ======= */
+const SHARE_URL='https://nescar.com.br';
+const SHARE_TEXT='Conhece o NESC? É o app 100% gratuito que organiza os ganhos de quem roda de Uber e 99 (faturamento, gastos, lucro de verdade). Quando chegarmos a 1.000 motoristas cadastrados, a NESC vai sortear R$ 1.000 no Pix! Entra aí: '+SHARE_URL;
+// Símbolo do Pix em dourado reluzente, com gradiente e brilho
+const pixIcon=(cls='')=>`<svg class="pixico ${cls}" viewBox="0 0 512 512" aria-hidden="true"><defs><linearGradient id="pixg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbe7bd"/><stop offset=".45" stop-color="#e2b250"/><stop offset="1" stop-color="#a87a2a"/></linearGradient></defs><g fill="url(#pixg)"><path d="M112.57 391.19c20.056 0 38.928-7.808 53.12-22.016l76.693-76.692c5.385-5.404 14.765-5.384 20.15 0l76.989 76.989c14.191 14.172 33.045 21.98 53.12 21.98h15.098l-97.138 97.139c-30.326 30.344-79.505 30.344-109.85 0l-97.415-97.415h9.227zM400.78 120.792c-20.055 0-38.927 7.809-53.12 22.016l-76.988 76.989c-5.551 5.532-14.6 5.551-20.15-.02l-76.693-76.692c-14.192-14.19-33.063-21.998-53.12-21.998h-9.227l97.415-97.416c30.327-30.344 79.505-30.344 109.85 0l97.138 97.138h-15.098z"/><path d="M22.645 200.265l58.731-58.73h30.954c13.839 0 27.4 5.606 37.18 15.406l76.694 76.692c7.148 7.148 16.53 10.722 25.911 10.722 9.38 0 18.763-3.574 25.91-10.722l76.99-76.989c9.78-9.8 23.34-15.406 37.18-15.406h26.267l58.97 58.97c30.327 30.344 30.327 79.544 0 109.888l-58.97 58.97h-26.266c-13.84 0-27.4-5.605-37.18-15.406l-76.99-76.988c-14.19-14.191-37.63-14.191-51.82 0l-76.694 76.692c-9.78 9.8-23.341 15.406-37.18 15.406H81.376l-58.731-58.73c-30.327-30.344-30.327-79.544 0-109.888z"/></g></svg>`;
+const shareIco=SVGI('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5 15.4 6.5M8.6 13.5 15.4 17.5"/>');
+function shareCard(kind){const side=kind==='side';
+  return`<div class="c sharec${side?' sharec-side':' sharec-banner'}">
+   <div class="shine" aria-hidden="true"></div>
+   <div class="sharec-main">
+    <div class="sharec-head">${pixIcon()}<div class="sharec-ht"><span class="sharec-tag">Indique e ganhe</span><span class="sharec-amt">R$ 1.000 no Pix</span></div></div>
+    <p class="sharec-txt">O NESC é <b>100% grátis</b>. Quando chegarmos a <b>1.000 motoristas cadastrados</b>, a NESC vai sortear <b>R$ 1.000 no Pix</b>. É só tocar: o link é copiado na hora para você mandar para outros motoristas.</p>
+   </div>
+   <div class="sharec-actions">
+    <button type="button" class="btn sharec-btn" data-share><span class="ni">${shareIco}</span><span>Indicar · copiar link</span></button>
+    ${navShare()?`<button type="button" class="btn ghost sm sharec-alt" data-share="native">Compartilhar</button>`:''}
+   </div>
+  </div>`}
+const navShare=()=>typeof navigator!=='undefined'&&typeof navigator.share==='function';
+async function doShare(native){
+  if(native&&navShare()){try{await navigator.share({title:'NESC',text:SHARE_TEXT,url:SHARE_URL});toast('Obrigado por indicar o NESC! 💛');track&&track('share_app');return}catch(e){if(e&&e.name==='AbortError')return}}
+  const ok=await copyText(SHARE_TEXT);
+  toast(ok?'Link copiado! Cole no WhatsApp e mande para outros motoristas. 💛':'Copie o link: '+SHARE_URL);
+  if(ok&&typeof track==='function')track('share_app');}
+async function copyText(t){try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(t);return true}}catch(e){}
+  try{const ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.top='-1000px';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand('copy');document.body.removeChild(ta);return ok}catch(e){return false}}
 const ICONS={historico:SVGI('<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4.5v4h4"/><path d="M12 8v4.5l3 1.8"/>'),despesas:SVGI('<path d="M6 3.5h12v17l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 11.5h6M9 15h3"/>'),
   manutencao:SVGI('<path d="M15 7 5.6 16.4a2.1 2.1 0 1 0 3 3L18 10"/><path d="M12.4 4.6l7 7-2.5 2.5-7-7z"/>'),config:SVGI('<circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M4.2 7.5l2.1 1.2M17.7 15.3l2.1 1.2M4.2 16.5l2.1-1.2M17.7 8.7l2.1-1.2"/><circle cx="12" cy="12" r="6.5"/>'),
   navin:SVGI('<path d="M15 6l-6 6 6 6"/>'),navout:SVGI('<path d="M9 6l6 6-6 6"/>'),
@@ -2899,6 +2978,7 @@ document.addEventListener('click',e=>{
   const pk=T.closest('[data-pick]');if(pk){obPick(pk.dataset.pick);return}
   if(T.closest('[data-close]')){closeModal();return}
   if(T.closest('[data-obskip]')){db.cfg.obSkip=true;Store.save();closeModal();render();toast('Tudo certo. Você pode cadastrar o veículo depois na aba Uber ou 99.');return}
+  const sh=T.closest('[data-share]');if(sh){doShare(sh.dataset.share==='native');return}
   const kmr=T.closest('[data-kmreveal]');if(kmr){const b=kmr.form&&kmr.form.querySelector('[data-kmbox]');if(b){b.hidden=false;kmr.hidden=true;const i=b.querySelector('input');i&&i.focus()}return}
   if(T.closest('#navbk')){$('#app').classList.remove('navx');renderNav();return}
   if(T.closest('[data-navtog]')){const a=$('#app');if(innerWidth<=900)a.classList.toggle('navx');else{a.classList.toggle('navc');try{localStorage.setItem('nesc_nav',a.classList.contains('navc')?'c':'')}catch(x){}}renderNav();return}
@@ -2925,9 +3005,10 @@ document.addEventListener('click',e=>{
   if(T.closest('[data-shopsale]')){openShopSale();return}
   if(T.closest('[data-shopnew]')){openShopProd();return}
   const sed=T.closest('[data-shopedit]');if(sed){openShopProd(sed.dataset.shopedit);return}
-  const ssl=T.closest('[data-shopsell]');if(ssl){const pr=db.shop.products.find(x=>x.id===ssl.dataset.shopsell);if(pr){const sid=uid();db.shop.sales.push({id:sid,d:TODAY(),pid:pr.id,name:pr.name,cat:pr.cat||'',qty:1,unit:r2(pr.price),cost:r2(pr.cost),at:Date.now()});mark();Store.save();render();toast('Venda de '+pr.name+' '+brl(pr.price)+' · lucro '+brl(r2(pr.price-pr.cost)),()=>{db.shop.sales=db.shop.sales.filter(x=>x.id!==sid);mark();Store.save();render()})}return}
+  const ssl=T.closest('[data-shopsell]');if(ssl){const pr=db.shop.products.find(x=>x.id===ssl.dataset.shopsell);if(pr){const sid=uid();db.shop.sales.push({id:sid,d:TODAY(),pid:pr.id,name:pr.name,cat:pr.cat||'',qty:1,unit:r2(pr.price),cost:r2(pr.cost),at:Date.now()});const hadStock=typeof pr.stock==='number';if(hadStock)pr.stock=Math.max(0,pr.stock-1);mark();Store.save();render();toast('Venda de '+pr.name+' '+brl(pr.price)+' · lucro '+brl(r2(pr.price-pr.cost))+(hadStock?' · estoque '+pr.stock:''),()=>{db.shop.sales=db.shop.sales.filter(x=>x.id!==sid);if(hadStock&&typeof pr.stock==='number')pr.stock+=1;mark();Store.save();render()})}return}
+  const sst=T.closest('[data-shopstock]');if(sst){openShopStock(sst.dataset.shopstock);return}
   const sdp=T.closest('[data-shopdel]');if(sdp){const pr=db.shop.products.find(x=>x.id===sdp.dataset.shopdel);if(pr){db.shop.products=db.shop.products.filter(x=>x.id!==pr.id);mark();Store.save();render();toast('Produto "'+pr.name+'" removido. As vendas já registradas continuam no histórico.',()=>{db.shop.products.push(pr);mark();Store.save();render()})}return}
-  const sds=T.closest('[data-shopdelsale]');if(sds){const sl=db.shop.sales.find(x=>x.id===sds.dataset.shopdelsale);if(sl){db.shop.sales=db.shop.sales.filter(x=>x.id!==sl.id);mark();Store.save();render();toast('Venda removida.',()=>{db.shop.sales.push(sl);mark();Store.save();render()})}return}
+  const sds=T.closest('[data-shopdelsale]');if(sds){const sl=db.shop.sales.find(x=>x.id===sds.dataset.shopdelsale);if(sl){db.shop.sales=db.shop.sales.filter(x=>x.id!==sl.id);const pr=sl.pid&&db.shop.products.find(x=>x.id===sl.pid),rest=pr&&typeof pr.stock==='number';if(rest)pr.stock+=(+sl.qty||0);mark();Store.save();render();toast('Venda removida.'+(rest?' Estoque devolvido.':''),()=>{db.shop.sales.push(sl);if(rest&&typeof pr.stock==='number')pr.stock=Math.max(0,pr.stock-(+sl.qty||0));mark();Store.save();render()})}return}
   if(T.closest('[data-onboard]')){openOnboard();return}
   if(T.closest('[data-more]')){openSheet();return}
   if(T.closest('[data-account]')){openAccount();return}
@@ -2959,6 +3040,7 @@ document.addEventListener('click',e=>{
   const pdb=T.closest('[data-pday]');if(pdb){const n=+pdb.dataset.pday,cur=pday||TODAY();setPday(n===0?TODAY():addD(cur,n));render();return}
   const fp=T.closest('[data-fper]');if(fp){fper=fp.dataset.fper;render();return}
   const hp=T.closest('[data-hper]');if(hp){hper=hp.dataset.hper;render();return}
+  const lp2=T.closest('[data-lper]');if(lp2){lper=lp2.dataset.lper;render();return}
   const ca=T.closest('[data-cap]');if(ca){cap=ca.dataset.cap;drawChart();return} // gráfico: Total, Uber ou 99 (redesenha só o gráfico)
   const rp=T.closest('[data-rper]');if(rp){rper=rp.dataset.rper;render();return}
   const rmt=T.closest('[data-rmet]');if(rmt){rmet=rmt.dataset.rmet;render();return}
@@ -3081,12 +3163,18 @@ document.addEventListener('submit',e=>{
   if(k==='shopprod'){const nm=(f.name||'').trim();if(!nm)return ferr(fm,'Informe o nome do produto.');
     const price=parseMoney(f.price);if(!(price>0))return ferr(fm,'Informe por quanto vende, ex.: 30 ou 30,50.');
     const cost=String(f.cost||'').trim()?parseMoney(f.cost):0;if(!(cost>=0))return ferr(fm,'Custo inválido.');
-    if(f.id){const pr=db.shop.products.find(x=>x.id===f.id);if(pr){pr.name=nm;pr.cost=r2(cost);pr.price=r2(price);pr.cat=(f.cat||'').trim()}}
-    else db.shop.products.push({id,name:nm,cost:r2(cost),price:r2(price),cat:(f.cat||'').trim(),at:Date.now()});
+    const ss=String(f.stock||'').trim();let stock=null;if(ss!==''){stock=parseInt(ss.replace(/[^\d]/g,''),10);if(!(stock>=0))return ferr(fm,'Estoque inválido. Use um número inteiro, ex.: 10.')}
+    if(f.id){const pr=db.shop.products.find(x=>x.id===f.id);if(pr){pr.name=nm;pr.cost=r2(cost);pr.price=r2(price);pr.cat=(f.cat||'').trim();if(ss!=='')pr.stock=stock;else delete pr.stock}}
+    else db.shop.products.push(Object.assign({id,name:nm,cost:r2(cost),price:r2(price),cat:(f.cat||'').trim(),at:Date.now()},ss!==''?{stock}:{}));
     return ok(f.id?'Produto atualizado.':'Produto cadastrado. Agora é só tocar em “Vender”.')}
+  if(k==='shopstock'){const pr=db.shop.products.find(x=>x.id===f.id);if(!pr)return ferr(fm,'Produto não encontrado.');
+    const add=parseInt(String(f.add||'').replace(/[^\d-]/g,''),10);if(!isFinite(add)||add===0)return ferr(fm,'Informe quantas unidades repor, ex.: 10.');
+    pr.stock=Math.max(0,(typeof pr.stock==='number'?pr.stock:0)+add);
+    return ok('Estoque de '+pr.name+' atualizado para '+pr.stock+' un.')}
   if(k==='shopsale'){const qty=Math.max(1,Math.round(parseFloat(String(f.qty||'1').replace(',','.')))||1),dd=f.d||d;if(dd>d)return ferr(fm,'A data não pode ser futura.');
     if(f.pid){const pr=db.shop.products.find(x=>x.id===f.pid);if(!pr)return ferr(fm,'Produto não encontrado.');
       db.shop.sales.push({id,d:dd,pid:pr.id,name:pr.name,cat:pr.cat||'',qty,unit:r2(pr.price),cost:r2(pr.cost),at:Date.now()});
+      if(typeof pr.stock==='number')pr.stock=Math.max(0,pr.stock-qty);
       return ok('Venda de '+qty+'× '+pr.name+' ('+brl(r2(qty*pr.price))+') registrada.')}
     const an=(f.aname||'').trim(),av=parseMoney(f.aval),ac=String(f.acost||'').trim()?parseMoney(f.acost):0;
     if(!an)return ferr(fm,'Diga o que você vendeu.');if(!(av>0))return ferr(fm,'Informe o valor recebido.');if(!(ac>=0))return ferr(fm,'Custo inválido.');
@@ -3131,7 +3219,7 @@ document.addEventListener('submit',e=>{
 /* ============ ANALYTICS PRÓPRIO E ANÔNIMO ============
    Só contagens de eventos da landing (tabela landing_events, que aceita apenas inserção de nomes fixos).
    Sem cookies, sem identificador, sem dados pessoais ou financeiros. Respeita "Do Not Track". */
-const TRACK_EV=['landing_view','cta_signup','cta_login','cta_how','cta_ranking','signup_done'];
+const TRACK_EV=['landing_view','cta_signup','cta_login','cta_how','cta_ranking','signup_done','share_app'];
 function track(ev,src){try{if(!TRACK_EV.includes(ev)||!C.supabaseUrl||!C.supabaseAnonKey||navigator.doNotTrack==='1'||window.doNotTrack==='1')return;
   fetch(C.supabaseUrl.replace(/\/+$/,'')+'/rest/v1/landing_events',{method:'POST',keepalive:true,headers:{apikey:C.supabaseAnonKey,Authorization:'Bearer '+C.supabaseAnonKey,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({event:ev,source:src?String(src).slice(0,40):null})}).catch(()=>{})}catch(e){}}
 

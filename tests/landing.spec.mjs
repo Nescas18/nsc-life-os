@@ -112,6 +112,22 @@ await test("Analytics anônimo: landing_view e cta_signup, só o nome do evento,
     assert(sent === 0, "enviou evento com Do Not Track");
   } finally { CONFIG = "window.NSC_CONFIG={};"; }
 });
+await test("Indique e ganhe: seção na home cita R$ 1.000 no Pix, mostra o ícone e copia o link", async (keep) => {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 860 }, locale: "pt-BR", permissions: ["clipboard-read", "clipboard-write"] }); keep(ctx);
+  await ctx.route(/cdnjs|cdn\.jsdelivr\.net|fonts\.googleapis|fonts\.gstatic|unpkg\.com/, (r) => r.abort());
+  const page = await ctx.newPage();
+  await page.goto(BASE); await page.waitForTimeout(500);
+  await home(page).locator("h1.hero-title").first().waitFor({ timeout: 8000 });
+  await home(page).locator("#indique .refer-card").scrollIntoViewIfNeeded();
+  const txt = await home(page).locator("#indique").innerText();
+  assert(/1\.000/.test(txt) && /Pix/i.test(txt) && /gratuito/i.test(txt), "texto do sorteio ausente na home: " + txt.slice(0, 140));
+  assert((await home(page).locator("#indique .refer-pix").count()) === 1, "ícone do Pix ausente na home");
+  await home(page).locator("#refer-copy").click();
+  await page.waitForTimeout(350);
+  const frame = page.frames().find((f) => /home\.html/.test(f.url()));
+  const clip = await frame.evaluate(() => navigator.clipboard.readText());
+  assert(/nescar\.com\.br/.test(clip) && /1\.000/.test(clip) && /Pix/i.test(clip), "link do sorteio não foi copiado: " + clip);
+});
 
 await browser.close();
 server.close();
