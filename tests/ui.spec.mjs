@@ -310,6 +310,25 @@ await test("Ícones de informação: abrem por toque e clique, ficam dentro da t
   return n + " explicações verificadas";
 });
 
+await test("Indicação: botão no Início e no Ranking copia o link e cita o sorteio de R$ 1.000 no Pix", async (keep) => {
+  const ctx = await ctxFor(keep, { viewport: { width: 1280, height: 900 }, permissions: ["clipboard-read", "clipboard-write"] });
+  const { page, errors } = await loggedPage(ctx);
+  // Início: banner presente, com Pix e a mensagem dos 1.000 usuários
+  const inicio = await page.evaluate(() => { const c = document.querySelector("#view .sharec"); return { has: !!c, txt: c ? c.innerText : "", pix: !!(c && c.querySelector(".pixico")), btn: !!(c && c.querySelector("[data-share]")) }; });
+  assert(inicio.has && inicio.pix && inicio.btn, "banner de indicação não apareceu no Início: " + JSON.stringify(inicio));
+  assert(/1\.000/.test(inicio.txt) && /Pix/i.test(inicio.txt), "texto do sorteio ausente no Início: " + inicio.txt.slice(0, 120));
+  // Ranking: card na lateral direita
+  await page.evaluate(() => { tab = "ranking"; render(); }); await page.waitForTimeout(300);
+  const side = await page.evaluate(() => { const c = document.querySelector(".rkside .sharec-side"); return { has: !!c, pix: !!(c && c.querySelector(".pixico")), btn: !!(c && c.querySelector("[data-share]")) }; });
+  assert(side.has && side.pix && side.btn, "card de indicação não apareceu na lateral do Ranking: " + JSON.stringify(side));
+  // Clicar copia o link do site
+  await page.click(".rkside .sharec-side [data-share]:not([data-share=native])"); await page.waitForTimeout(250);
+  const clip = await page.evaluate(() => navigator.clipboard.readText());
+  assert(/nescar\.com\.br/.test(clip) && /1\.000/.test(clip) && /Pix/i.test(clip), "clipboard não recebeu o link/sorteio: " + clip);
+  assert(!errors.length, errors.join(" | "));
+  return "copiou: " + clip.slice(-24);
+});
+
 await browser.close();
 server.close();
 let fail = 0;

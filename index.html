@@ -255,6 +255,23 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;padding:calc(30px + var(--sat)) 36
 .pos{color:var(--ok)}.neg{color:var(--bad)}.wrn{color:var(--warn)}
 .res-pos{color:var(--ok)}.res-neg{color:var(--bad)}.res-even{color:var(--gold-hi)}
 .v-fat{color:var(--tx)}.v-cost{color:var(--cost)}
+/* Indicação / Pix R$ 1.000 */
+.sharec{position:relative;overflow:hidden;border:1px solid var(--gold-line);background:linear-gradient(135deg,rgba(226,178,80,.16),rgba(168,122,42,.07) 48%,rgba(13,13,14,.6));box-shadow:0 0 0 1px rgba(226,178,80,.08) inset,0 10px 30px -18px rgba(226,178,80,.6)}
+.sharec .shine{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 42%,rgba(255,244,214,.22) 48%,rgba(255,255,255,.08) 52%,transparent 58%);background-size:260% 100%;background-position:170% 0;animation:shcSweep 5.5s ease-in-out infinite}
+@keyframes shcSweep{0%,62%{background-position:170% 0}82%,100%{background-position:-70% 0}}
+.sharec-head{display:flex;align-items:center;gap:12px}
+.pixico{width:46px;height:46px;flex:none;filter:drop-shadow(0 0 7px rgba(226,178,80,.55));animation:pixPulse 3.4s ease-in-out infinite}
+@keyframes pixPulse{0%,100%{filter:drop-shadow(0 0 5px rgba(226,178,80,.4))}50%{filter:drop-shadow(0 0 12px rgba(246,220,154,.75))}}
+.sharec-tag{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-hi)}
+.sharec-head h3{font-family:var(--fd);background:linear-gradient(120deg,#fbe7bd,#e2b250 55%,#f6dc9a);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.01em}
+.sharec-txt{font-size:.86rem;color:var(--tx2);margin:12px 0 14px;line-height:1.5}
+.sharec-btn{width:100%;position:relative;z-index:1}
+.sharec-alt{width:100%;margin-top:8px}
+.sharec-side .pixico{width:40px;height:40px}
+.sharec.sharec-side{height:100%}
+@media(min-width:760px){.sharec:not(.sharec-side){display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:'head btn' 'txt btn';align-items:center;gap:4px 22px}
+ .sharec:not(.sharec-side) .sharec-head{grid-area:head}.sharec:not(.sharec-side) .sharec-txt{grid-area:txt;margin:8px 0 0}.sharec:not(.sharec-side) .sharec-btn{grid-area:btn;width:auto;white-space:nowrap;align-self:center}.sharec:not(.sharec-side) .pixico{width:52px;height:52px}}
+@media(prefers-reduced-motion:reduce){.sharec .shine,.pixico{animation:none}}
 .tag.rt-pos{color:var(--ok);border-color:rgba(95,196,142,.4)}.tag.rt-neg{color:var(--bad);border-color:rgba(239,111,102,.4)}.tag.rt-even{color:var(--gold-hi);border-color:var(--gold-line)}
 .resd .it{gap:10px}.resd .it b{font-variant-numeric:tabular-nums;font-family:var(--fm);white-space:nowrap}.resd .tag{flex:0 0 auto;min-width:76px;text-align:center}
 .bar{height:6px;border-radius:6px;background:var(--panel2);overflow:hidden;margin-top:14px}
@@ -2279,6 +2296,7 @@ hoje(){
    ${hper!=='d'&&N?`<p class="sub" style="margin:-4px 0 14px">${N} dia(s) trabalhado(s) · média de ${brl(cs.wdInc/N)} por dia trabalhado</p>`:''}
    <div class="chart-box" id="dchart" data-f="${cf}" data-t="${cto}" data-hl="${hper==='d'?t:''}"></div>
   </section>
+  <div class="s12">${shareCard('banner')}</div>
   <div class="c s3 k2"><h3>Caixa de hoje</h3><div class="big ${net(t)>0?'pos':net(t)<0?'neg':''}">${brl(net(t))}</div><div class="sub">Entradas menos gastos lançados hoje</div></div>
   <div class="c s3 k2"><h3>Rotina de hoje</h3><div class="big">${goalsDone()}/${gd.length}</div><div class="sub">${gd.length?'metas de rotina concluídas':'<button type="button" class="lnk" data-go="metas">Criar meta de rotina</button>'}</div></div>
   <div class="c s6"><h3>Contas dos próximos 7 dias</h3>${up.length?up.map(x=>`<div class="alert"><div class="g">${esc(x.b.name)}<small style="display:block;color:var(--mut)">${fmtD(x.o)} · ${brl(x.rem)}</small></div><button class="btn" data-paybtn="${x.b.id}|${x.o}">Pagar</button></div>`).join(''):empt('Nenhuma conta nos próximos 7 dias.')}</div>
@@ -2455,12 +2473,15 @@ ranking(){const[f,t]=range(rper),c=cfg(),out=c.rankOut===true,mine=CS(f,t),myAct
   <div class="c s8"><h3>${Cloud.on?'Classificação':'Ranking local deste dispositivo'} por ${RMET[rmet].toLowerCase()}</h3>
    <div class="scope"><b>Critério:</b> ${rmet==='lucro'?'lucro operacional do período = faturamento − combustível/energia − passes rateados − outros gastos (a mesma conta do Início e de Relatórios)':'faturamento bruto registrado no período (Uber + 99)'}. Empates dividem a posição. ${Cloud.on?'Calculado no servidor a partir dos registros salvos de cada conta; ninguém consegue editar a própria posição. Valores são os declarados por cada motorista.':'Inclui só contas deste aparelho que ativaram o compartilhamento.'}</div>
    ${myMsg?`<p class="sub" style="margin:0 0 10px">${myMsg}</p>`:''}${list}</div>
-  <form class="c s4" data-form="rank" novalidate><h3>Sua participação</h3>
+  <div class="s4 rkside">
+   <form class="c" data-form="rank" novalidate><h3>Sua participação</h3>
    <p class="sub" style="margin:-6px 0 12px">No ranking aparecem só a posição, o apelido e o valor do critério escolhido. Nunca seu nome, e-mail, veículo, despesas ou lançamentos.</p>
    <div class="f"><label for="rk-nick">Apelido público (opcional)</label><input id="rk-nick" name="nick" maxlength="24" value="${esc(c.rankNick||'')}" placeholder="Sem apelido: Motorista #XXXX" autocomplete="off"></div>
    <label class="chkl"><input type="checkbox" name="part" value="1" ${out?'':'checked'}> Participar da classificação</label>
    ${!Cloud.on?`<label class="chkl"><input type="checkbox" data-rankshare ${c.rankShare===true?'checked':''}> Compartilhar com outras contas deste dispositivo</label>`:''}
    <div class="err" data-err></div><button class="btn">Salvar participação</button></form>
+   ${shareCard('side')}
+  </div>
   </div>`},
 metas(){const c=cfg(),fin=db.goals.filter(g=>g.kind==='fin'),dg=db.goals.filter(g=>g.kind==='dia'),lg=db.goals.filter(g=>g.kind==='longo');
   const row=g=>g.kind==='dia'
@@ -2748,6 +2769,28 @@ const TABINFO={hoje:['Confira seus ganhos, despesas, lucro e metas em um só lug
   ranking:['Compare seu lucro operacional com o de outros participantes no mesmo período.','','']};
 /* ícones de traço (sem emoji); Uber e 99 usam o identificador de cor da marca, sem repetir o nome */
 const SVGI=d=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
+/* ======= Indicação (indique e concorra a R$ 1.000 no Pix) ======= */
+const SHARE_URL='https://nescar.com.br';
+const SHARE_TEXT='Conhece o NESC? É o app 100% gratuito que organiza os ganhos de quem roda de Uber e 99 (faturamento, gastos, lucro de verdade). Quando chegarmos a 1.000 motoristas cadastrados, a NESC vai sortear R$ 1.000 no Pix! Entra aí: '+SHARE_URL;
+// Símbolo do Pix em dourado reluzente, com gradiente e brilho
+const pixIcon=(cls='')=>`<svg class="pixico ${cls}" viewBox="0 0 512 512" aria-hidden="true"><defs><linearGradient id="pixg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbe7bd"/><stop offset=".45" stop-color="#e2b250"/><stop offset="1" stop-color="#a87a2a"/></linearGradient></defs><g fill="url(#pixg)"><path d="M112.57 391.19c20.056 0 38.928-7.808 53.12-22.016l76.693-76.692c5.385-5.404 14.765-5.384 20.15 0l76.989 76.989c14.191 14.172 33.045 21.98 53.12 21.98h15.098l-97.138 97.139c-30.326 30.344-79.505 30.344-109.85 0l-97.415-97.415h9.227zM400.78 120.792c-20.055 0-38.927 7.809-53.12 22.016l-76.988 76.989c-5.551 5.532-14.6 5.551-20.15-.02l-76.693-76.692c-14.192-14.19-33.063-21.998-53.12-21.998h-9.227l97.415-97.416c30.327-30.344 79.505-30.344 109.85 0l97.138 97.138h-15.098z"/><path d="M22.645 200.265l58.731-58.73h30.954c13.839 0 27.4 5.606 37.18 15.406l76.694 76.692c7.148 7.148 16.53 10.722 25.911 10.722 9.38 0 18.763-3.574 25.91-10.722l76.99-76.989c9.78-9.8 23.34-15.406 37.18-15.406h26.267l58.97 58.97c30.327 30.344 30.327 79.544 0 109.888l-58.97 58.97h-26.266c-13.84 0-27.4-5.605-37.18-15.406l-76.99-76.988c-14.19-14.191-37.63-14.191-51.82 0l-76.694 76.692c-9.78 9.8-23.341 15.406-37.18 15.406H81.376l-58.731-58.73c-30.327-30.344-30.327-79.544 0-109.888z"/></g></svg>`;
+const shareIco=SVGI('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5 15.4 6.5M8.6 13.5 15.4 17.5"/>');
+function shareCard(kind){const side=kind==='side';
+  return`<div class="c sharec${side?' sharec-side':''}">
+   <div class="shine" aria-hidden="true"></div>
+   <div class="sharec-head">${pixIcon('sh-pix')}<div><span class="sharec-tag">Indique e ganhe</span><h3 style="margin:2px 0 0">R$ 1.000 no Pix</h3></div></div>
+   <p class="sharec-txt">O NESC é <b>100% grátis</b>. Quando chegarmos a <b>1.000 motoristas cadastrados</b>, vamos sortear <b>R$ 1.000 no Pix</b>. Toque no botão: o link é copiado na hora para você mandar para outros motoristas.</p>
+   <button type="button" class="btn sharec-btn" data-share><span class="ni">${shareIco}</span>Indicar o app · copiar link</button>
+   ${navShare()?`<button type="button" class="btn ghost sm sharec-alt" data-share="native">Abrir o compartilhamento do celular</button>`:''}
+  </div>`}
+const navShare=()=>typeof navigator!=='undefined'&&typeof navigator.share==='function';
+async function doShare(native){
+  if(native&&navShare()){try{await navigator.share({title:'NESC',text:SHARE_TEXT,url:SHARE_URL});toast('Obrigado por indicar o NESC! 💛');track&&track('share_app');return}catch(e){if(e&&e.name==='AbortError')return}}
+  const ok=await copyText(SHARE_TEXT);
+  toast(ok?'Link copiado! Cole no WhatsApp e mande para outros motoristas. 💛':'Copie o link: '+SHARE_URL);
+  if(ok&&typeof track==='function')track('share_app');}
+async function copyText(t){try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(t);return true}}catch(e){}
+  try{const ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.top='-1000px';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand('copy');document.body.removeChild(ta);return ok}catch(e){return false}}
 const ICONS={historico:SVGI('<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4.5v4h4"/><path d="M12 8v4.5l3 1.8"/>'),despesas:SVGI('<path d="M6 3.5h12v17l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 11.5h6M9 15h3"/>'),
   manutencao:SVGI('<path d="M15 7 5.6 16.4a2.1 2.1 0 1 0 3 3L18 10"/><path d="M12.4 4.6l7 7-2.5 2.5-7-7z"/>'),config:SVGI('<circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M4.2 7.5l2.1 1.2M17.7 15.3l2.1 1.2M4.2 16.5l2.1-1.2M17.7 8.7l2.1-1.2"/><circle cx="12" cy="12" r="6.5"/>'),
   navin:SVGI('<path d="M15 6l-6 6 6 6"/>'),navout:SVGI('<path d="M9 6l6 6-6 6"/>'),
@@ -2899,6 +2942,7 @@ document.addEventListener('click',e=>{
   const pk=T.closest('[data-pick]');if(pk){obPick(pk.dataset.pick);return}
   if(T.closest('[data-close]')){closeModal();return}
   if(T.closest('[data-obskip]')){db.cfg.obSkip=true;Store.save();closeModal();render();toast('Tudo certo. Você pode cadastrar o veículo depois na aba Uber ou 99.');return}
+  const sh=T.closest('[data-share]');if(sh){doShare(sh.dataset.share==='native');return}
   const kmr=T.closest('[data-kmreveal]');if(kmr){const b=kmr.form&&kmr.form.querySelector('[data-kmbox]');if(b){b.hidden=false;kmr.hidden=true;const i=b.querySelector('input');i&&i.focus()}return}
   if(T.closest('#navbk')){$('#app').classList.remove('navx');renderNav();return}
   if(T.closest('[data-navtog]')){const a=$('#app');if(innerWidth<=900)a.classList.toggle('navx');else{a.classList.toggle('navc');try{localStorage.setItem('nesc_nav',a.classList.contains('navc')?'c':'')}catch(x){}}renderNav();return}
@@ -3131,7 +3175,7 @@ document.addEventListener('submit',e=>{
 /* ============ ANALYTICS PRÓPRIO E ANÔNIMO ============
    Só contagens de eventos da landing (tabela landing_events, que aceita apenas inserção de nomes fixos).
    Sem cookies, sem identificador, sem dados pessoais ou financeiros. Respeita "Do Not Track". */
-const TRACK_EV=['landing_view','cta_signup','cta_login','cta_how','cta_ranking','signup_done'];
+const TRACK_EV=['landing_view','cta_signup','cta_login','cta_how','cta_ranking','signup_done','share_app'];
 function track(ev,src){try{if(!TRACK_EV.includes(ev)||!C.supabaseUrl||!C.supabaseAnonKey||navigator.doNotTrack==='1'||window.doNotTrack==='1')return;
   fetch(C.supabaseUrl.replace(/\/+$/,'')+'/rest/v1/landing_events',{method:'POST',keepalive:true,headers:{apikey:C.supabaseAnonKey,Authorization:'Bearer '+C.supabaseAnonKey,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({event:ev,source:src?String(src).slice(0,40):null})}).catch(()=>{})}catch(e){}}
 
