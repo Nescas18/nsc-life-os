@@ -58,7 +58,7 @@
 --bg:#040405;--surface:#0b0b0d;--surface2:#111114;--panel:rgba(255,255,255,.032);--panel2:rgba(255,255,255,.06);--line:rgba(255,255,255,.085);--line2:rgba(255,255,255,.14);
 --tx:#f5f5f4;--tx2:#c9c9cf;--mut:#8b8b94;--faint:#5c5c66;
 --gold:#e2b250;--gold-hi:#f6dc9a;--gold-lo:#a87a2a;--gold-a:rgba(226,178,80,.13);--gold-line:rgba(226,178,80,.38);
---ac:#e4e4e7;--ok:#5fc48e;--bad:#ef6f66;--warn:#e9a84b;--uber:#e9e9ee;--n99:#ffd400;--n99s:#f4e04d;--tot:#e2b250;--app:var(--gold);
+--ac:#e4e4e7;--ok:#5fc48e;--bad:#ef6f66;--warn:#e9a84b;--cost:#f2a254;--uber:#e9e9ee;--n99:#ffd400;--n99s:#f4e04d;--tot:#e2b250;--app:var(--gold);
 --r-sm:9px;--r:12px;--r-lg:16px;--ease:cubic-bezier(.2,.7,.2,1);--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);color-scheme:dark;box-sizing:border-box}
 html{scroll-padding-top:var(--sat)}
 *{box-sizing:border-box;margin:0;padding:0;font-family:inherit}
@@ -254,6 +254,7 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;padding:calc(30px + var(--sat)) 36
 .note{color:var(--mut);font-size:.78rem;line-height:1.5;margin-top:10px}
 .pos{color:var(--ok)}.neg{color:var(--bad)}.wrn{color:var(--warn)}
 .res-pos{color:var(--ok)}.res-neg{color:var(--bad)}.res-even{color:var(--gold-hi)}
+.v-fat{color:var(--tx)}.v-cost{color:var(--cost)}
 .tag.rt-pos{color:var(--ok);border-color:rgba(95,196,142,.4)}.tag.rt-neg{color:var(--bad);border-color:rgba(239,111,102,.4)}.tag.rt-even{color:var(--gold-hi);border-color:var(--gold-line)}
 .resd .it{gap:10px}.resd .it b{font-variant-numeric:tabular-nums;font-family:var(--fm);white-space:nowrap}.resd .tag{flex:0 0 auto;min-width:76px;text-align:center}
 .bar{height:6px;border-radius:6px;background:var(--panel2);overflow:hidden;margin-top:14px}
@@ -378,7 +379,6 @@ form[data-form=jr]{container-type:inline-size}
 .pt.pos b{color:var(--ok)}.pt.neg b{color:var(--bad)}.pt.hl{border-color:var(--gold-line);background:linear-gradient(145deg,rgba(226,178,80,.1),rgba(226,178,80,.02))}
 .estbox{margin-top:12px;padding:11px 13px;border:1px dashed var(--gold-line);border-radius:var(--r-lg)}.estbox small{display:block;text-transform:uppercase;letter-spacing:.05em;font-size:.66rem;color:var(--gold)}.estbox b{display:block;margin:3px 0;font-size:.95rem}.estbox span{color:var(--mut);font-size:.78rem;line-height:1.4}
 .prow{display:flex;gap:8px;align-items:center;margin-bottom:8px}.prow input{flex:1;min-width:0}.prow span{color:var(--mut);font-size:.8rem}
-form[data-kmmode="none"] [data-km="total"]{display:none}
 form[data-gm] [data-gs]{display:none}form[data-gm=fat] [data-gs~=fat],form[data-gm=lucro] [data-gs~=lucro],form[data-gm=desp] [data-gs~=desp],form[data-gm=res] [data-gs~=res],form[data-gm=obr] [data-gs~=obr],form[data-gm=pers] [data-gs~=pers]{display:block}form[data-gm] span[data-gs]{display:none}form[data-gm=fat] span[data-gs~=fat],form[data-gm=lucro] span[data-gs~=lucro],form[data-gm=desp] span[data-gs~=desp],form[data-gm=res] span[data-gs~=res],form[data-gm=obr] span[data-gs~=obr]{display:inline}
 form[data-etype="fuel"] [data-nofuel]{display:none}form[data-etype] [data-show]{display:none}form[data-etype="fuel"] [data-show="fuel"],form[data-etype="maint"] [data-show="maint"]{display:block}
 .pick3{display:grid;gap:10px;margin-bottom:14px}.pick3 .btn{text-align:left;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:center;padding:14px 16px}.pick3 .btn span{grid-row:span 2;font-size:1.3rem}.pick3 .btn small{font-weight:400;font-size:.78rem;opacity:.75}
@@ -2113,16 +2113,22 @@ function incForm(a,d,inModal){const ex=APPS[a]?db.tx.filter(t=>t.type==='in'&&ap
    ${ex.length&&!inModal?`<p class="note" style="margin-top:0">Já registrado em ${fmtD(d)}: ${brl(sum(ex))} (${ex.length} lançamento${ex.length>1?'s':''}). Ao salvar, você escolhe se substitui ou acrescenta.</p>`:''}
    <div class="err" data-err></div><button class="btn">Salvar ganho</button></form>`}
 function jrForm(a,d){const ex=db.jr.filter(j=>j.app===a&&j.d===d),one=ex.length===1&&ex[0].v===2?ex[0]:null,per=ex.every(j=>j.v===2)?ex.flatMap(j=>j.periods||[]):[],min=ex.reduce((s,j)=>s+jrMin(j),0);
-  const trL=ex.map(jrTrips).filter(x=>x!=null),kmL=ex.map(jrKm).filter(x=>x!=null),mode=kmL.length?'total':'none',notes=ex.map(j=>j.notes).filter(Boolean).join(' · ');
-  return`<form data-form="jr" novalidate data-kmmode="${mode}"><input type="hidden" name="app" value="${a}">
+  const trL=ex.map(jrTrips).filter(x=>x!=null),kmL=ex.map(jrKm).filter(x=>x!=null),notes=ex.map(j=>j.notes).filter(Boolean).join(' · ');
+  return`<form data-form="jr" novalidate><input type="hidden" name="app" value="${a}">
    <div class="jrtop"><div class="f jr-d"><label for="jr-d-${a}">Data</label><input id="jr-d-${a}" name="d" type="date" value="${d}" max="${TODAY()}" data-pdate required></div>
    <div class="f jr-h"><label id="jr-h-l">Horas trabalhadas no dia</label><div class="durrow" role="group" aria-labelledby="jr-h-l"><input name="hh" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" placeholder="0" aria-label="Horas" value="${min?Math.floor(min/60):''}" ${per.length?'readonly':''} data-dur><span>h</span><input name="mm" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" placeholder="00" aria-label="Minutos" value="${min?String(min%60).padStart(2,'0'):''}" ${per.length?'readonly':''} data-dur><span>min</span></div><small class="sub" data-durout>${min?'Total: '+fmtDur(min):'Ex.: 6 h e 30 min'}</small></div>
    <div class="f jr-t"><label for="jr-t-${a}">Viagens (opcional)</label><input id="jr-t-${a}" name="trips" inputmode="numeric" autocomplete="off" value="${trL.length?trL.reduce((s,x)=>s+x,0):''}"></div></div>
    ${(()=>{const o=a==='uber'?'n99':'uber',om=db.jr.filter(j=>j.app===o&&j.d===d).reduce((s,j)=>s+jrMin(j),0);return om>0?`<label class="chkl"><input type="checkbox" name="overlap" value="1" ${one&&one.overlap?'checked':''}> São as mesmas horas da jornada na ${APPS[o].n} (${fmtDur(om)}): os dois apps ficaram ligados ao mesmo tempo</label>`:''})()}
    <details class="sec" ${per.length?'open':''}><summary>Adicionar período (opcional)</summary><p class="note" style="margin-top:0">Use se trabalhou em intervalos separados, por exemplo 15h–17h e 19h–23h. O total é calculado sem contar sobreposições.</p>
     <div class="periods">${per.map(p=>periodRow(p)).join('')}</div><button type="button" class="btn ghost sm" data-addper>+ Adicionar período</button> <span class="sub" data-pertotal>${per.length?'Total: '+hm(unionMin(per)):''}</span></details>
-   <div class="f" style="margin-top:12px"><div class="lblrow"><label>Quilometragem percorrida no dia (opcional)</label>${tip('De onde vem o km','<p>É o total que <b>você</b> informa aqui, do início ao fim do dia (incluindo deslocamentos sem passageiro). É essa distância que o NESC usa no <b>bruto por km</b>.</p><p>A distância das corridas importadas <b>não</b> é usada como distância total, porque não inclui os trechos sem passageiro.</p>')}</div>${rseg('kmMode',mode,{none:'Não informar',total:'Informar o total'})}</div>
-   <div class="row wrap" data-km="total"><div class="f"><label>Total percorrido (km)</label><input name="km" inputmode="decimal" autocomplete="off" value="${mode==='total'&&kmL.length?kmL.reduce((s,x)=>s+x,0):''}"></div></div>
+   ${(()=>{const exKm=kmL.reduce((s,x)=>s+x,0),fk=k=>k%1?num(k,1):String(k);return`<div class="f" style="margin-top:12px"><div class="lblrow"><label>Quilometragem percorrida no dia (opcional)</label>${tip('De onde vem o km','<p>É o total que <b>você</b> informa aqui, do início ao fim do dia (incluindo deslocamentos sem passageiro). É essa distância que o NESC usa no <b>bruto por km</b>.</p><p>A distância das corridas importadas <b>não</b> é usada como distância total, porque não inclui os trechos sem passageiro.</p>')}</div>
+   ${exKm>0
+    ?`<p class="note" style="margin-top:0">Você já informou <b>${fk(exKm)} km</b> hoje. O que digitar aqui <b>soma</b> a esse total.</p>
+      <div class="row wrap"><div class="f"><label>Quilômetros desta jornada (km)</label><input name="km" inputmode="decimal" autocomplete="off" placeholder="Ex.: 67"></div></div>
+      <details class="sec"><summary>Corrigir o total do dia</summary><div class="f"><label>Total percorrido no dia (km)</label><input name="kmset" inputmode="decimal" autocomplete="off" placeholder="${fk(exKm)} km"></div><small class="sub">Substitui o total do dia pelo valor digitado, em vez de somar.</small></details>`
+    :`<button type="button" class="btn ghost sm" data-kmreveal>Informar o total</button>
+      <div class="row wrap" data-kmbox hidden><div class="f"><label>Total percorrido (km)</label><input name="km" inputmode="decimal" autocomplete="off" placeholder="Ex.: 129"></div></div>`
+   }</div>`})()}
    ${energyKind()==='ev'?'':`<div class="f"><div class="lblrow"><label for="jr-kml-${a}">Consumo do veículo no dia (km/L, opcional)</label>${tip('Consumo do dia','<p>Só para a estimativa de combustível deste dia (km ÷ km/L × preço do litro). Não muda o consumo padrão do veículo e não entra no lucro quando houver abastecimento registrado.</p>')}</div><input id="jr-kml-${a}" name="kmlDay" inputmode="decimal" autocomplete="off" placeholder="${cfg().kml>0?'Padrão do veículo: '+num(cfg().kml,1):'Ex.: 12,4'}" value="${one&&+one.kml>0?num(one.kml,1):''}"></div>`}
    <div class="f"><label>Observações (opcional)</label><input name="notes" autocomplete="off" value="${esc(notes)}"></div>
    <div class="err" data-err></div><button class="btn">${ex.length?'Atualizar jornada do dia':'Salvar jornada do dia'}</button>${ex.length?`<p class="note">Já existe jornada em ${fmtD(d)}. Salvar atualiza o registro do dia, sem duplicar.</p>`:''}</form>`}
@@ -2264,8 +2270,8 @@ hoje(){
   ${remind}
   <section class="c s12 resumo" aria-labelledby="rs-h"><div class="mhead"><h3 id="rs-h" style="margin:0">Resumo ${lbl}</h3>${seg('hper',hper,{d:'Hoje',w:'7 dias',m:'Mês'})}</div>
    <div class="rs">
-    <div class="rs-main"><small>Faturamento ${hper==='d'?'de hoje':'no período'} · Uber + 99</small><b>${brl(cs.inc)}</b><div class="rs-split"><span><span class="idn uber" aria-hidden="true"></span>Uber ${brl(u.inc)}</span><span><span class="idn n99" aria-hidden="true"></span>99 ${brl(n.inc)}</span></div></div>
-    <div><small>Despesas lançadas</small><b>${brl(cs.expTot)}</b><small style="margin:6px 0 0">combustível, manutenção, outros e passes</small></div>
+    <div class="rs-main"><small>Faturamento ${hper==='d'?'de hoje':'no período'} · Uber + 99</small><b class="v-fat">${brl(cs.inc)}</b><div class="rs-split"><span><span class="idn uber" aria-hidden="true"></span>Uber ${brl(u.inc)}</span><span><span class="idn n99" aria-hidden="true"></span>99 ${brl(n.inc)}</span></div></div>
+    <div><small>Despesas lançadas</small><b class="v-cost">${brl(cs.expTot)}</b><small style="margin:6px 0 0">combustível, manutenção, outros e passes</small></div>
     <div><small>Lucro operacional ${tip('Lucro operacional',`<p>Faturamento − despesas registradas: ${fuelTerm().toLowerCase()}, passes divididos pelos dias trabalhados e outros gastos.</p><p>Manutenção e custos fixos ficam no resultado completo, em Relatórios. Estimativas por km nunca entram nessa conta.</p>`)}</small><b class="${resCls(cs.op,cs.inc)}">${brl(cs.op)}</b><small style="margin:6px 0 0">${fuelTerm()} ${emTag(cs.emode)}</small>${estLine(cs)}</div>
     <div class="gl"><small>Meta de faturamento de hoje</small>${gp.has?`<b>${pctTxt(gp.pct)}${gp.over?' <span class="pill">superada</span>':''}</b><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(gp.bar)}" aria-label="Atingimento da meta de faturamento"><i style="width:${gp.bar}%;background:${gColor(gp.pct/100)}"></i></div><small style="margin:6px 0 0">Realizado ${brl(ct.inc)} de ${brl(g)} · ${gp.hit?(gp.over?'superou em '+brl(r2(ct.inc-g)):'meta alcançada'):'faltam '+brl(r2(g-ct.inc))}</small>`:`<b>—</b><small style="margin:6px 0 0"><button type="button" class="lnk" data-go="metas">Definir meta de faturamento</button></small>`}
      ${lp&&lp.has?`<small style="margin:10px 0 0;color:var(--tx2)">Meta de lucro: ${pctTxt(lp.pct)} · ${brl(ct.op)} de ${brl(+lg.target)}</small>`:''}</div>
@@ -2292,8 +2298,8 @@ const tc=s.opCost+s.maint+s.own;
 return `<div class="daynav"><button type="button" class="nb" data-pday="-1" aria-label="Dia anterior">‹</button><input type="date" value="${d}" max="${TODAY()}" data-pdate aria-label="Data exibida"><button type="button" class="nb" data-pday="1" aria-label="Próximo dia" ${isT?'disabled':''}>›</button>${isT?'<span class="sub">Hoje</span>':'<button type="button" class="btn ghost sm" data-pday="0">Voltar para hoje</button>'}</div>
 <div class="grid">${UBER_CARD_VISIBLE&&a==='uber'?uberCard():''}
 <div class="s12"><div class="kpis">
- ${kpi('Faturamento bruto',brl(s.inc),cx(s.inc,p.inc,{good:1})+(s.promo>0?' · '+brl(s.promo)+' de promoções':''),'hl')}
- ${kpi('Custos operacionais',brl(s.opCost),fuelTerm().toLowerCase()+' '+emTag(s.emode)+'<br>'+cx(s.opCost,p.opCost,{good:-1}))}
+ ${kpi('Faturamento bruto',`<span class="v-fat">${brl(s.inc)}</span>`,cx(s.inc,p.inc,{good:1})+(s.promo>0?' · '+brl(s.promo)+' de promoções':''),'hl')}
+ ${kpi('Custos operacionais',`<span class="v-cost">${brl(s.opCost)}</span>`,fuelTerm().toLowerCase()+' '+emTag(s.emode)+'<br>'+cx(s.opCost,p.opCost,{good:-1}))}
  ${kpi('Lucro operacional',`<span class="${resCls(s.op,s.inc)}">${brl(s.op)}</span>`,cx(s.op,p.op,{good:1}),'hl')}
  ${s.estFuel>0?kpi(fuelTerm()+' estimado',brl(s.estFuel),estBasis(s)+' · fora do lucro; registre o abastecimento'):''}
  ${kpi('Resultado completo',`<span class="${resCls(s.full,s.inc)}">${brl(s.full)}</span>`,'com manutenção e custos fixos')}
@@ -2893,6 +2899,7 @@ document.addEventListener('click',e=>{
   const pk=T.closest('[data-pick]');if(pk){obPick(pk.dataset.pick);return}
   if(T.closest('[data-close]')){closeModal();return}
   if(T.closest('[data-obskip]')){db.cfg.obSkip=true;Store.save();closeModal();render();toast('Tudo certo. Você pode cadastrar o veículo depois na aba Uber ou 99.');return}
+  const kmr=T.closest('[data-kmreveal]');if(kmr){const b=kmr.form&&kmr.form.querySelector('[data-kmbox]');if(b){b.hidden=false;kmr.hidden=true;const i=b.querySelector('input');i&&i.focus()}return}
   if(T.closest('#navbk')){$('#app').classList.remove('navx');renderNav();return}
   if(T.closest('[data-navtog]')){const a=$('#app');if(innerWidth<=900)a.classList.toggle('navx');else{a.classList.toggle('navc');try{localStorage.setItem('nesc_nav',a.classList.contains('navc')?'c':'')}catch(x){}}renderNav();return}
   const go=T.closest('[data-go]');if(go){if(go.dataset.hset){hf.type=go.dataset.hset;hf.n=40}tab=go.dataset.go;$('#app').classList.remove('navx');if($('#modal.on'))closeModal();render();$('main').scrollTop=0;return}
@@ -3001,7 +3008,6 @@ document.addEventListener('change',e=>{
   if(el.name==='comp'&&el.type==='checkbox'){const b=el.closest('form').querySelector(`.cmpfields[data-for="${el.value}"]`);if(b)b.classList.toggle('on',el.checked);visitHints(el.form);return}
   if(el.form&&el.form.dataset.form==='visit'&&(el.name==='odo'||el.name==='d')){visitHints(el.form);return}
   if(el.name==='type'&&el.form&&el.form.dataset.form==='exp'){el.form.dataset.etype=el.value;return}
-  if(el.name==='kmMode'&&el.form){el.form.dataset.kmmode=el.value;return}
   if(el.hasAttribute('data-obsync')){obSync();return}
   if(el.hasAttribute('data-obcustom')){$('#obcustom').style.display=el.checked?'flex':'none';if(el.checked){obSel=null;$('#vq').value=''}obSync();return}
   if(el.dataset.pct){const g=db.goals.find(a=>a.id===el.dataset.pct);if(g){g.pct=+el.value;mark();Store.save();render()}}
@@ -3044,8 +3050,10 @@ function saveJr(form,f){const a=f.app,d=f.d||TODAY();if(!APPS[a])return false;if
   if(periods.length)min=unionMin(periods);else{const r=durMin(f.hh,f.mm);if(!r.ok){form.hh&&form.hh.setAttribute('aria-invalid','true');return ferr(form,r.err)}min=r.min??0}
   if(min>24*60)return ferr(form,'O total passa de 24 horas. Confira as horas ou os períodos.');
   let trips=null;if(f.trips!==''&&f.trips!=null){trips=parseInt(f.trips,10);if(!(trips>=0)||String(trips)!==String(f.trips).trim())return ferr(form,'Viagens deve ser um número inteiro.')}
-  let km=null,kmSrc=null;const mode=f.kmMode||'none';
-  if(mode==='total'&&f.km){km=parseDec(f.km);if(!(km>=0))return ferr(form,'Quilometragem inválida.');kmSrc='total'}
+  let km=null,kmSrc=null;const exKm=db.jr.filter(j=>j.app===a&&j.d===d).map(jrKm).filter(x=>x!=null).reduce((s,x)=>s+x,0);
+  if(String(f.kmset||'').trim()!==''){km=parseDec(f.kmset);if(!(km>=0))return ferr(form,'Quilometragem inválida.');kmSrc='total'}
+  else if(String(f.km||'').trim()!==''){const add=parseDec(f.km);if(!(add>=0))return ferr(form,'Quilometragem inválida.');km=r2(exKm+add);kmSrc='total'}
+  else if(exKm>0){km=r2(exKm);kmSrc='total'}
   if(km!=null&&km>2000)return ferr(form,'Mais de 2.000 km em um dia: confira o valor.');
   let kmlD=null;if(String(f.kmlDay||'').trim()!==''){kmlD=parseDec(f.kmlDay);if(!(kmlD>=1&&kmlD<=60))return ferr(form,'Consumo do dia inválido. Use km/L entre 1 e 60, ex.: 8,5 · 10 · 12,4.')}
   const notes=(f.notes||'').trim();if(!(min>0)&&trips==null&&km==null&&!notes)return ferr(form,'Informe ao menos horas, viagens, quilometragem ou uma observação.');
