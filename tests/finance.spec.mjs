@@ -641,10 +641,11 @@ await test("Auditoria H: hodômetro de jornada removido da interface; registro a
   await setDb(o.page, { cfg: { pass: OFF }, vehicle: { brand: "Fiat", model: "Argo", custom: true, energy: "flex", odo: 70000, odoD: "2026-10-20" }, tx: [tx({ d: T, type: "in", app: "uber", v: 270 })], jr: [{ id: "jold", v: 2, d: T, app: "uber", min: 300, periods: [], trips: null, km: 170, kmSrc: "odo", odoIni: 70000, odoFim: 70170, at: 1 }] });
   await o.page.evaluate((d) => { tab = "uber"; pday = d; lm = "jr"; render(); }, T);
   const form = await o.page.evaluate(() => { const r = document.querySelector("#reg");
-    return { opts: [...r.querySelectorAll("input[name=kmMode]")].map((i) => i.value), hasHod: /Hod[óo]metro/i.test(r.innerHTML), hasIniFim: !!r.querySelector("[name=odoIni],[name=odoFim]"), kmPrefill: (r.querySelector("[name=km]") || {}).value }; });
+    return { nRadio: r.querySelectorAll("input[name=kmMode]").length, hasHod: /Hod[óo]metro/i.test(r.innerHTML), hasIniFim: !!r.querySelector("[name=odoIni],[name=odoFim]"), hasKm: !!r.querySelector("[name=km]"), hasSet: !!r.querySelector("[name=kmset]"), showsTotal: /170\s*km/.test(r.innerHTML) }; });
   if (form.hasHod || form.hasIniFim) throw new Error("hodômetro ainda aparece no formulário: " + JSON.stringify(form));
-  if (JSON.stringify(form.opts) !== JSON.stringify(["none", "total"])) throw new Error("opções de km deveriam ser só none/total: " + JSON.stringify(form.opts));
-  if (form.kmPrefill !== "170") throw new Error("km do registro antigo deveria ser preservado no campo: " + form.kmPrefill);
+  if (form.nRadio) throw new Error("as abas de opção de km (none/total) deveriam ter sido removidas: " + JSON.stringify(form));
+  if (!form.hasKm || !form.hasSet) throw new Error("deveria haver campo para somar km e para corrigir o total: " + JSON.stringify(form));
+  if (!form.showsTotal) throw new Error("o total de km já informado (170) deveria aparecer no formulário: " + JSON.stringify(form));
   const r = await ind(o.page, "uber", T, T);
   if (!near(r.brutoKm, 1.5882, 0.005)) throw new Error("km antigo preservado deveria dar bruto/km 1,59: " + JSON.stringify(r));
   const odo = await o.page.evaluate(() => odoNow().km);
@@ -656,6 +657,23 @@ await test("Auditoria I: distância das corridas importadas (kmTrips) nunca vira
   await setDb(o.page, { cfg: { pass: OFF }, tx: [tx({ d: T, type: "in", app: "uber", v: 270 })], jr: [jrr({ d: T, min: 300, km: null, kmTrips: 120, src: "uber_api" })] });
   const r = await ind(o.page, "uber", T, T);
   if (r.kmKnown || r.km !== 0 || r.brutoKm !== null) throw new Error("kmTrips não pode alimentar o bruto/km: " + JSON.stringify(r));
+});
+await test("Km soma: jornada à noite acrescenta à do dia (62 + 67 = 129); corrigir total substitui", async (keep) => {
+  const o = await open(); keep(o.ctx);
+  await setDb(o.page, { cfg: { pass: OFF }, jr: [{ id: "j1", v: 2, d: T, app: "uber", min: 240, periods: [], trips: null, km: 62, kmSrc: "total", at: 1 }] });
+  await o.page.evaluate((d) => { tab = "uber"; pday = d; lm = "jr"; render(); }, T);
+  await o.page.waitForSelector("#reg form[data-form=jr] [name=km]");
+  await o.page.fill("#reg form[data-form=jr] [name=km]", "67");
+  await o.page.click("#reg form[data-form=jr] button.btn:not(.ghost)"); await o.page.waitForTimeout(150);
+  const km1 = await o.page.evaluate((d) => db.jr.filter((j) => j.app === "uber" && j.d === d).map((j) => +j.km).reduce((s, x) => s + x, 0), T);
+  if (km1 !== 129) throw new Error("62 + 67 deveria somar 129: " + km1);
+  // reabre e corrige o total do dia para 200 (substitui, não soma)
+  await o.page.evaluate((d) => { tab = "uber"; pday = d; lm = "jr"; render(); }, T);
+  await o.page.waitForSelector("#reg form[data-form=jr] [name=kmset]", { state: "attached" });
+  await o.page.evaluate(() => { const f = document.querySelector("#reg form[data-form=jr]"); f.querySelector("[name=kmset]").value = "200"; f.requestSubmit(); }); await o.page.waitForTimeout(150);
+  const km2 = await o.page.evaluate((d) => db.jr.filter((j) => j.app === "uber" && j.d === d).map((j) => +j.km).reduce((s, x) => s + x, 0), T);
+  if (km2 !== 200) throw new Error("corrigir o total deveria substituir por 200: " + km2);
+  return "62 + 67 = 129; correção = 200";
 });
 
 await browser.close();
