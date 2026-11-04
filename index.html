@@ -63,7 +63,7 @@
 html{scroll-padding-top:var(--sat)}
 *{box-sizing:border-box;margin:0;padding:0;font-family:inherit}
 html{font-family:var(--ff)}
-body{font-feature-settings:"ss01";-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+body{font-feature-settings:"zero" 0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 h1,h2,.brand-title,.lp-logo b,.lp h3,.lp-n,.lp-stat b{font-family:var(--fd);font-feature-settings:normal;font-variation-settings:"wght" 600,"opsz" 24}
 body,html{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);-webkit-text-size-adjust:100%}
 #canvas-container{position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 68% 45%,#17130a 0%,#070707 45%,#040405 75%)}
@@ -2262,7 +2262,7 @@ function shopTop(f,to,by){const ss=db.shop.sales.filter(x=>x.d>=f&&x.d<=to),m={}
 function shopSlow(f,to){const sold={};db.shop.sales.filter(x=>x.d>=f&&x.d<=to&&x.pid).forEach(x=>{sold[x.pid]=(sold[x.pid]||0)+(+x.qty||0)});
   return db.shop.products.map(p=>({id:p.id,name:p.name,qty:sold[p.id]||0,stock:typeof p.stock==='number'?p.stock:null})).sort((a,b)=>a.qty-b.qty||(b.stock||0)-(a.stock||0))}
 // Resumo de estoque: unidades e custo parado dos produtos que controlam estoque.
-function shopStock(){let un=0,val=0,low=0,out=0,tracked=0;db.shop.products.forEach(p=>{if(typeof p.stock==='number'){tracked++;un+=p.stock;val+=p.stock*(+p.cost||0);if(p.stock===0)out++;else if(p.stock<=2)low++}});return{un,val:r2(val),low,out,tracked}}
+function shopStock(){let un=0,val=0,low=0,out=0,tracked=0;db.shop.products.forEach(p=>{if(typeof p.stock==='number'){tracked++;un+=p.stock;val+=p.stock*(+p.cost||0);if(p.stock===0)out++;else if(p.stock===1)low++}});return{un,val:r2(val),low,out,tracked}}
 function openShopStock(pid){const p=db.shop.products.find(x=>x.id===pid);if(!p)return;const cur=typeof p.stock==='number'?p.stock:0;
   modal(`<h2>Repor estoque</h2><form data-form="shopstock" novalidate><input type="hidden" name="id" value="${p.id}">
   <p class="note" style="margin-top:0"><b>${esc(p.name)}</b> · em estoque agora: <b>${cur}</b> un.</p>
@@ -2290,7 +2290,7 @@ loja(){const t=TODAY(),mf=t.slice(0,8)+'01',P=db.shop.products,dS=shopStats(t,t)
   const pS=shopStats(pf,pt),topQ=shopTop(pf,pt,'qty'),slow=shopSlow(pf,pt),stk=shopStock();
   const recent=[...db.shop.sales].sort((a,b)=>(b.at||0)-(a.at||0)).slice(0,8);
   const tile=(l,v,c)=>`<div class="shk"><small>${l}</small><b class="${c||''}">${v}</b></div>`;
-  const stText=p=>typeof p.stock!=='number'?'<span class="shsub">estoque não controlado</span>':p.stock===0?'<span class="shbadge out">esgotado</span>':p.stock<=2?`<span class="shbadge low">só ${p.stock} em estoque</span>`:`<span class="shsub">em estoque: <b>${p.stock}</b></span>`;
+  const stText=p=>typeof p.stock!=='number'?'<span class="shsub">estoque não controlado</span>':p.stock===0?'<span class="shbadge out">esgotado</span>':p.stock===1?'<span class="shbadge low">última unidade</span>':`<span class="shsub">em estoque: <b>${p.stock}</b></span>`;
   return `<div class="grid">
    <div class="c s12 shop-note">A Lojinha é <b>separada</b> do faturamento de Uber e 99. Aqui entra só o que você vende dentro do carro. No <b>Início</b>, o gráfico do dia soma a lojinha por cima, na cor <b style="color:var(--shop-hi)">roxa</b>, pra você ver quanto veio das vendas e quanto veio das corridas.</div>
    <section class="c s12"><div class="mhead"><h3 style="margin:0">Hoje</h3><button type="button" class="btn sm" data-shopsale><span class="ni">${ICON('plus')}</span>Registrar venda</button></div>
@@ -2299,7 +2299,7 @@ loja(){const t=TODAY(),mf=t.slice(0,8)+'01',P=db.shop.products,dS=shopStats(t,t)
     <div class="shks">${tile('Faturamento',brl(pS.inc))}${tile('Custo',brl(pS.cst),'neg')}${tile('Lucro',brl(pS.profit),'gold')}${tile('Itens vendidos',String(pS.qty))}</div></section>
    <section class="c s6"><h3>Mais vendidos <span class="sub">· ${plbl}</span></h3>${topQ.length?`<ol class="shtop">${topQ.map((x,i)=>`<li><b>${i+1}º</b><span>${esc(x.name)}</span><em>${x.qty}× · lucro ${brl(x.profit)}</em></li>`).join('')}</ol>`:'<p class="sub">Registre vendas para ver o que mais sai e o que dá mais lucro.</p>'}</section>
    <section class="c s6"><h3>Parados <span class="sub">· o que menos saiu · ${plbl}</span></h3>${slow.length?`<ul class="shslow">${slow.slice(0,6).map(x=>`<li><div class="g"><b>${esc(x.name)}</b><small>${x.qty===0?'não vendeu neste período':x.qty+'× no período'}${x.stock!=null?' · '+(x.stock===0?'sem estoque':'estoque '+x.stock):''}</small></div>${x.qty===0?'<span class="shbadge low">parado</span>':`<em class="shq">${x.qty}×</em>`}</li>`).join('')}</ul><p class="sub" style="margin-top:8px">Quem fica no topo da lista é o que menos está saindo — vale uma promoção ou tirar do carro.</p>`:'<p class="sub">Cadastre produtos para ver o que está encalhado.</p>'}</section>
-   ${stk.tracked?`<section class="c s12"><h3>Estoque <span class="sub">· só produtos com estoque informado</span></h3><div class="shks">${tile('Unidades guardadas',String(stk.un))}${tile('Custo parado',brl(stk.val),'neg')}${tile('Acabando (≤2)',String(stk.low),stk.low?'warn':'')}${tile('Esgotados',String(stk.out),stk.out?'neg':'')}</div></section>`:''}
+   ${stk.tracked?`<section class="c s12"><h3>Estoque <span class="sub">· só produtos com estoque informado</span></h3><div class="shks">${tile('Unidades guardadas',String(stk.un))}${tile('Custo parado',brl(stk.val),'neg')}${tile('Na última unidade',String(stk.low),stk.low?'warn':'')}${tile('Esgotados',String(stk.out),stk.out?'neg':'')}</div></section>`:''}
    <section class="c s12"><div class="mhead"><h3 style="margin:0">Seus produtos</h3><button type="button" class="btn ghost sm" data-shopnew><span class="ni">${ICON('plus')}</span>Novo produto</button></div>
     ${P.length?`<div class="shprods">${P.map(x=>`<div class="shprod"><div class="g"><b>${esc(x.name)}</b><small>custo ${brl(x.cost)} · vende ${brl(x.price)} · lucro ${brl(r2(x.price-x.cost))}</small><div class="shprod-st">${stText(x)}</div></div><div class="row"><button type="button" class="btn sm" data-shopsell="${x.id}">Vender 1</button><button type="button" class="btn ghost sm" data-shopstock="${x.id}">Estoque</button><button type="button" class="btn ghost sm" data-shopedit="${x.id}">Editar</button><button type="button" class="btn ghost sm" data-shopdel="${x.id}">Excluir</button></div></div>`).join('')}</div>`:`<div class="shempty"><p><b>Cadastre seu primeiro produto.</b></p><p class="sub">Você informa o nome, quanto paga, por quanto vende e, se quiser, quantos tem em estoque — uma vez só. Depois é só tocar em “Vender” a cada venda.</p><button type="button" class="btn" data-shopnew>Cadastrar produto</button></div>`}
    </section>
