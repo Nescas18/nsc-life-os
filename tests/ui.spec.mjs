@@ -207,7 +207,7 @@ await test("Metas: sugestão abre formulário preenchido e cria meta de faturame
   const ctx = await ctxFor(keep);
   const { page } = await loggedPage(ctx);
   await page.evaluate(() => { tab = "metas"; render(); });
-  await page.click("[data-gsug]");
+  await page.click(".qa [data-gsug]");
   assert((await page.inputValue("#g-v")) === "220,00", "valor da sugestão");
   await page.click("#mbox form[data-form=gnew] button.btn");
   const t = await page.evaluate(() => document.querySelector(".it.goal").textContent.replace(/\s+/g, " "));

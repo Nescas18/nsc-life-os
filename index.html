@@ -217,6 +217,25 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;padding:calc(30px + var(--sat)) 36
 .head .hact{display:flex;gap:8px;flex-wrap:wrap}
 .cempty2{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:8px 0;color:var(--mut);line-height:1.5}
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;padding:3px 9px;border-radius:20px;border:1px solid var(--gold-line);color:var(--gold-hi);background:var(--gold-a);white-space:nowrap}
+/* suavidade global: cards entram em cascata ao trocar de aba; micro-hover; respeita reduzir movimento */
+@media (prefers-reduced-motion:no-preference){
+#view.tab-enter>.head{animation:viewFade .45s var(--ease) both}
+#view.tab-enter .grid>.c{animation:cardFade .5s var(--ease) both}
+#view.tab-enter .grid>.c:nth-child(1){animation-delay:.02s}#view.tab-enter .grid>.c:nth-child(2){animation-delay:.06s}#view.tab-enter .grid>.c:nth-child(3){animation-delay:.1s}#view.tab-enter .grid>.c:nth-child(4){animation-delay:.14s}#view.tab-enter .grid>.c:nth-child(5){animation-delay:.18s}#view.tab-enter .grid>.c:nth-child(6){animation-delay:.22s}#view.tab-enter .grid>.c:nth-child(7){animation-delay:.26s}#view.tab-enter .grid>.c:nth-child(n+8){animation-delay:.3s}
+}
+@keyframes cardFade{from{opacity:0}}@keyframes viewFade{from{opacity:0}}
+#app.on #view .c{transition:border-color .3s,box-shadow .45s var(--ease),transform .3s var(--ease)}
+.it,.shprod,.btn.ghost{transition:background .25s,border-color .25s,transform .18s var(--ease),color .2s}
+.shcats{display:flex;flex-direction:column;gap:12px}.shcat-h{display:flex;justify-content:space-between;gap:10px;font-size:.9rem;margin-bottom:6px}.shcat-h b{color:var(--tx)}.shcat-h span{color:var(--mut);font-size:.8rem;font-variant-numeric:tabular-nums}
+.shcat-bar{height:10px;border-radius:6px;background:var(--panel2);overflow:hidden}.shcat-bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--gold-2),var(--gold-hi));box-shadow:0 0 10px var(--gold-a);transition:width .6s var(--ease)}
+.metasub{width:100%;margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.msubh{font-size:.72rem;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.msubs{display:flex;gap:12px;flex-wrap:wrap}
+.msub{flex:1 1 180px;min-width:150px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+.msub>small{display:block;color:var(--mut);font-size:.72rem;margin-bottom:5px;text-transform:none;letter-spacing:0}
+.msub-v{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.msub-v b{font-size:1.3rem;font-family:var(--fm);font-variant-numeric:tabular-nums}.msub-v span{color:var(--mut);font-size:.78rem}
+.msub-bar{height:8px;border-radius:5px;background:var(--panel2);overflow:hidden;margin:8px 0 6px}.msub-bar i{display:block;height:100%;border-radius:5px;transition:width .6s var(--ease)}
+.msub-f{font-size:.78rem;font-variant-numeric:tabular-nums}.msub .lnk{margin-top:6px;display:inline-block}
 .shop-note{font-size:.86rem;color:var(--tx2);border:1px dashed var(--gold-line);background:var(--gold-a);border-radius:var(--r-lg);padding:12px 14px}.shop-note b{color:var(--gold-hi)}
 .shks{display:flex;flex-wrap:wrap;gap:10px}.shk{flex:1 1 120px;min-width:108px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}.shk small{display:block;color:var(--mut);font-size:.72rem;margin-bottom:4px}.shk b{font-size:1.25rem;font-variant-numeric:tabular-nums;font-family:var(--fm)}.shk b.neg{color:var(--bad)}.shk b.gold{color:var(--gold-hi)}
 .shtop{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}.shtop li{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;font-size:.9rem}.shtop li b{color:var(--gold)}.shtop li em{color:var(--mut);font-style:normal;font-size:.8rem;font-variant-numeric:tabular-nums}
@@ -1624,8 +1643,8 @@ const resCls=(v,inc)=>'res-'+resTone(v,inc),RES_LBL={pos:'Lucro',neg:'Prejuízo'
    Dígitos em negrito ocupam ~0,62 em; "107,03%" fica em 16, "1000,00%" em 14, "86%" no máximo de 22. */
 const ringFs=t=>Math.min(22,Math.floor(112/Math.max(4,String(t).length)));
 const GOALM={fat:'Faturamento',lucro:'Lucro operacional',desp:'Limite de despesas',res:'Economia / reserva',obr:'Pagamento de obrigação',pers:'Personalizada'};
-const GPER={dia:'por dia',semana:'por semana'};
-const goalRange=(per,d)=>{d=d||TODAY();return per==='semana'?[wkStart(d),d]:[d,d]};
+const GPER={dia:'por dia',semana:'por semana',mes:'por mês'};
+const goalRange=(per,d)=>{d=d||TODAY();return per==='semana'?[wkStart(d),d]:per==='mes'?[d.slice(0,8)+'01',d]:[d,d]};
 function goalProgress(g,d){d=d||TODAY();const t=+g.target||0;
   if(g.metric==='fat'||g.metric==='lucro'||g.metric==='desp'){const[f,to]=goalRange(g.per,d),c=CS(f,to),real=g.metric==='fat'?c.inc:g.metric==='lucro'?c.op:c.expTot,gp=goalPct(real,t);
     if(g.metric==='desp'){const left=r2(t-real);return Object.assign(gp,{real,target:t,f,to,ok:real<=t,msg:t>0?(real<=t?'Dentro do limite: restam '+brl(left)+'.':'Limite ultrapassado em '+brl(-left)+'.'):'Defina o limite.'})}
@@ -2195,12 +2214,16 @@ let chartRT;let navW=innerWidth<=900;addEventListener('resize',()=>{clearTimeout
 function shopStats(f,to){const ss=db.shop.sales.filter(x=>x.d>=f&&x.d<=to);let inc=0,cst=0,qt=0;
   for(const x of ss){const q=+x.qty||0,u=+x.unit||0,c=+x.cost||0;inc+=q*u;cst+=q*c;qt+=q}
   return{inc:r2(inc),cst:r2(cst),profit:r2(inc-cst),qty:qt,n:ss.length}}
+function shopTopCat(f,to){const ss=db.shop.sales.filter(x=>x.d>=f&&x.d<=to),pm={};db.shop.products.forEach(pp=>pm[pp.id]=pp.cat||'');const m={};let tot=0;
+  for(const x of ss){const q=+x.qty||0,u=+x.unit||0,c=+x.cost||0,cat=((x.cat||pm[x.pid]||'')+'').trim()||'Sem tipo';(m[cat]=m[cat]||{cat,qty:0,profit:0});m[cat].qty+=q;m[cat].profit+=q*(u-c);tot+=q}
+  return{tot,rows:Object.values(m).map(o=>({cat:o.cat,qty:o.qty,profit:r2(o.profit),pct:tot?Math.round(o.qty/tot*100):0})).sort((a,b)=>b.qty-a.qty)}}
 function shopTop(f,to,by){const ss=db.shop.sales.filter(x=>x.d>=f&&x.d<=to),m={};
   for(const x of ss){const k=x.pid||('a:'+x.name),q=+x.qty||0,u=+x.unit||0,c=+x.cost||0;(m[k]=m[k]||{name:x.name,qty:0,inc:0,profit:0});m[k].qty+=q;m[k].inc+=q*u;m[k].profit+=q*(u-c)}
   return Object.values(m).map(o=>({name:o.name,qty:o.qty,inc:r2(o.inc),profit:r2(o.profit)})).sort((a,b)=>by==='qty'?b.qty-a.qty||b.profit-a.profit:b.profit-a.profit).slice(0,5)}
 function openShopProd(pid){const p=pid&&db.shop.products.find(x=>x.id===pid);
   modal(`<h2>${p?'Editar produto':'Novo produto'}</h2><form data-form="shopprod" novalidate><input type="hidden" name="id" value="${p?p.id:''}">
-  <div class="f"><label>Nome do produto</label><input name="name" autocomplete="off" required placeholder="Ex.: Perfume" value="${p?esc(p.name):''}"></div>
+  <div class="f"><label>Nome do produto</label><input name="name" autocomplete="off" required placeholder="Ex.: Perfume Fresh" value="${p?esc(p.name):''}"></div>
+  <div class="f"><label>Tipo / categoria (opcional)</label><input name="cat" autocomplete="off" placeholder="Ex.: Perfume, Chaveiro, Bala" value="${p&&p.cat?esc(p.cat):''}"><small class="fhint">Agrupa no painel “O que mais vende por tipo”. Use o mesmo tipo para produtos parecidos.</small></div>
   <div class="row wrap"><div class="f"><label>Quanto você paga (custo) · R$</label><input name="cost" inputmode="decimal" autocomplete="off" placeholder="Ex.: 12" value="${p&&p.cost?num(p.cost,2):''}"></div>
   <div class="f"><label>Por quanto vende · R$</label><input name="price" inputmode="decimal" autocomplete="off" required placeholder="Ex.: 30" value="${p?num(p.price,2):''}"></div></div>
   <p class="note" style="margin-top:0">Cadastre uma vez só. Depois é só tocar em “Vender” a cada venda.</p>
@@ -2225,6 +2248,7 @@ loja(){const t=TODAY(),mf=t.slice(0,8)+'01',P=db.shop.products,dS=shopStats(t,t)
    <section class="c s12"><div class="mhead"><h3 style="margin:0">Seus produtos</h3><button type="button" class="btn ghost sm" data-shopnew><span class="ni">${ICON('plus')}</span>Novo produto</button></div>
     ${P.length?`<div class="shprods">${P.map(x=>`<div class="shprod"><div class="g"><b>${esc(x.name)}</b><small>custo ${brl(x.cost)} · vende ${brl(x.price)} · lucro ${brl(r2(x.price-x.cost))}</small></div><div class="row"><button type="button" class="btn sm" data-shopsell="${x.id}">Vender 1</button><button type="button" class="btn ghost sm" data-shopedit="${x.id}">Editar</button><button type="button" class="btn ghost sm" data-shopdel="${x.id}">Excluir</button></div></div>`).join('')}</div>`:`<div class="shempty"><p><b>Cadastre seu primeiro produto.</b></p><p class="sub">Você informa o nome, quanto paga e por quanto vende — uma vez só. Depois é só tocar em “Vender” a cada venda, sem redigitar preço.</p><button type="button" class="btn" data-shopnew>Cadastrar produto</button></div>`}
    </section>
+   ${(()=>{const tc=shopTopCat(mf,t);const show=tc.rows.length>1||(tc.rows[0]&&tc.rows[0].cat!=='Sem tipo');return show?`<section class="c s12"><h3>O que mais vende <span class="sub">· por tipo · este mês</span></h3><div class="shcats">${tc.rows.map(r=>`<div class="shcat"><div class="shcat-h"><b>${esc(r.cat)}</b><span>${r.qty}× · ${r.pct}% · lucro ${brl(r.profit)}</span></div><div class="shcat-bar"><i style="width:${Math.max(4,r.pct)}%"></i></div></div>`).join('')}</div></section>`:''})()}
    ${recent.length?`<section class="c s12"><h3>Vendas recentes</h3><ul class="shsales">${recent.map(x=>`<li><div><b>${esc(x.name)}</b><small>${fmtD(x.d)} · ${x.qty}× · lucro ${brl(r2(x.qty*(x.unit-x.cost)))}</small></div><span class="gold">${brl(r2(x.qty*x.unit))}</span><button type="button" class="btn ghost sm" data-shopdelsale="${x.id}">Excluir</button></li>`).join('')}</ul></section>`:''}
   </div>`},
 
@@ -2303,12 +2327,17 @@ const REC={unica:'Não se repete',mensal:'Mensal',semanal:'Semanal'};
 /* ============ VELOCÍMETRO DE GANHOS (SVG, sem WebGL) ============ */
 const GLEN=Math.PI*80;let gLast=0;
 function gaugeHTML(){const c=cfg(),T=TODAY(),inc=CS(T,T).inc,g=+c.goal||0,gp=goalPct(inc,g);
-  if(!gp.has)return`<div class="gauge"><svg viewBox="0 0 200 118" role="img" aria-label="Velocímetro sem meta"><path d="M20 100 A80 80 0 0 1 180 100" class="gt"/></svg><div><div class="big">${brl(inc)}</div><p class="sub">Faturamento de hoje (Uber + 99). Defina a meta de faturamento do dia abaixo para ver o atingimento.</p></div></div>`;
+  const wf=wkStart(T),mf=T.slice(0,8)+'01',wInc=CS(wf,T).inc,mInc=CS(mf,T).inc,base=g||220;
+  const wg=db.goals.find(x=>x.kind==='fin'&&x.metric==='fat'&&x.per==='semana'),mg=db.goals.find(x=>x.kind==='fin'&&x.metric==='fat'&&x.per==='mes');
+  const mini=(lbl,real,goal,sug)=>{if(goal&&+goal.target>0){const pr=goalPct(real,+goal.target),col=gColor(pr.pct/100);return`<div class="msub"><small>${lbl}</small><div class="msub-v"><b>${brl(real)}</b><span>de ${brl(goal.target)}</span></div><div class="msub-bar"><i style="width:${pr.bar}%;background:${col}"></i></div><span class="msub-f" style="color:${pr.hit?'var(--ok)':'var(--mut)'}">${pr.hit?'Meta batida · +'+brl(r2(real-goal.target)):'Faltam '+brl(r2(goal.target-real))+' · '+pctTxt(pr.pct)}</span></div>`;}
+    return`<div class="msub"><small>${lbl}</small><div class="msub-v"><b>${brl(real)}</b></div><button type="button" class="lnk" data-gsug='${esc(JSON.stringify(sug))}'>Definir meta ${lbl.toLowerCase()==='semana'?'da semana':'do mês'}</button></div>`;};
+  const sub=`<div class="metasub"><div class="msubh">Também na semana e no mês</div><div class="msubs">${mini('Semana',wInc,wg,{metric:'fat',per:'semana',target:Math.round(base*6)})}${mini('Mês',mInc,mg,{metric:'fat',per:'mes',target:Math.round(base*26)})}</div></div>`;
+  if(!gp.has)return`<div class="gauge"><svg viewBox="0 0 200 118" role="img" aria-label="Velocímetro sem meta"><path d="M20 100 A80 80 0 0 1 180 100" class="gt"/></svg><div><div class="big">${brl(inc)}</div><p class="sub">Faturamento de hoje (Uber + 99). Defina a meta de faturamento do dia abaixo para ver o atingimento.</p>${sub}</div></div>`;
   const f=gp.bar/100,lo=clamp(+c.gLo,0,100),hi=Math.max(lo,clamp(+c.gHi,0,100)),col=gColor(gp.pct/100),tick=q=>{const a=Math.PI*(1-q/100);return`<line x1="${100+70*Math.cos(a)}" y1="${100-70*Math.sin(a)}" x2="${100+90*Math.cos(a)}" y2="${100-90*Math.sin(a)}" class="gk"/>`};
   return`<div class="gauge" data-f="${f}"><svg viewBox="0 0 200 118" role="img" aria-label="${pctTxt(gp.pct)} da meta de faturamento do dia"><path d="M20 100 A80 80 0 0 1 180 100" class="gt"/><path d="M20 100 A80 80 0 0 1 180 100" class="gp" style="stroke:${col};stroke-dasharray:${GLEN};stroke-dashoffset:${GLEN*(1-gLast)}"/>${tick(lo)}${tick(hi)}
    <g class="nd" style="transform:rotate(${-90+180*gLast}deg)"><line x1="100" y1="100" x2="100" y2="34"/><circle cx="100" cy="100" r="6"/></g></svg>
    <div><div class="gpct" style="color:${col}">Atingimento: ${pctTxt(gp.pct)} ${tip('Como o atingimento é calculado','<p>Cálculo: faturamento de hoje ÷ meta × 100. O ponteiro para em 100%; o número mostra quanto passou.</p>')}${gp.over?' <span class="pill">meta superada</span>':''}</div><div class="kv" style="margin:8px 0"><span>Faturamento realizado</span><span><b>${brl(inc)}</b></span><span>Meta de faturamento</span><span>${brl(g)}</span><span>${gp.hit?'Acima da meta':'Falta'}</span><span>${brl(Math.abs(r2(inc-g)))}</span></div>
-   <div class="gleg"><span style="color:var(--bad)">● abaixo de ${num(lo,0)}%</span><span style="color:var(--warn)">● ${num(lo,0)}–${num(hi,0)}%</span><span style="color:var(--ok)">● ${num(hi,0)}% ou mais</span></div></div></div>`}
+   <div class="gleg"><span style="color:var(--bad)">● abaixo de ${num(lo,0)}%</span><span style="color:var(--warn)">● ${num(lo,0)}–${num(hi,0)}%</span><span style="color:var(--ok)">● ${num(hi,0)}% ou mais</span></div>${sub}</div></div>`}
 function mountGauge(){const el=$('.gauge[data-f]');if(!el)return;const f=clamp(+el.dataset.f,0,1),gp=el.querySelector('.gp'),nd=el.querySelector('.nd');gLast=f;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{gp.style.strokeDashoffset=GLEN*(1-f);nd.style.transform=`rotate(${-90+180*f}deg)`}))}
 
@@ -2431,7 +2460,7 @@ metas(){const c=cfg(),fin=db.goals.filter(g=>g.kind==='fin'),dg=db.goals.filter(
   const row=g=>g.kind==='dia'
    ?`<div class="it"><button class="chk ${g.last===TODAY()?'on':''}" data-goal="${g.id}" aria-label="${g.last===TODAY()?'Desmarcar':'Concluir'} meta">${g.last===TODAY()?'✓':''}</button><div class="g ${g.last===TODAY()?'done':''}">${esc(g.text)}<small>${g.last===TODAY()?'Concluída hoje':'Marque quando concluir hoje'}</small></div>${del('goals',g.id)}</div>`
    :`<div class="it"><div class="g">${esc(g.text)}<small>${g.pct||0}% concluído (você atualiza)</small><input type="range" min="0" max="100" step="5" value="${g.pct||0}" data-pct="${g.id}" style="margin-top:8px" aria-label="Progresso de ${esc(g.text)}"></div>${del('goals',g.id)}</div>`;
-  const SUG=[['Faturar R$ 220,00 no dia',{metric:'fat',per:'dia',target:220}],['Alcançar R$ 350,00 de faturamento',{metric:'fat',per:'dia',target:350}],['R$ 150,00 de lucro operacional',{metric:'lucro',per:'dia',target:150}],['Guardar R$ 30,00 dos ganhos do dia',{metric:'res',per:'dia',target:30,text:'Guardar dos ganhos do dia'}],['Limitar as despesas do dia a R$ 80,00',{metric:'desp',per:'dia',target:80}],['Reservar a parcela do veículo',{metric:'obr'}],['Acumular R$ 500,00 para manutenção',{metric:'res',per:'total',target:500,text:'Reserva para manutenção'}],
+  const SUG=[['Faturar R$ 220,00 no dia',{metric:'fat',per:'dia',target:220}],['Alcançar R$ 350,00 de faturamento',{metric:'fat',per:'dia',target:350}],['Faturar R$ 1.500,00 na semana',{metric:'fat',per:'semana',target:1500}],['Faturar R$ 6.000,00 no mês',{metric:'fat',per:'mes',target:6000}],['R$ 2.500,00 de lucro no mês',{metric:'lucro',per:'mes',target:2500}],['R$ 150,00 de lucro operacional',{metric:'lucro',per:'dia',target:150}],['Guardar R$ 30,00 dos ganhos do dia',{metric:'res',per:'dia',target:30,text:'Guardar dos ganhos do dia'}],['Limitar as despesas do dia a R$ 80,00',{metric:'desp',per:'dia',target:80}],['Reservar a parcela do veículo',{metric:'obr'}],['Acumular R$ 500,00 para manutenção',{metric:'res',per:'total',target:500,text:'Reserva para manutenção'}],
    ['Registrar os ganhos ao fim do expediente',{metric:'pers',pk:'dia',text:'Registrar os ganhos ao fim do expediente'}],['Registrar todas as despesas do dia',{metric:'pers',pk:'dia',text:'Registrar todas as despesas do dia'}],['Conferir o saldo no encerramento',{metric:'pers',pk:'dia',text:'Conferir o saldo no encerramento do dia'}],['Revisar um item do veículo quando necessário',{metric:'pers',pk:'longo',text:'Revisar o item de manutenção mais próximo do vencimento'}]];
   return `<div class="grid"><div class="c s12"><div class="mhead"><h3 style="margin:0">Meta de faturamento diário</h3><span class="sub">Uber + 99, receita bruta</span></div>${gaugeHTML()}
    <div class="row wrap" style="margin-top:16px;align-items:flex-end"><div class="f" style="max-width:280px"><label for="goal-main">Meta de faturamento do dia (R$)</label><input id="goal-main" inputmode="decimal" data-cfgm="goal" value="${c.goal?num(c.goal,2):''}" placeholder="Ex.: 220,00"></div>
@@ -2485,7 +2514,7 @@ config(){const c=cfg(),wp=workPattern(),share=c.rankShare===true;
 });
 V.uber=()=>appView('uber');V.n99=()=>appView('n99');
 /* ============ METAS: linha, título e formulário ============ */
-function goalTitle(g){const v=brl(+g.target||0),pp=g.per==='semana'?' na semana':' no dia';
+function goalTitle(g){const v=brl(+g.target||0),pp=g.per==='semana'?' na semana':g.per==='mes'?' no mês':' no dia';
   if(g.metric==='fat')return'Faturar '+v+pp;if(g.metric==='lucro')return'Lucro operacional de '+v+pp;if(g.metric==='desp')return'Despesas de até '+v+pp;
   if(g.metric==='res'){const r=db.reserves.find(x=>x.id===g.ref);return'Guardar '+v+(g.per==='dia'?' por dia':'')+(r?' · '+r.name:'')}
   if(g.metric==='obr'){const b=db.bills.find(x=>x.id===g.ref);return'Separar o valor de '+(b?b.name:'uma conta')}return g.text||'Meta'}
@@ -2502,7 +2531,7 @@ function openGoal(pre){pre=pre||{};const g=pre.id?db.goals.find(x=>x.id===pre.id
   modal(`<h2>${pre.id?'Editar meta':'Nova meta'}</h2><p class="sub" style="margin-bottom:14px">Escolha o que quer acompanhar. Só o valor é obrigatório.</p>
   <form data-form="gnew" data-gm="${m}" novalidate>${pre.id?`<input type="hidden" name="id" value="${pre.id}">`:''}
    <div class="f"><label for="g-m">Tipo de meta</label><select id="g-m" name="metric" data-gmetric>${opt(GOALM,m)}</select><small class="sub" data-ghelp>${GPH[m][1]}</small></div>
-   <div class="row wrap"><div class="f" data-gs="fat lucro desp res"><label for="g-p">Período</label><select id="g-p" name="per">${opt(m==='res'?{dia:'Por dia (guardar hoje)',total:'Total acumulado'}:{dia:'Por dia',semana:'Por semana (seg a dom)'},g.per||(m==='res'?'total':'dia'))}</select></div>
+   <div class="row wrap"><div class="f" data-gs="fat lucro desp res"><label for="g-p">Período</label><select id="g-p" name="per">${opt(m==='res'?{dia:'Por dia (guardar hoje)',total:'Total acumulado'}:{dia:'Por dia',semana:'Por semana (seg a dom)',mes:'Por mês'},g.per||(m==='res'?'total':'dia'))}</select></div>
    <div class="f" data-gs="fat lucro desp res"><label for="g-v">Valor (R$)</label><input id="g-v" name="target" inputmode="decimal" autocomplete="off" placeholder="${GPH[m][0]}" value="${g.target?num(g.target,2):''}"></div></div>
    <div class="f" data-gs="res"><label for="g-r">Reserva</label><select id="g-r" name="ref"><option value="">Criar uma reserva nova para esta meta</option>${db.reserves.map(r=>`<option value="${r.id}" ${g.ref===r.id?'selected':''}>${esc(r.name)} · ${brl(resBal(r))} guardados</option>`).join('')}</select></div>
    <div class="f" data-gs="obr"><label for="g-b">Conta</label>${db.bills.length?`<select id="g-b" name="bill">${db.bills.map(b=>`<option value="${b.id}" ${g.ref===b.id?'selected':''}>${esc(b.name)} · ${brl(b.v)}</option>`).join('')}</select>`:`<p class="sub">Nenhuma conta cadastrada. <button type="button" class="lnk" data-addbill>Cadastrar a parcela ou outra conta</button></p>`}</div>
@@ -2515,7 +2544,7 @@ function saveGoal(fm,f){const m=f.metric,isNew=!f.id,old=f.id?db.goals.find(x=>x
   if(m==='obr'){if(!f.bill)return ferr(fm,'Cadastre e escolha a conta a acompanhar.');ref=f.bill}
   else{target=parseMoney(f.target);if(!(target>0))return ferr(fm,'Informe um valor maior que zero, ex.: 220 ou 220,50.')}
   if(m==='res'){ref=f.ref;if(!ref){const r={id:uid(),name:(f.text||'').trim()||'Reserva da meta',kind:'meta',target:f.per==='dia'?0:target,due:'',bill:'',moves:[]};db.reserves.push(r);ref=r.id}}
-  const g={kind:'fin',metric:m,per:m==='res'?(f.per==='dia'?'dia':'total'):m==='obr'?'':(f.per==='semana'?'semana':'dia'),target,ref,text:(f.text||'').trim(),at:Date.now()};
+  const g={kind:'fin',metric:m,per:m==='res'?(f.per==='dia'?'dia':'total'):m==='obr'?'':(f.per==='semana'?'semana':f.per==='mes'?'mes':'dia'),target,ref,text:(f.text||'').trim(),at:Date.now()};
   if(old){Object.assign(old,g);return'Meta atualizada.'}db.goals.push(Object.assign({id:uid()},g));return isNew?'Meta criada.':'Meta salva.'}
 
 /* ============ HISTÓRICO: estado dos filtros e detalhes ============ */
@@ -2739,7 +2768,7 @@ function render(){if(!user||!db)return;Tip.close(true);if(!V[tab]||!TABS.some(t=
   const greet=tab==='hoje'?`Olá, ${esc(user.name.split(' ')[0])}`:(app?`<span class="idn lg ${tab}" aria-hidden="true"></span>`:'')+T[2],I=TABINFO[tab]||['','',''];
   const vw=$('#view');vw.style.setProperty('--app',tab==='uber'?'var(--uber)':tab==='n99'?'var(--n99)':'var(--gold)');
   vw.innerHTML=`<div class="head"><div><h1>${greet}</h1>${tab==='hoje'||app?`<p>${dateLabel()}</p>`:''}${I[0]?`<p class="intro">${I[0]}</p>`:''}</div>${I[1]?`<div class="hact"><button type="button" class="btn" ${I[2]}>${I[1]}</button></div>`:''}</div>${tab==='historico'?'':`<input class="srch" id="q" type="search" placeholder="Buscar no NESC…" aria-label="Buscar em lançamentos, metas, contas e manutenção" autocomplete="off"><div id="sr"></div>`}`+V[tab]();
-  renderNav();Bot.dock();Bot.tab(tab);
+  if(tab!==render._lt){vw.classList.add('tab-enter');render._lt=tab;}else vw.classList.remove('tab-enter');renderNav();Bot.dock();Bot.tab(tab);
   if(tab==='hoje'){mountGlobe();drawChart()}if(tab==='metas')mountGauge();
 }
 function modal(h){$('#mbox').innerHTML=h;const m=$('#modal');m.classList.add('on');const f=m.querySelector('input:not([type=hidden]):not([type=radio]),select,button');if(f)setTimeout(()=>f.focus(),30)}
@@ -2889,7 +2918,7 @@ document.addEventListener('click',e=>{
   if(T.closest('[data-shopsale]')){openShopSale();return}
   if(T.closest('[data-shopnew]')){openShopProd();return}
   const sed=T.closest('[data-shopedit]');if(sed){openShopProd(sed.dataset.shopedit);return}
-  const ssl=T.closest('[data-shopsell]');if(ssl){const pr=db.shop.products.find(x=>x.id===ssl.dataset.shopsell);if(pr){const sid=uid();db.shop.sales.push({id:sid,d:TODAY(),pid:pr.id,name:pr.name,qty:1,unit:r2(pr.price),cost:r2(pr.cost),at:Date.now()});mark();Store.save();render();toast('Venda de '+pr.name+' '+brl(pr.price)+' · lucro '+brl(r2(pr.price-pr.cost)),()=>{db.shop.sales=db.shop.sales.filter(x=>x.id!==sid);mark();Store.save();render()})}return}
+  const ssl=T.closest('[data-shopsell]');if(ssl){const pr=db.shop.products.find(x=>x.id===ssl.dataset.shopsell);if(pr){const sid=uid();db.shop.sales.push({id:sid,d:TODAY(),pid:pr.id,name:pr.name,cat:pr.cat||'',qty:1,unit:r2(pr.price),cost:r2(pr.cost),at:Date.now()});mark();Store.save();render();toast('Venda de '+pr.name+' '+brl(pr.price)+' · lucro '+brl(r2(pr.price-pr.cost)),()=>{db.shop.sales=db.shop.sales.filter(x=>x.id!==sid);mark();Store.save();render()})}return}
   const sdp=T.closest('[data-shopdel]');if(sdp){const pr=db.shop.products.find(x=>x.id===sdp.dataset.shopdel);if(pr){db.shop.products=db.shop.products.filter(x=>x.id!==pr.id);mark();Store.save();render();toast('Produto "'+pr.name+'" removido. As vendas já registradas continuam no histórico.',()=>{db.shop.products.push(pr);mark();Store.save();render()})}return}
   const sds=T.closest('[data-shopdelsale]');if(sds){const sl=db.shop.sales.find(x=>x.id===sds.dataset.shopdelsale);if(sl){db.shop.sales=db.shop.sales.filter(x=>x.id!==sl.id);mark();Store.save();render();toast('Venda removida.',()=>{db.shop.sales.push(sl);mark();Store.save();render()})}return}
   if(T.closest('[data-onboard]')){openOnboard();return}
@@ -3044,12 +3073,12 @@ document.addEventListener('submit',e=>{
   if(k==='shopprod'){const nm=(f.name||'').trim();if(!nm)return ferr(fm,'Informe o nome do produto.');
     const price=parseMoney(f.price);if(!(price>0))return ferr(fm,'Informe por quanto vende, ex.: 30 ou 30,50.');
     const cost=String(f.cost||'').trim()?parseMoney(f.cost):0;if(!(cost>=0))return ferr(fm,'Custo inválido.');
-    if(f.id){const pr=db.shop.products.find(x=>x.id===f.id);if(pr){pr.name=nm;pr.cost=r2(cost);pr.price=r2(price)}}
-    else db.shop.products.push({id,name:nm,cost:r2(cost),price:r2(price),at:Date.now()});
+    if(f.id){const pr=db.shop.products.find(x=>x.id===f.id);if(pr){pr.name=nm;pr.cost=r2(cost);pr.price=r2(price);pr.cat=(f.cat||'').trim()}}
+    else db.shop.products.push({id,name:nm,cost:r2(cost),price:r2(price),cat:(f.cat||'').trim(),at:Date.now()});
     return ok(f.id?'Produto atualizado.':'Produto cadastrado. Agora é só tocar em “Vender”.')}
   if(k==='shopsale'){const qty=Math.max(1,Math.round(parseFloat(String(f.qty||'1').replace(',','.')))||1),dd=f.d||d;if(dd>d)return ferr(fm,'A data não pode ser futura.');
     if(f.pid){const pr=db.shop.products.find(x=>x.id===f.pid);if(!pr)return ferr(fm,'Produto não encontrado.');
-      db.shop.sales.push({id,d:dd,pid:pr.id,name:pr.name,qty,unit:r2(pr.price),cost:r2(pr.cost),at:Date.now()});
+      db.shop.sales.push({id,d:dd,pid:pr.id,name:pr.name,cat:pr.cat||'',qty,unit:r2(pr.price),cost:r2(pr.cost),at:Date.now()});
       return ok('Venda de '+qty+'× '+pr.name+' ('+brl(r2(qty*pr.price))+') registrada.')}
     const an=(f.aname||'').trim(),av=parseMoney(f.aval),ac=String(f.acost||'').trim()?parseMoney(f.acost):0;
     if(!an)return ferr(fm,'Diga o que você vendeu.');if(!(av>0))return ferr(fm,'Informe o valor recebido.');if(!(ac>=0))return ferr(fm,'Custo inválido.');
