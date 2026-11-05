@@ -1,15 +1,20 @@
-# Modelos 3D
+# Modelos 3D do NESC
 
-## carro-v1.glb
+A aba Manutenção usa um sistema de modelos 3D licenciados por veículo. Cada carro só
+mostra um modelo 3D quando há um arquivo licenciado correspondente registrado; caso
+contrário, aparece "Modelo 3D ainda não disponível" (nunca outro carro no lugar).
 
-Versão otimizada (geometria simplificada e quantizada, texturas em WebP, peças internas
-invisíveis removidas) do modelo **Car Concept** do repositório oficial de exemplos do glTF:
+## carro-v1.glb — modelo de DEMONSTRAÇÃO do visualizador
+Não representa o carro de nenhum usuário. É usado apenas no botão "Ver o visualizador 3D
+em ação", para demonstrar o funcionamento do visualizador.
 
+Versão otimizada do modelo **Car Concept** do repositório oficial de exemplos do glTF:
 - Fonte: https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept
 - Licença: [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/legalcode)
-- Créditos: Khronos Group / glTF Sample Assets, a partir do modelo em domínio público (CC0)
-  "Free Concept Car 004" de Unity Fan (https://sketchfab.com/3d-models/free-concept-car-004-public-domain-cc0-4cba124633eb494eadc3bb0c4660ad7e).
-- Alterações feitas pelo NESC: otimização para web (simplificação, quantização, WebP) e
-  remoção de peças internas. A cor da pintura é alterada em tempo real no app.
+- Créditos: Khronos Group / glTF Sample Assets (a partir de modelo CC0 de Unity Fan).
+- Alterações: otimização para web (simplificação, quantização, texturas WebP).
 
-A licença não inclui logotipos nem marcas registradas.
+## Modelos licenciados por veículo (adicionados progressivamente)
+Registrados em `CAR_MODELS3D` (index.html), indexados pelo id do catálogo. Cada arquivo
+GLB fica em `models/` com seus créditos/licença anotados aqui ao ser adicionado.
+Nenhum ainda — slots reservados: Chevrolet Onix 2020 (hatch).

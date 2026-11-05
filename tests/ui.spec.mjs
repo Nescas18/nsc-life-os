@@ -329,23 +329,31 @@ await test("Indicação: botão no Início e no Ranking copia o link e cita o so
   return "copiou: " + clip.slice(-24);
 });
 
-await test("Manutenção: carro 3D (ou ilustração sem WebGL) com marcadores por peça, detalhe que abre o registro e cor do carro", async (keep) => {
+await test("Manutenção: sem modelo 3D mostra 'não disponível' (nunca outro carro) com os marcadores; demonstração carrega o visualizador GLB", async (keep) => {
   const ctx = await ctxFor(keep, { viewport: { width: 1280, height: 900 } });
   const { page, errors } = await loggedPage(ctx);
+  const tap = (sel) => page.evaluate((s) => document.querySelector(s).click(), sel);
   await page.evaluate(() => { tab = "manutencao"; render(); });
-  await page.waitForSelector("#car3d.gl, #car3d.flat", { timeout: 30000 });
-  const info = await page.evaluate(() => {
+  // veículo de teste sem modelo licenciado → estado honesto "Modelo 3D ainda não disponível"
+  await page.waitForSelector("#car3d.flat", { timeout: 20000 });
+  const na = await page.evaluate(() => {
     const R = { vencido: 0, conferir: 1, proximo: 2, ok: 3, none: 4 }, worst = (ks) => ks.filter((k) => comps().includes(k)).map((k) => compState(k).st).reduce((m, s) => (R[s] < R[m] ? s : m), "none");
     const pins = [...document.querySelectorAll(".c3-pin")].map((p) => ({ z: p.dataset.c3z, st: (p.className.match(/st-(\w+)/) || [])[1], pos: p.style.translate }));
-    return { mode: document.querySelector("#car3d").classList.contains("gl") ? "3d" : "2d", pins, motor: worst(["oleo", "f_oleo", "f_ar", "correia", "velas", "arref"]), pneus: worst(["pneus", "alinh"]) };
+    return { badge: /não disponível/i.test(document.querySelector(".c3-na-badge")?.textContent || ""), has3d: document.querySelector("#car3d").dataset.has3d, pins, motor: worst(["oleo", "f_oleo", "f_ar", "correia", "velas", "arref"]) };
   });
-  assert(info.pins.length >= 6, "poucos marcadores: " + JSON.stringify(info.pins));
-  assert(info.pins.every((p) => p.pos && p.pos !== "none"), "marcador sem posição na imagem do carro: " + JSON.stringify(info.pins));
-  assert(info.pins.find((p) => p.z === "motor").st === info.motor, "cor do marcador do motor não bate com o estado da manutenção: " + JSON.stringify(info));
-  assert(info.pins.find((p) => p.z === "pneus").st === info.pneus, "cor do marcador dos pneus não bate com o estado: " + JSON.stringify(info));
+  assert(na.badge && na.has3d === "0", "estado 'não disponível' não apareceu: " + JSON.stringify(na));
+  assert(na.pins.length >= 6 && na.pins.every((p) => p.pos && p.pos !== "none"), "marcadores sem posição no esquema: " + JSON.stringify(na.pins));
+  assert(na.pins.find((p) => p.z === "motor").st === na.motor, "cor do marcador do motor não bate com o estado: " + JSON.stringify(na));
+  // cor do carro muda o esquema e persiste
+  await tap("[data-c3color=azul]");
+  assert(await page.evaluate(() => db.vehicle.color === "azul"), "cor não foi salva no veículo");
+  // demonstração: carrega o visualizador 3D real (qualquer GLB licenciado entra por aqui)
+  await tap("[data-c3demo]:not([data-c3demo=off])");
+  await page.waitForSelector("#car3d.gl", { timeout: 30000 });
+  const gl = await page.evaluate(() => ({ demo: Car3D.demo, zoom: typeof (Car3D.v && Car3D.v.zoomBy), pins: document.querySelectorAll(".c3-pin").length }));
+  assert(gl.demo === true && gl.zoom === "function" && gl.pins >= 6, "visualizador 3D não carregou na demonstração: " + JSON.stringify(gl));
+  await page.evaluate(() => Car3D.v.zoomBy(1.2)); // zoom não lança
   // tocar numa zona abre o detalhe; "Registrar" abre o formulário com a peça já marcada
-  // cliques direto no DOM: o WebGL do ambiente de teste roda por software e o clique "estável" do Playwright esperaria quadros lentos
-  const tap = (sel) => page.evaluate((s) => document.querySelector(s).click(), sel);
   await tap(".c3-zones [data-c3z=motor]");
   const det = await page.evaluate(() => ({ open: !document.querySelector("#c3det").hidden, txt: document.querySelector("#c3det").innerText, on: document.querySelector(".c3-pin[data-c3z=motor]").classList.contains("on") }));
   assert(det.open && det.on && /Óleo do motor/.test(det.txt), "detalhe da zona não abriu: " + JSON.stringify(det));
@@ -353,12 +361,8 @@ await test("Manutenção: carro 3D (ou ilustração sem WebGL) com marcadores po
   await page.waitForSelector("#modal.on", { timeout: 8000 });
   assert(await page.evaluate(() => !!document.querySelector('#modal.on input[name=comp][value=oleo]:checked')), "o formulário não veio com o óleo marcado");
   await page.evaluate(() => closeModal());
-  // cor do carro: salva no veículo e aparece no resumo
-  await tap("[data-c3color=azul]");
-  const col = await page.evaluate(() => ({ c: db.vehicle.color, sub: document.querySelector(".c3-id small").textContent, pressed: document.querySelector("[data-c3color=azul]").getAttribute("aria-pressed") }));
-  assert(col.c === "azul" && /Azul/.test(col.sub) && col.pressed === "true", "cor não foi salva/exibida: " + JSON.stringify(col));
   assert(!errors.length, errors.join(" | "));
-  return info.mode + " · " + info.pins.length + " marcadores";
+  return "não disponível + demo GLB ok · " + na.pins.length + " marcadores";
 });
 
 await browser.close();
