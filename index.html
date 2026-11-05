@@ -271,7 +271,7 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;padding:calc(30px + var(--sat)) 36
 .c3-hint{position:absolute;left:16px;bottom:10px;font-size:.7rem;color:var(--mut);letter-spacing:.02em;pointer-events:none}.c3-stage.flat .c3-hint{display:none}
 .c3-stage.na{background:radial-gradient(130% 100% at 50% 64%,rgba(226,178,80,.06),rgba(20,16,10,0) 60%)}
 .c3-na-badge{position:absolute;left:0;right:0;bottom:0;padding:14px 18px 16px;background:linear-gradient(0deg,rgba(13,13,15,.92),rgba(13,13,15,.0));text-align:center;pointer-events:none}
-.c3-na-badge b{display:block;color:var(--gold-hi);font-size:.95rem}.c3-na-badge span{display:block;color:var(--tx2);font-size:.76rem;margin-top:3px;max-width:430px;margin-inline:auto;line-height:1.45}
+.c3-na-badge b{display:block;color:var(--gold-hi);font-size:1rem;font-family:var(--fd);font-weight:700;letter-spacing:-.01em}.c3-na-badge span.c3-na-tag{display:inline-block;margin:0 auto 8px;padding:4px 11px;border-radius:999px;border:1px solid var(--gold-line);background:rgba(226,178,80,.1);color:var(--gold-hi);font:600 .68rem/1 var(--fm);letter-spacing:.08em;text-transform:uppercase}.c3-na-badge span{display:block;color:var(--tx2);font-size:.77rem;margin-top:4px;max-width:440px;margin-inline:auto;line-height:1.5}
 .c3-na-acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
 .c3-tools{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px;z-index:2}
 .c3-tool{width:36px;height:36px;border-radius:10px;border:1px solid var(--line2);background:rgba(13,13,15,.6);color:var(--tx);font-size:1.3rem;line-height:1;cursor:pointer;backdrop-filter:blur(4px);display:grid;place-items:center;min-height:0;padding:0}.c3-tool:hover{background:rgba(226,178,80,.14);border-color:var(--gold-line);color:var(--gold-hi)}
@@ -2340,8 +2340,6 @@ const CAR_MODELS3D={
   'chevrolet-onix-1-0-aspirado':{pending:true,label:'Chevrolet Onix 2020 LT Hatch'},
   'chevrolet-onix-1-0-turbo':{pending:true,label:'Chevrolet Onix 2020 Hatch'}
 };
-// Modelo de DEMONSTRAÇÃO do visualizador (não é o carro de ninguém): carro-conceito CC BY 4.0 já no projeto.
-const CAR_DEMO={file:'/models/carro-v1.glb',fit:{forward:'+z'},paint:'Paint 1',author:'Khronos Group — modelo “Car Concept”',license:'CC BY 4.0',licenseUrl:'https://creativecommons.org/licenses/by/4.0/deed.pt-br'};
 const carKeys=v=>{const o=[];if(v&&v.catId)o.push(v.catId);if(v&&v.brand&&v.model)o.push(slug(v.brand+' '+v.model));return o};
 // Modelo 3D disponível para o veículo, ou null. Aceita override local p/ TESTAR um arquivo comprado sem republicar:
 //   ?car3d=/models/arquivo.glb&fwd=+z   ou   localStorage nesc_car3d_<chave> = {"file":"...","fit":{...}}
@@ -2351,7 +2349,7 @@ function model3dFor(v){if(!v)return null;
   for(const k of carKeys(v)){const m=CAR_MODELS3D[k];if(m&&m.file)return m}return null}
 const model3dPending=v=>carKeys(v).map(k=>CAR_MODELS3D[k]).find(m=>m&&m.pending&&!m.file)||null;
 function car3dCard(){const v=db.vehicle;if(!v)return'';const s=carSpec(v),Z=carZones(s),od=odoNow(),col=carColor(),nv=Z.filter(z=>z.st==='vencido').length,np=Z.filter(z=>z.st==='proximo'||z.st==='conferir').length;
-  const model=Car3D.demo?CAR_DEMO:model3dFor(v),has3d=!!model,cred=model&&model.license?model:null,pend=model3dPending(v);
+  const model=model3dFor(v),has3d=!!model,cred=model&&model.license?model:null,pend=model3dPending(v);
   const sub=[v.year,CAR_COLORS[col][0],od.km!=null?num(od.km,0)+' km':''].filter(Boolean).join(' · ');
   const pins=Z.map((z,i)=>`<button type="button" class="c3-pin st-${z.st}" data-c3z="${z.id}" aria-label="${i+1}. ${esc(z.n)}: ${ZST[z.st][0]}"><b>${i+1}</b></button>`).join('');
   return`<section class="c s12 car3d" aria-label="Veículo em 3D">
@@ -2361,19 +2359,18 @@ function car3dCard(){const v=db.vehicle;if(!v)return'';const s=carSpec(v),Z=carZ
     <div class="c3-load" aria-live="polite"><span class="c3-spin" aria-hidden="true"></span>Carregando o modelo 3D <b>0%</b></div>
     ${has3d?'<div class="c3-tools"><button type="button" class="c3-tool" data-c3zoom="1.2" aria-label="Aproximar">+</button><button type="button" class="c3-tool" data-c3zoom="0.84" aria-label="Afastar">−</button></div>':''}
     <div class="c3-pins">${pins}</div>
-    ${has3d?'<span class="c3-hint" aria-hidden="true">Arraste para girar · role ou use + / − para aproximar · toque nos números</span>':`<div class="c3-na-badge"><b>Modelo 3D ainda não disponível</b><span>${pend?'O modelo do seu veículo já está na fila de aquisição.':'Ainda não temos o modelo 3D fiel do seu veículo.'} Os marcadores de manutenção abaixo já funcionam sobre o esquema.</span></div>`}</div>
+    ${has3d?'<span class="c3-hint" aria-hidden="true">Arraste para girar · role ou use + / − para aproximar · toque nos números</span>':`<div class="c3-na-badge"><span class="c3-na-tag">${pend?'Modelo em preparação':'Esquema do veículo'}</span><b>Modelo 3D ainda não disponível</b><span>${pend?'O modelo fiel do seu '+esc([v.brand,v.model].filter(Boolean).join(' ')||'veículo')+' já está na fila de produção.':'Ainda não temos o modelo 3D fiel do seu veículo.'} Os marcadores de manutenção abaixo já funcionam sobre o esquema.</span></div>`}</div>
    <div class="c3-leg" aria-hidden="true"><span><i class="ok"></i>Em dia</span><span><i class="warn"></i>Próximo</span><span><i class="bad"></i>Vencido</span><span><i class="mu"></i>Sem registro</span></div>
-   ${has3d?'':`<div class="c3-na-acts"><button type="button" class="btn ghost sm" data-c3demo>Ver o visualizador 3D em ação</button><button type="button" class="btn ghost sm" data-c3notify>Avisar quando o modelo do meu carro chegar</button></div>`}
+   ${has3d?'':`<div class="c3-na-acts"><button type="button" class="btn ghost sm" data-c3notify>Avisar quando o modelo do meu carro chegar</button></div>`}
    <div class="c3-zones scrollx" role="list">${Z.map((z,i)=>`<button type="button" role="listitem" class="c3-z st-${z.st}" data-c3z="${z.id}"><b>${i+1}</b><span>${esc(z.n)}</span><em>${ZST[z.st][0]}</em></button>`).join('')}</div>
    <div class="c3-det" id="c3det" hidden></div>
    <div class="c3-colors"><span>Cor do carro</span>${Object.entries(CAR_COLORS).map(([k,c])=>`<button type="button" class="c3-sw${k===col?' on':''}" data-c3color="${k}" style="--sw:${c[2]}" aria-label="${c[0]}" aria-pressed="${k===col}" title="${c[0]}"></button>`).join('')}</div>
-   ${Car3D.demo?'<button type="button" class="btn ghost sm" data-c3demo="off" style="margin-top:10px">Sair da demonstração</button>':''}
-   ${cred?`<p class="c3-cred">${Car3D.demo?'Demonstração do visualizador · ':'Modelo 3D · '}${esc(cred.author||'')}${cred.license?' · <a href="'+(cred.licenseUrl||'#')+'" target="_blank" rel="noopener">'+esc(cred.license)+'</a>':''}</p>`:''}
+   ${cred?`<p class="c3-cred">Modelo 3D · ${esc(cred.author||'')}${cred.license?' · <a href="'+(cred.licenseUrl||'#')+'" target="_blank" rel="noopener">'+esc(cred.license)+'</a>':''}</p>`:''}
   </section>`}
-const Car3D={v:null,vp:null,sel:null,Z:[],s:null,demo:false,fail:false,url:null,
+const Car3D={v:null,vp:null,sel:null,Z:[],s:null,fail:false,url:null,
   /* carrega o modelo 3D licenciado do veículo (car3d.js, three.js r170). Sem modelo → esquema 2D honesto. */
   mount(){const host=$('#car3d');if(!host)return;this.Z=carZones(this.s=carSpec(db.vehicle));this.pinEls=[...host.querySelectorAll('.c3-pin')];if(this.sel)this.select(this.sel,true);
-    const model=this.demo?CAR_DEMO:model3dFor(db.vehicle);
+    const model=model3dFor(db.vehicle);
     if(!model||this.fail)return this.flat(host);
     if(this.url!==model.file){if(this.v)this.v.stop();this.url=model.file;this.v=null;this.vp=null}
     if(!this.vp){host.classList.add('loading');const pv=window.__THREE__;try{delete window.__THREE__}catch(_){}
@@ -2381,8 +2378,9 @@ const Car3D={v:null,vp:null,sel:null,Z:[],s:null,demo:false,fail:false,url:null,
         .then(v=>{this.v=v;if(!this.rz){this.rz=()=>{clearTimeout(this.rzt);this.rzt=setTimeout(()=>this.v&&this.v.resize(),120)};addEventListener('resize',this.rz)}return v})}
     this.vp.then(v=>{const h=$('#car3d');if(!h||tab!=='manutencao')return;h.classList.remove('loading');h.classList.add('gl');v.attach(h);v.setColor(carColor());v.setZones(this.Z.map(z=>({id:z.id,st:z.st})));if(this.sel)v.select(this.sel);v.start()})
       .catch(e=>{console.warn('Modelo 3D indisponível',e);this.fail=true;const h=$('#car3d');if(h){h.classList.remove('loading');this.flat(h)}})},
-  setDemo(on){this.demo=!!on;this.fail=false;if(this.v)this.v.stop();this.url=null;this.v=null;this.vp=null;render()},
-  stop(){if(this.v)this.v.stop()},
+  /* ao sair da aba Manutenção: libera a GPU (contexto WebGL, geometrias e texturas). O GLB fica em cache
+     no módulo car3d.js, então voltar à aba reconstrói a cena sem baixar de novo. */
+  stop(){if(this.v){try{this.v.dispose?this.v.dispose():this.v.stop()}catch(e){}this.v=null;this.vp=null;this.url=null}},
   select(id,quiet){const z=this.Z.find(x=>x.id===id);const det=$('#c3det');document.querySelectorAll('[data-c3z]').forEach(b=>b.classList.toggle('on',b.dataset.c3z===id&&!!z));
     if(!z||!det){if(det)det.hidden=true;this.sel=null;if(this.v)this.v.select(null);return}this.sel=id;const i=this.Z.indexOf(z)+1;
     det.hidden=false;det.innerHTML=`<div class="c3-dh"><b><span class="c3-n st-${z.st}">${i}</span>${esc(z.n)}</b><button type="button" class="c3-x" data-c3z="" aria-label="Fechar">✕</button></div>
@@ -3142,7 +3140,6 @@ document.addEventListener('click',e=>{
   const c3z=T.closest('[data-c3z]');if(c3z){const id=c3z.dataset.c3z;Car3D.select(id&&id!==Car3D.sel?id:'');return}
   const c3m=T.closest('[data-c3maint]');if(c3m){openMaint(c3m.dataset.c3maint);return}
   const c3c=T.closest('[data-c3color]');if(c3c&&db.vehicle){const k=c3c.dataset.c3color;if(!CAR_COLORS[k])return;db.vehicle.color=k;mark();Store.save();render();toast('Cor do carro: '+CAR_COLORS[k][0]+'.');return}
-  const c3d=T.closest('[data-c3demo]');if(c3d){Car3D.setDemo(c3d.dataset.c3demo!=='off');return}
   const c3zm=T.closest('[data-c3zoom]');if(c3zm){if(Car3D.v)Car3D.v.zoomBy(+c3zm.dataset.c3zoom);return}
   const c3n=T.closest('[data-c3notify]');if(c3n){const k=(db.vehicle&&db.vehicle.catId)||(db.vehicle?slug(db.vehicle.brand+' '+db.vehicle.model):'');try{const q=JSON.parse(localStorage.getItem('nesc_model_queue')||'[]');if(k&&!q.includes(k)){q.push(k);localStorage.setItem('nesc_model_queue',JSON.stringify(q))}}catch(e){}toast('Anotado! Vamos priorizar o modelo 3D do seu veículo.');return}
   const kmr=T.closest('[data-kmreveal]');if(kmr){const b=kmr.form&&kmr.form.querySelector('[data-kmbox]');if(b){b.hidden=false;kmr.hidden=true;const i=b.querySelector('input');i&&i.focus()}return}

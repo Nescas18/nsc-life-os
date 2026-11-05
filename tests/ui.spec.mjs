@@ -329,31 +329,27 @@ await test("Indicação: botão no Início e no Ranking copia o link e cita o so
   return "copiou: " + clip.slice(-24);
 });
 
-await test("Manutenção: sem modelo 3D mostra 'não disponível' (nunca outro carro) com os marcadores; demonstração carrega o visualizador GLB", async (keep) => {
+await test("Manutenção: sem modelo 3D mostra 'não disponível' (nunca outro carro) com os marcadores", async (keep) => {
   const ctx = await ctxFor(keep, { viewport: { width: 1280, height: 900 } });
   const { page, errors } = await loggedPage(ctx);
   const tap = (sel) => page.evaluate((s) => document.querySelector(s).click(), sel);
   await page.evaluate(() => { tab = "manutencao"; render(); });
-  // veículo de teste sem modelo licenciado → estado honesto "Modelo 3D ainda não disponível"
+  // veículo de teste sem modelo licenciado → estado honesto "Modelo 3D ainda não disponível" (sem GLB, sem three.js)
   await page.waitForSelector("#car3d.flat", { timeout: 20000 });
   const na = await page.evaluate(() => {
     const R = { vencido: 0, conferir: 1, proximo: 2, ok: 3, none: 4 }, worst = (ks) => ks.filter((k) => comps().includes(k)).map((k) => compState(k).st).reduce((m, s) => (R[s] < R[m] ? s : m), "none");
     const pins = [...document.querySelectorAll(".c3-pin")].map((p) => ({ z: p.dataset.c3z, st: (p.className.match(/st-(\w+)/) || [])[1], pos: p.style.translate }));
-    return { badge: /não disponível/i.test(document.querySelector(".c3-na-badge")?.textContent || ""), has3d: document.querySelector("#car3d").dataset.has3d, pins, motor: worst(["oleo", "f_oleo", "f_ar", "correia", "velas", "arref"]) };
+    return { badge: /não disponível/i.test(document.querySelector(".c3-na-badge")?.textContent || ""), has3d: document.querySelector("#car3d").dataset.has3d, demoBtn: !!document.querySelector("[data-c3demo]"), svg: !!document.querySelector("#car3d .c3-canvas svg"), hasV: !!Car3D.v, pins, motor: worst(["oleo", "f_oleo", "f_ar", "correia", "velas", "arref"]) };
   });
   assert(na.badge && na.has3d === "0", "estado 'não disponível' não apareceu: " + JSON.stringify(na));
+  assert(!na.demoBtn, "o botão de demonstração NÃO deveria mais existir (carro genérico removido)");
+  assert(na.svg && !na.hasV, "sem modelo licenciado deveria desenhar só o esquema SVG, sem carregar o visualizador 3D");
   assert(na.pins.length >= 6 && na.pins.every((p) => p.pos && p.pos !== "none"), "marcadores sem posição no esquema: " + JSON.stringify(na.pins));
   assert(na.pins.find((p) => p.z === "motor").st === na.motor, "cor do marcador do motor não bate com o estado: " + JSON.stringify(na));
   // cor do carro muda o esquema e persiste
   await tap("[data-c3color=azul]");
   assert(await page.evaluate(() => db.vehicle.color === "azul"), "cor não foi salva no veículo");
-  // demonstração: carrega o visualizador 3D real (qualquer GLB licenciado entra por aqui)
-  await tap("[data-c3demo]:not([data-c3demo=off])");
-  await page.waitForSelector("#car3d.gl", { timeout: 30000 });
-  const gl = await page.evaluate(() => ({ demo: Car3D.demo, zoom: typeof (Car3D.v && Car3D.v.zoomBy), pins: document.querySelectorAll(".c3-pin").length }));
-  assert(gl.demo === true && gl.zoom === "function" && gl.pins >= 6, "visualizador 3D não carregou na demonstração: " + JSON.stringify(gl));
-  await page.evaluate(() => Car3D.v.zoomBy(1.2)); // zoom não lança
-  // tocar numa zona abre o detalhe; "Registrar" abre o formulário com a peça já marcada
+  // tocar numa zona abre o detalhe; "Registrar" abre o formulário com a peça já marcada (também sem 3D)
   await tap(".c3-zones [data-c3z=motor]");
   const det = await page.evaluate(() => ({ open: !document.querySelector("#c3det").hidden, txt: document.querySelector("#c3det").innerText, on: document.querySelector(".c3-pin[data-c3z=motor]").classList.contains("on") }));
   assert(det.open && det.on && /Óleo do motor/.test(det.txt), "detalhe da zona não abriu: " + JSON.stringify(det));
@@ -362,7 +358,39 @@ await test("Manutenção: sem modelo 3D mostra 'não disponível' (nunca outro c
   assert(await page.evaluate(() => !!document.querySelector('#modal.on input[name=comp][value=oleo]:checked')), "o formulário não veio com o óleo marcado");
   await page.evaluate(() => closeModal());
   assert(!errors.length, errors.join(" | "));
-  return "não disponível + demo GLB ok · " + na.pins.length + " marcadores";
+  return "não disponível (esquema honesto, sem 3D) · " + na.pins.length + " marcadores";
+});
+
+await test("Manutenção: com modelo licenciado o visualizador GLB carrega, gira, dá zoom e LIBERA a GPU ao sair da aba", async (keep) => {
+  const ctx = await ctxFor(keep, { viewport: { width: 1280, height: 900 } });
+  const { page, errors } = await loggedPage(ctx);
+  // Registra um modelo para o veículo de teste pelo MESMO caminho de um GLB licenciado real
+  // (override local nesc_car3d_<chave>). O arquivo é um fixture de teste, nunca publicado.
+  await page.evaluate(() => {
+    const key = (db.vehicle.catId) || slug(db.vehicle.brand + " " + db.vehicle.model);
+    localStorage.setItem("nesc_car3d_" + key, JSON.stringify({ file: "/tests/fixtures/car-concept.glb", fit: { forward: "+z" }, author: "Khronos — Car Concept (fixture de teste)", license: "CC BY 4.0" }));
+    Car3D.url = null; Car3D.v = null; Car3D.vp = null; tab = "manutencao"; render();
+  });
+  await page.waitForSelector("#car3d.gl", { timeout: 45000 });
+  const gl = await page.evaluate(() => ({ has3d: document.querySelector("#car3d").dataset.has3d, zoom: typeof (Car3D.v && Car3D.v.zoomBy), yaw: typeof (Car3D.v && Car3D.v.yaw), cred: /CC BY 4\.0/.test(document.querySelector(".c3-cred")?.textContent || ""), pins: document.querySelectorAll(".c3-pin").length }));
+  assert(gl.has3d === "1" && gl.zoom === "function" && gl.pins >= 6, "visualizador 3D não carregou o modelo licenciado: " + JSON.stringify(gl));
+  assert(gl.cred, "a atribuição (autor/licença) do modelo não apareceu");
+  // gira e dá zoom sem lançar
+  await page.evaluate(() => { const y0 = Car3D.v.yaw; Car3D.v.yaw = y0 + 0.5; Car3D.v.zoomBy(1.3); Car3D.v.zoomBy(0.8); });
+  await page.waitForTimeout(150);
+  // sair da aba deve descarregar o visualizador (libera contexto WebGL / memória de GPU) e manter o GLB em cache
+  const vBefore = await page.evaluate(() => !!Car3D.v);
+  await page.evaluate(() => { tab = "inicio"; render(); });
+  await page.waitForTimeout(150);
+  const freed = await page.evaluate(() => Car3D.v === null && Car3D.vp === null && Car3D.url === null);
+  assert(vBefore && freed, "ao sair da aba o visualizador deveria ser descarregado para liberar a GPU");
+  // voltar reconstrói a partir do cache (sem baixar de novo)
+  await page.evaluate(() => { tab = "manutencao"; render(); });
+  await page.waitForSelector("#car3d.gl", { timeout: 45000 });
+  const back = await page.evaluate(() => typeof (Car3D.v && Car3D.v.zoomBy) === "function");
+  assert(back, "voltar à aba Manutenção deveria reconstruir o visualizador a partir do cache");
+  assert(!errors.length, errors.join(" | "));
+  return "GLB licenciado: carrega · gira · zoom · libera GPU · recarrega do cache";
 });
 
 await browser.close();

@@ -162,6 +162,22 @@ export async function createCarViewer(opt = {}) {
     zoomBy(f) { setZoom(zoom * f); idle = performance.now(); },
     start() { if (!raf) raf = requestAnimationFrame(tick); },
     stop() { if (raf) cancelAnimationFrame(raf); raf = 0; last = 0; },
+    // libera a GPU ao sair da aba: para o loop, solta o contexto WebGL e descarta texturas/geometrias PRÓPRIAS
+    // (plataforma, sombra, ambiente). As do GLB ficam no cache do módulo — voltar à aba reconstrói sem baixar.
+    dispose() {
+      if (raf) cancelAnimationFrame(raf); raf = 0; last = 0;
+      try { io.disconnect(); } catch (_) {}
+      try { if (cv.parentNode) cv.parentNode.removeChild(cv); } catch (_) {}
+      try { if (scene.environment) scene.environment.dispose(); } catch (_) {}
+      const own = new Set(); car.traverse((o) => own.add(o)); // subárvore do carro = compartilhada com o cache
+      scene.traverse((o) => {
+        if (own.has(o)) return;
+        if (o.geometry) { try { o.geometry.dispose(); } catch (_) {} }
+        const m = o.material; if (m) (Array.isArray(m) ? m : [m]).forEach((mt) => { try { if (mt.map) mt.map.dispose(); mt.dispose(); } catch (_) {} });
+      });
+      try { R.dispose(); R.forceContextLoss(); } catch (_) {}
+      host = null; pinEls = []; zones = [];
+    },
     get yaw() { return yaw; }, set yaw(v) { yaw = v; tgt = null; vy = 0; idle = performance.now() + 1e9; },
     get quality() { return lvl; }, anchors: A, camera: cam, pivot, soft,
   };

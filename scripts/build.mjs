@@ -25,8 +25,9 @@ for (const file of ["bricolage.woff2", "geist.woff2", "geist-mono.woff2", "LICEN
   console.log(`Copied fonts/${file} to www/fonts/`);
 }
 
-// carro 3D da aba Manutenção: three.js r170 (módulos) e o modelo otimizado
-for (const [dir, files] of [["vendor/three", ["three.module.min.js", "GLTFLoader.js", "BufferGeometryUtils.js", "RoomEnvironment.js", "LICENSE"]], ["models", ["carro-v1.glb", "LICENSE.md"]]]) {
+// carro 3D da aba Manutenção: three.js r170 (módulos). Os GLBs licenciados por veículo são adicionados
+// progressivamente em models/ e entram aqui quando registrados — nenhum carro genérico é publicado.
+for (const [dir, files] of [["vendor/three", ["three.module.min.js", "GLTFLoader.js", "BufferGeometryUtils.js", "RoomEnvironment.js", "LICENSE"]], ["models", ["LICENSE.md"]]]) {
   await mkdir(`www/${dir}`, { recursive: true });
   for (const file of files) {
     await copyFile(`${dir}/${file}`, `www/${dir}/${file}`);
