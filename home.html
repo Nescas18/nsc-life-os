@@ -1072,7 +1072,7 @@ input[type='range']:focus-visible { box-shadow: 0 0 0 3px rgba(237, 190, 90, 0.3
 
 @media (max-width: 900px) {
   .story-grid { display: flex; flex-direction: column; position: relative; gap: 0; }
-  .story-visual { order: -1; top: 60px; height: 58vh; z-index: 1; }
+  .story-visual { order: -1; top: 54px; height: 52vh; z-index: 1; }
   .story-count { display: none; }
   .story-steps { padding-left: 0; z-index: 2; margin-top: -20vh; }
   .story-rail, .story-step::before { display: none; }
@@ -1286,9 +1286,9 @@ input[type='range']:focus-visible { box-shadow: 0 0 0 3px rgba(237, 190, 90, 0.3
   .manifesto{padding-bottom:40px}
   .story{padding-top:34px;padding-bottom:14vh}
   .story .sec-head{margin-bottom:14px}
-  .story-visual{top:60px;height:58vh;align-items:center;padding-top:0;-webkit-mask-image:linear-gradient(#000 94%,transparent);mask-image:linear-gradient(#000 94%,transparent)}
+  .story-visual{top:54px;height:52vh;align-items:center;justify-items:center;padding-top:0;-webkit-mask-image:linear-gradient(#000 90%,transparent);mask-image:linear-gradient(#000 90%,transparent)}
   .story-steps{margin-top:0}
-  .story-step{min-height:74vh;align-items:flex-end;padding-bottom:4vh}
+  .story-step{min-height:64vh;align-items:flex-end;padding-bottom:3vh}
   .step-card{background:rgba(13,12,9,.95);border:1px solid var(--line-2);border-radius:20px;padding:18px 18px 20px;box-shadow:0 18px 50px -20px rgba(0,0,0,.8)}
   .step-card h3{font-size:1.5rem;margin:12px 0 8px}
   .step-card p{font-size:14.5px}
@@ -2687,8 +2687,13 @@ input[type='range']:focus-visible { box-shadow: 0 0 0 3px rgba(237, 190, 90, 0.3
     const mobile = innerWidth <= 900;
     // mede a altura REAL do palco (sticky) em vez de supor um valor fixo, para o celular caber inteiro
     const box = storyVisual ? storyVisual.clientHeight : innerHeight;
-    const avail = mobile ? box - 36 : innerHeight - 120;
-    storyPhone.style.setProperty('--ps', clamp(avail / 640, 0.5, 1).toFixed(3));
+    const avail = mobile ? box - 52 : innerHeight - 120;
+    const ps = clamp(avail / 640, 0.5, 1);
+    storyPhone.style.setProperty('--ps', ps.toFixed(3));
+    // o transform:scale não encolhe a CAIXA de layout (640px): sem isso o grid não consegue
+    // centralizar o celular no palco mais baixo. Margem negativa faz a caixa bater com o tamanho renderizado.
+    const m = mobile ? Math.round(320 * (ps - 1)) : 0;
+    storyPhone.style.marginTop = storyPhone.style.marginBottom = m ? m + 'px' : '';
   };
   fitPhone();
 
