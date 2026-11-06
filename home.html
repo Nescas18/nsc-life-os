@@ -1072,7 +1072,7 @@ input[type='range']:focus-visible { box-shadow: 0 0 0 3px rgba(237, 190, 90, 0.3
 
 @media (max-width: 900px) {
   .story-grid { display: flex; flex-direction: column; position: relative; gap: 0; }
-  .story-visual { order: -1; top: 64px; height: 62vh; z-index: 1; }
+  .story-visual { order: -1; top: 60px; height: 58vh; z-index: 1; }
   .story-count { display: none; }
   .story-steps { padding-left: 0; z-index: 2; margin-top: -20vh; }
   .story-rail, .story-step::before { display: none; }
@@ -1286,9 +1286,9 @@ input[type='range']:focus-visible { box-shadow: 0 0 0 3px rgba(237, 190, 90, 0.3
   .manifesto{padding-bottom:40px}
   .story{padding-top:34px;padding-bottom:14vh}
   .story .sec-head{margin-bottom:14px}
-  .story-visual{top:40px;height:40vh;align-items:center;padding-top:0;-webkit-mask-image:linear-gradient(#000 82%,transparent);mask-image:linear-gradient(#000 82%,transparent)}
+  .story-visual{top:60px;height:58vh;align-items:center;padding-top:0;-webkit-mask-image:linear-gradient(#000 94%,transparent);mask-image:linear-gradient(#000 94%,transparent)}
   .story-steps{margin-top:0}
-  .story-step{min-height:92vh;align-items:flex-end;padding-bottom:4vh}
+  .story-step{min-height:74vh;align-items:flex-end;padding-bottom:4vh}
   .step-card{background:rgba(13,12,9,.95);border:1px solid var(--line-2);border-radius:20px;padding:18px 18px 20px;box-shadow:0 18px 50px -20px rgba(0,0,0,.8)}
   .step-card h3{font-size:1.5rem;margin:12px 0 8px}
   .step-card p{font-size:14.5px}
@@ -2683,9 +2683,12 @@ input[type='range']:focus-visible { box-shadow: 0 0 0 3px rgba(237, 190, 90, 0.3
   if (steps.length) setStep(0);
 
   const storyPhone = $('.story-phone');
+  const storyVisual = storyPhone && storyPhone.closest('.story-visual');
   const fitPhone = () => {
     const mobile = innerWidth <= 900;
-    const avail = mobile ? innerHeight * 0.62 - 20 : innerHeight - 120;
+    // mede a altura REAL do palco (sticky) em vez de supor um valor fixo, para o celular caber inteiro
+    const box = storyVisual ? storyVisual.clientHeight : innerHeight;
+    const avail = mobile ? box - 36 : innerHeight - 120;
     storyPhone.style.setProperty('--ps', clamp(avail / 640, 0.5, 1).toFixed(3));
   };
   fitPhone();
